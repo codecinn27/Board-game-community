@@ -13,7 +13,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 |---|---------|-------|--------|
 | 1 | Stack & architecture | Foundation | done |
 | 2 | Coding standards & tooling | Foundation | planned |
-| 3 | Data model | Foundation | planned |
+| 3 | Data model | Foundation | in-progress |
 | 4 | Design system & mobile first UI | Foundation | planned |
 | 5 | Two languages (English + Chinese) | Foundation | planned |
 | 6 | Member accounts | Slice 1 | planned |
@@ -48,10 +48,19 @@ Capture conventions, then install lint, format, and pre commit checks from the r
 **Done when:** root `AGENTS.md` reflects the real stack, and lint, format, and pre commit run clean.
 - [ ] Capture conventions + tooling choices: `/audit`
 
-### 3. Data model · needs a decision
+### 3. Data model · in-progress
 Core entities every feature builds on: members and roles, games (with where their data came from), who owns which game, rating form entries, comments, top 5 picks, wishlist entries.
 **Done when:** the model supports every later slice (ratings, comments, top 5, wishlist, admin) without a breaking migration, and one game can have many owners without being stored twice.
-- [ ] Design it (spec): `/architect data model`
+- [x] Design it (spec): `/architect data model`
+- [ ] Build it: `/develop data model`
+  - [x] Foundation thread: local Supabase, first migration, typed read, and its policy tests (AC-1, 2, 4, 5, 6, 7, 11, 12)
+  - [x] Ratings, comments, and game stats (AC-3 done; AC-14 finishes with `wishlist_count` in the next milestone)
+  - [ ] Top 5 and wishlist (AC-8, 9)
+  - [ ] Admin tools data, log, buckets, and account deletion (AC-6, 10, 12, 13)
+  - [ ] Seed data and merge readiness check (AC-13, 15)
+- [ ] Verify it: `/check verify data model`
+- [ ] Test it: `/test data model`
+Spec [0002](../specs/0002-data-model/index.md) · code in `supabase/` and `src/lib/supabase/`
 
 ### 4. Design system & mobile first UI · needs a decision
 Visual language, layout primitives, and base components (game card, rating sliders, forms), designed for a phone screen first and stretched to desktop second.
