@@ -47,11 +47,11 @@ Spec [0001](../specs/0001-stack-architecture/index.md) · code in `src/`
 Capture conventions, then install lint, format, and pre commit checks from the real scaffolded project.
 **Done when:** root `AGENTS.md` reflects the real stack, and lint, format, and pre commit run clean.
 - [x] Decide the standard (spec): `/architect coding standards & tooling`
-- [ ] Install it and fix existing code: `/develop coding standards & tooling`
-- [ ] Refresh root `AGENTS.md` with the real commands and tooling: `/audit`
+- [x] Install it and fix existing code: `/develop coding standards & tooling`
+- [x] Refresh root `AGENTS.md` with the real commands and tooling: `/audit`
 - [ ] Verify it: `/check verify coding standards & tooling`
 - [ ] Test it: `/test coding standards & tooling`
-Spec [0003](../specs/0003-coding-standards-tooling.md)
+Spec [0003](../specs/0003-coding-standards-tooling.md) · code in repo root configs, `.husky/`, `.github/`
 
 ### 3. Data model · done
 Core entities every feature builds on: members and roles, games (with where their data came from), who owns which game, rating form entries, comments, top 5 picks, wishlist entries.
