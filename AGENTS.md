@@ -48,6 +48,14 @@ Stored in `docs/specs/`. Format: `docs/specs/NNNN-title.md`. Feature scope lives
 - Tests sit next to the code (`*.test.ts`, Vitest).
 - Mobile first UI; all user facing text goes through next-intl (English and Chinese).
 
+## Git
+
+- Remote: `origin` (https://github.com/codecinn27/Board-game-community.git).
+- Branch per feature, named `feat/{number}-{feature}` in kebab case, e.g. `feat/1-data-model`. The number counts feature branches in the order they are created, starting at 1.
+- Create the branch once the feature is built, tested, and documented, then commit as each milestone lands.
+- Ask the user before every commit, and again before any push or pull request. Never push without a fresh yes.
+- End commit messages with the `Co-Authored-By` trailer from the session.
+
 ## Agent skills
 
 - [supabase](.claude/skills/supabase/): `supabase/agent-skills`, Supabase auth, clients, and RLS

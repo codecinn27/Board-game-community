@@ -1,0 +1,16 @@
+.next
+node_modules
+pnpm-lock.yaml
+.claude
+.agents
+skills-lock.json
+supabase
+public
+out
+build
+coverage
+.vercel
+next-env.d.ts
+src/lib/supabase/database.types.ts
+docs
+*.md

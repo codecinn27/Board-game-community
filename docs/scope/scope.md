@@ -12,8 +12,8 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | # | Feature | Phase | Status |
 |---|---------|-------|--------|
 | 1 | Stack & architecture | Foundation | done |
-| 2 | Coding standards & tooling | Foundation | planned |
-| 3 | Data model | Foundation | in-progress |
+| 2 | Coding standards & tooling | Foundation | in-progress |
+| 3 | Data model | Foundation | done |
 | 4 | Design system & mobile first UI | Foundation | planned |
 | 5 | Two languages (English + Chinese) | Foundation | planned |
 | 6 | Member accounts | Slice 1 | planned |
@@ -43,12 +43,17 @@ Decide the stack and scaffold a runnable project so every later slice builds on 
 - [x] Test it: `/test stack & architecture`
 Spec [0001](../specs/0001-stack-architecture/index.md) · code in `src/`
 
-### 2. Coding standards & tooling
+### 2. Coding standards & tooling · in-progress
 Capture conventions, then install lint, format, and pre commit checks from the real scaffolded project.
 **Done when:** root `AGENTS.md` reflects the real stack, and lint, format, and pre commit run clean.
-- [ ] Capture conventions + tooling choices: `/audit`
+- [x] Decide the standard (spec): `/architect coding standards & tooling`
+- [ ] Install it and fix existing code: `/develop coding standards & tooling`
+- [ ] Refresh root `AGENTS.md` with the real commands and tooling: `/audit`
+- [ ] Verify it: `/check verify coding standards & tooling`
+- [ ] Test it: `/test coding standards & tooling`
+Spec [0003](../specs/0003-coding-standards-tooling.md)
 
-### 3. Data model · in-progress
+### 3. Data model · done
 Core entities every feature builds on: members and roles, games (with where their data came from), who owns which game, rating form entries, comments, top 5 picks, wishlist entries.
 **Done when:** the model supports every later slice (ratings, comments, top 5, wishlist, admin) without a breaking migration, and one game can have many owners without being stored twice.
 - [x] Design it (spec): `/architect data model`
