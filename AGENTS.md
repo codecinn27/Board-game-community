@@ -30,7 +30,11 @@ pnpm dev
 pnpm build
 pnpm lint
 pnpm test        # vitest run
+supabase test db # pgTAP database tests (needs Docker Desktop running)
+supabase db push # apply migrations to the linked real project
 ```
+
+Docker Desktop's CLI is in `C:\Users\kobe9\AppData\Local\Programs\DockerDesktop\resources\bin`. Git Bash gets it from `~/.bash_profile`; if `docker` is not found, add that folder to `PATH` (details in [supabase/AGENTS.md](supabase/AGENTS.md)).
 
 ## Specs
 
@@ -57,5 +61,6 @@ Stored in `docs/specs/`. Format: `docs/specs/NNNN-title.md`. Feature scope lives
 ## Context files
 
 - [src/lib/supabase/AGENTS.md](src/lib/supabase/AGENTS.md) (which Supabase client to use, and the secret key rule)
+- [supabase/AGENTS.md](supabase/AGENTS.md) (migrations, pgTAP tests, seed, and running Docker for the local stack)
 
 _Drafted by /audit from the repo, worth a quick human pass. Edit freely: once a line stops matching this draft, later runs treat it as curated and will flag rather than overwrite it._

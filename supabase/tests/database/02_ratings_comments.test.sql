@@ -2,6 +2,10 @@
 -- Run with `supabase test db`.
 begin;
 
+-- Start from an empty database so the local seed data cannot collide with the fixtures below.
+delete from public.games;
+delete from auth.users;
+
 select plan(23);
 
 create schema tests;
