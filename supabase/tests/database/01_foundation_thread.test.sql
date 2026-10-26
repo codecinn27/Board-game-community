@@ -2,6 +2,10 @@
 -- Run with `supabase test db`.
 begin;
 
+-- Start from an empty database so the local seed data cannot collide with the fixtures below.
+delete from public.games;
+delete from auth.users;
+
 select plan(49);
 
 -- Local helper: act as a given user (or anon) inside this transaction. -------
@@ -195,8 +199,8 @@ select tests.act_as('00000000-0000-0000-0000-000000000011');
 select is(tests.affected($$ update public.games set description = 'nope' where name = 'Gloomhaven' $$), 0::bigint,
   'AC-6: a disabled admin has no admin powers');
 select tests.act_as('00000000-0000-0000-0000-00000000000d');
-select throws_ok($$ delete from public.games where name = 'Nobody Owns This' $$, '42501', null,
-  'AC-12: delete on games is not available yet (admin delete arrives in migration 4)');
+select lives_ok($$ delete from public.games where name = 'Nobody Owns This' $$,
+  'AC-12: an admin can delete a game (granted in migration 4)');
 select tests.reset();
 
 -- updated_at moves on edit ---------------------------------------------------------------------
