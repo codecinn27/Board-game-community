@@ -23,7 +23,27 @@ export type Database = {
           }
         },"public": {
           Tables: {
-            "comments": {
+            "admin_actions": {
+                  Row: {
+                    "action": string,"admin_id": string | null,"created_at": string,"details": Json,"id": number,"target_id": string,"target_table": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "action": string,"admin_id"?: string | null,"created_at"?: string,"details"?: Json,"id"?: never,"target_id": string,"target_table": string
+                  }
+                  Update: {
+                    "action"?: string,"admin_id"?: string | null,"created_at"?: string,"details"?: Json,"id"?: never,"target_id"?: string,"target_table"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "admin_actions_admin_id_fkey"
+      columns: ["admin_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"comments": {
                   Row: {
                     "body": string,"created_at": string,"game_id": number,"id": number,"member_id": string,"updated_at": string
                   }
@@ -153,12 +173,76 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"top_picks": {
+                  Row: {
+                    "game_id": number,"member_id": string,"position": number
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "game_id": number,"member_id"?: string,"position": number
+                  }
+                  Update: {
+                    "game_id"?: number,"member_id"?: string,"position"?: number
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "top_picks_game_id_fkey"
+      columns: ["game_id"]
+isOneToOne: false
+      referencedRelation: "game_stats"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "top_picks_game_id_fkey"
+      columns: ["game_id"]
+isOneToOne: false
+      referencedRelation: "games"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "top_picks_member_id_fkey"
+      columns: ["member_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"wishlist_entries": {
+                  Row: {
+                    "created_at": string,"game_id": number,"member_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"game_id": number,"member_id"?: string
+                  }
+                  Update: {
+                    "created_at"?: string,"game_id"?: number,"member_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "wishlist_entries_game_id_fkey"
+      columns: ["game_id"]
+isOneToOne: false
+      referencedRelation: "game_stats"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "wishlist_entries_game_id_fkey"
+      columns: ["game_id"]
+isOneToOne: false
+      referencedRelation: "games"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "wishlist_entries_member_id_fkey"
+      columns: ["member_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
                 }
           }
           Views: {
             "game_stats": {
                   Row: {
-                    "added_by": string | null,"avg_entertainment": number | null,"avg_luck": number | null,"avg_recommendation": number | null,"avg_strategy": number | null,"avg_time_to_learn": number | null,"best_players_mode": number | null,"cover_path": string | null,"created_at": string | null,"description": string | null,"id": number | null,"name": string | null,"name_normalized": string | null,"owner_count": number | null,"play_time_max": number | null,"play_time_min": number | null,"players_max": number | null,"players_min": number | null,"rating_count": number | null,"source_id": string | null,"source_kind": Database["public"]['Enums']["game_source_kind"] | null,"source_provider": string | null,"source_url": string | null,"updated_at": string | null
+                    "added_by": string | null,"avg_entertainment": number | null,"avg_luck": number | null,"avg_recommendation": number | null,"avg_strategy": number | null,"avg_time_to_learn": number | null,"best_players_mode": number | null,"cover_path": string | null,"created_at": string | null,"description": string | null,"id": number | null,"name": string | null,"name_normalized": string | null,"owner_count": number | null,"play_time_max": number | null,"play_time_min": number | null,"players_max": number | null,"players_min": number | null,"rating_count": number | null,"source_id": string | null,"source_kind": Database["public"]['Enums']["game_source_kind"] | null,"source_provider": string | null,"source_url": string | null,"updated_at": string | null,"wishlist_count": number | null
                   }
                   ComputedFields: never
                   Relationships: [
@@ -173,7 +257,12 @@ isOneToOne: false
                 }
           }
           Functions: {
-            [_ in never]: never
+            "admin_set_member_status":
+{ Args: { "new_status": Database["public"]["Enums"]["member_status"],"target": string }; Returns: undefined
+                           }
+            "save_top_picks":
+{ Args: { "game_ids": (number)[] }; Returns: undefined
+                           }
           }
           Enums: {
             "game_source_kind": "manual"|"lookup"|"link","member_role": "member"|"admin","member_status": "active"|"disabled"

@@ -52,14 +52,14 @@ Capture conventions, then install lint, format, and pre commit checks from the r
 Core entities every feature builds on: members and roles, games (with where their data came from), who owns which game, rating form entries, comments, top 5 picks, wishlist entries.
 **Done when:** the model supports every later slice (ratings, comments, top 5, wishlist, admin) without a breaking migration, and one game can have many owners without being stored twice.
 - [x] Design it (spec): `/architect data model`
-- [ ] Build it: `/develop data model`
+- [x] Build it: `/develop data model`
   - [x] Foundation thread: local Supabase, first migration, typed read, and its policy tests (AC-1, 2, 4, 5, 6, 7, 11, 12)
   - [x] Ratings, comments, and game stats (AC-3 done; AC-14 finishes with `wishlist_count` in the next milestone)
-  - [ ] Top 5 and wishlist (AC-8, 9)
-  - [ ] Admin tools data, log, buckets, and account deletion (AC-6, 10, 12, 13)
-  - [ ] Seed data and merge readiness check (AC-13, 15)
-- [ ] Verify it: `/check verify data model`
-- [ ] Test it: `/test data model`
+  - [x] Top 5 and wishlist (AC-8, 9, and AC-14 now complete with `wishlist_count`)
+  - [x] Admin tools data, log, buckets, and account deletion (AC-6, 10, 12, 13; pgTAP file 04 passes)
+  - [x] Seed data and merge readiness check (AC-13, 15; `seed.sql` loads and pgTAP file 05 passes)
+- [x] Verify it: `/check verify data model`
+- [x] Test it: `/test data model`
 Spec [0002](../specs/0002-data-model/index.md) · code in `supabase/` and `src/lib/supabase/`
 
 ### 4. Design system & mobile first UI · needs a decision
