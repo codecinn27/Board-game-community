@@ -1,7 +1,7 @@
 # 0002. Data model for the community board game shelf
 
 **Date**: 2026-10-23
-**Status**: In Progress
+**Status**: Accepted
 
 ## Summary
 

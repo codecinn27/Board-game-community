@@ -28,7 +28,10 @@ Tracer Bullet (prove one real thread through every layer first, then thicken it 
 pnpm install
 pnpm dev
 pnpm build
-pnpm lint
+pnpm lint        # eslint --max-warnings=0, any warning fails
+pnpm format      # prettier --write .
+pnpm format:check
+pnpm typecheck   # next typegen && tsc --noEmit
 pnpm test        # vitest run
 supabase test db # pgTAP database tests (needs Docker Desktop running)
 supabase db push # apply migrations to the linked real project
@@ -46,7 +49,29 @@ Stored in `docs/specs/`. Format: `docs/specs/NNNN-title.md`. Feature scope lives
 - The Supabase secret key is used only in `src/lib/supabase/admin.ts`.
 - Row level security on every table; public read, member write.
 - Tests sit next to the code (`*.test.ts`, Vitest).
+- Style is enforced by tools, not memory: Prettier (with the Tailwind class sorter), ESLint, and TypeScript `strict` plus `noUncheckedIndexedAccess`. Use explicit guards, never `!`. Type imports are inline (`import { type X }`). Unused names start with `_`.
+- The admin client (`@/lib/supabase/admin`) may be imported only from `src/lib/supabase/**`, files named `actions.ts`, `route.ts`, `src/proxy.ts`, and tests. ESLint fails anywhere else.
+- Read env vars through `requireEnv` in `src/lib/supabase/env.ts`, not `process.env.X!`.
+- Files and folders are lowercase kebab case. Import with `@/`. Group by feature: `src/lib/<feature>/`, `src/components/<feature>/`. `src/components/ui/` is shadcn generated, edit it only through the shadcn CLI.
+- New logic and every RLS policy change need a test. No coverage gate.
 - Mobile first UI; all user facing text goes through next-intl (English and Chinese).
+
+## Tooling
+
+- Config files: `.prettierrc`, `.prettierignore`, `.gitattributes` (LF endings), `eslint.config.mjs`, `tsconfig.json`, `commitlint.config.mjs`, `.lintstagedrc`, `.husky/`, `.github/workflows/ci.yml`, `.github/dependabot.yml`, `.git-blame-ignore-revs`.
+- Husky hooks: `pre-commit` runs lint-staged (ESLint fix and Prettier on staged files), `commit-msg` runs commitlint, `pre-push` runs `pnpm typecheck && pnpm test`. `--no-verify` only for an emergency, and CI still has to pass.
+- CI (`checks` job) runs format check, lint, typecheck, tests, Gitleaks, and a commitlint check of the PR title. Dependabot sends grouped weekly PRs. `next build` and pgTAP are not in CI yet.
+- Merge with squash, and write the PR title as a Conventional Commit.
+- Generated and vendored files are not formatted or linted: `database.types.ts`, `next-env.d.ts`, `.claude`, `.agents`, `supabase/`, and Markdown under `docs/`.
+
+## Git
+
+- Remote: `origin` (https://github.com/codecinn27/Board-game-community.git).
+- Branch per feature, named `feat/{number}-{feature}` in kebab case, e.g. `feat/1-data-model`. The number counts feature branches in the order they are created, starting at 1.
+- Create the branch once the feature is built, tested, and documented, then commit as each milestone lands.
+- Ask the user before every commit, and again before any push or pull request. Never push without a fresh yes.
+- Commit messages use Conventional Commits, `type(scope): subject` (types: feat, fix, docs, refactor, test, chore, ci, build, perf, style), checked by commitlint.
+- End commit messages with the `Co-Authored-By` trailer from the session.
 
 ## Agent skills
 
@@ -57,6 +82,7 @@ Stored in `docs/specs/`. Format: `docs/specs/NNNN-title.md`. Feature scope lives
 - [deploy-to-vercel](.claude/skills/deploy-to-vercel/): `vercel-labs/agent-skills`, deploying to Vercel
 - [shadcn](.claude/skills/shadcn/): `shadcn-ui/ui`, shadcn/ui components and styling
 - [playwright-cli](.claude/skills/playwright-cli/): `microsoft/playwright-cli`, browser automation and tests
+- Declined: Agent Skills for Prettier, ESLint, Husky, lint-staged, and commitlint (spec 0003 follow-up)
 
 ## Context files
 

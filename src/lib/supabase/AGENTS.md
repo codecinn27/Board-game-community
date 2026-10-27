@@ -12,6 +12,7 @@ The four ways the app talks to Supabase. Every database, auth, or storage call g
 | [browser.ts](browser.ts) | `createClient()` for client components (interactive parts only). |
 | [public.ts](public.ts) | `createPublicClient()`: no cookies, no session. Use for public read paths so pages stay cacheable. |
 | [admin.ts](admin.ts) | `createAdminClient()`: uses the secret key, bypasses row level security. Marked `server-only`. |
+| [env.ts](env.ts) | `requireEnv(value, name)`: returns the env value or throws `Missing environment variable <name>`. Pass `process.env.NAME` written out, so Next can inline `NEXT_PUBLIC_` vars. |
 | [clients.test.ts](clients.test.ts) | Vitest checks that each factory passes the right keys and options. |
 
 ## Conventions

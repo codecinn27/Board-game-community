@@ -1,10 +1,10 @@
-import { Suspense } from "react"
-import { getShelfGames } from "@/lib/games/shelf"
+import { Suspense } from "react";
+import { getShelfGames } from "@/lib/games/shelf";
 
 // Tracer bullet thread: one typed read from the database to the page.
 // Replaced by the real shelf (feature 8) and translated text (feature 5).
 async function Shelf() {
-  const games = await getShelfGames()
+  const games = await getShelfGames();
   return (
     <ul>
       {games.map((game) => (
@@ -13,7 +13,7 @@ async function Shelf() {
         </li>
       ))}
     </ul>
-  )
+  );
 }
 
 export default function Home() {
@@ -23,5 +23,5 @@ export default function Home() {
         <Shelf />
       </Suspense>
     </main>
-  )
+  );
 }
