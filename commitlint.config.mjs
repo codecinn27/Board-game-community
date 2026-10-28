@@ -17,6 +17,8 @@ const config = {
         "style",
       ],
     ],
+    // Dependabot titles always start with a capital "Bump".
+    "subject-case": [0],
   },
 };
 
