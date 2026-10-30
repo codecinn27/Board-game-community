@@ -1,0 +1,19 @@
+{
+  "shell": {
+    "brand": "桌游架",
+    "meta": {
+      "titleTemplate": "%s · 桌游架",
+      "description": "我们社区拥有的每一款桌游，以及谁拥有它。"
+    },
+    "tabs": {
+      "home": "首页",
+      "shelf": "游戏架",
+      "add": "添加",
+      "signIn": "登录",
+      "me": "我的"
+    },
+    "nav": {
+      "label": "主导航"
+    }
+  }
+}
