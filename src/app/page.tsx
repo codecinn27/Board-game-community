@@ -18,10 +18,10 @@ async function Shelf() {
 
 export default function Home() {
   return (
-    <main className="p-4">
+    <div>
       <Suspense fallback={null}>
         <Shelf />
       </Suspense>
-    </main>
+    </div>
   );
 }

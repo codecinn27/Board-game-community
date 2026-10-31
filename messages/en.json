@@ -1,0 +1,19 @@
+{
+  "shell": {
+    "brand": "Game Shelf",
+    "meta": {
+      "titleTemplate": "%s · Game Shelf",
+      "description": "Every board game our community owns, and who owns it."
+    },
+    "tabs": {
+      "home": "Home",
+      "shelf": "Shelf",
+      "add": "Add",
+      "signIn": "Sign in",
+      "me": "Me"
+    },
+    "nav": {
+      "label": "Main navigation"
+    }
+  }
+}
