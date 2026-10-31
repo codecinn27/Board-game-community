@@ -33,6 +33,7 @@ pnpm format      # prettier --write .
 pnpm format:check
 pnpm typecheck   # next typegen && tsc --noEmit
 pnpm test        # vitest run
+pnpm test:e2e    # Playwright at 360px and 1280px, light and dark (starts pnpm dev, needs .env.local)
 supabase test db # pgTAP database tests (needs Docker Desktop running)
 supabase db push # apply migrations to the linked real project
 ```
@@ -49,18 +50,21 @@ Stored in `docs/specs/`. Format: `docs/specs/NNNN-title.md`. Feature scope lives
 - The Supabase secret key is used only in `src/lib/supabase/admin.ts`.
 - Row level security on every table; public read, member write.
 - Tests sit next to the code (`*.test.ts`, Vitest).
+- Browser checks live in `e2e/` (Playwright, `playwright.config.ts`); results go to the git ignored `test-results/`.
 - Style is enforced by tools, not memory: Prettier (with the Tailwind class sorter), ESLint, and TypeScript `strict` plus `noUncheckedIndexedAccess`. Use explicit guards, never `!`. Type imports are inline (`import { type X }`). Unused names start with `_`.
 - The admin client (`@/lib/supabase/admin`) may be imported only from `src/lib/supabase/**`, files named `actions.ts`, `route.ts`, `src/proxy.ts`, and tests. ESLint fails anywhere else.
 - Read env vars through `requireEnv` in `src/lib/supabase/env.ts`, not `process.env.X!`.
 - Files and folders are lowercase kebab case. Import with `@/`. Group by feature: `src/lib/<feature>/`, `src/components/<feature>/`. `src/components/ui/` is shadcn generated, edit it only through the shadcn CLI.
 - New logic and every RLS policy change need a test. No coverage gate.
 - Mobile first UI; all user facing text goes through next-intl (English and Chinese).
+- Messages live in `messages/en.json` and `messages/zh.json` with the same keys (checked by `src/i18n/messages.test.ts`); the locale is set in `src/i18n/request.ts`.
+- Shell tabs come only from `src/lib/app-shell/nav.ts` (`enabled` plus `audience`); the bottom tab bar shows only at 2 or more visible tabs.
 
 ## Tooling
 
 - Config files: `.prettierrc`, `.prettierignore`, `.gitattributes` (LF endings), `eslint.config.mjs`, `tsconfig.json`, `commitlint.config.mjs`, `.lintstagedrc`, `.husky/`, `.github/workflows/ci.yml`, `.github/dependabot.yml`, `.git-blame-ignore-revs`.
 - Husky hooks: `pre-commit` runs lint-staged (ESLint fix and Prettier on staged files), `commit-msg` runs commitlint, `pre-push` runs `pnpm typecheck && pnpm test`. `--no-verify` only for an emergency, and CI still has to pass.
-- CI (`checks` job) runs format check, lint, typecheck, tests, Gitleaks, and a commitlint check of the PR title. Dependabot sends grouped weekly PRs. `next build` and pgTAP are not in CI yet.
+- CI (`checks` job) runs format check, lint, typecheck, tests, Gitleaks, and a commitlint check of the PR title. Dependabot sends grouped weekly PRs. `next build`, pgTAP, and Playwright are not in CI yet.
 - Merge with squash, and write the PR title as a Conventional Commit.
 - Generated and vendored files are not formatted or linted: `database.types.ts`, `next-env.d.ts`, `.claude`, `.agents`, `supabase/`, and Markdown under `docs/`.
 
@@ -86,6 +90,7 @@ Stored in `docs/specs/`. Format: `docs/specs/NNNN-title.md`. Feature scope lives
 
 ## Context files
 
+- Design system: build all UI to [docs/design.md](docs/design.md) (art direction and the build mandate); token values live in `src/app/globals.css`, and `/design` previews them.
 - [src/lib/supabase/AGENTS.md](src/lib/supabase/AGENTS.md) (which Supabase client to use, and the secret key rule)
 - [supabase/AGENTS.md](supabase/AGENTS.md) (migrations, pgTAP tests, seed, and running Docker for the local stack)
 
