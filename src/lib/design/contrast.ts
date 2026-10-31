@@ -46,6 +46,35 @@ export function oklchToSrgb(
   return { r: encode(clamp(r)), g: encode(clamp(g)), b: encode(clamp(bl)) };
 }
 
+/** Gamma encoded sRGB to OKLCH (lightness 0..1, chroma, hue in degrees). */
+export function srgbToOklch({ r, g, b }: Omit<Rgba, "a">): {
+  l: number;
+  c: number;
+  h: number;
+} {
+  const lr = decode(r);
+  const lg = decode(g);
+  const lb = decode(b);
+
+  const l_ = Math.cbrt(
+    0.4122214708 * lr + 0.5363325363 * lg + 0.0514459929 * lb,
+  );
+  const m_ = Math.cbrt(
+    0.2119034982 * lr + 0.6806995451 * lg + 0.1073969566 * lb,
+  );
+  const s_ = Math.cbrt(
+    0.0883024619 * lr + 0.2817188376 * lg + 0.6299787005 * lb,
+  );
+
+  const l = 0.2104542553 * l_ + 0.793617785 * m_ - 0.0040720468 * s_;
+  const a = 1.9779984951 * l_ - 2.428592205 * m_ + 0.4505937099 * s_;
+  const bb = 0.0259040371 * l_ + 0.7827717662 * m_ - 0.808675766 * s_;
+
+  const c = Math.hypot(a, bb);
+  const h = ((Math.atan2(bb, a) * 180) / Math.PI + 360) % 360;
+  return { l, c, h };
+}
+
 /** Paints a translucent color over an opaque background, in sRGB space. */
 export function composite(top: Rgba, bottom: Rgba): Rgba {
   const mix = (t: number, u: number) => t * top.a + u * (1 - top.a);

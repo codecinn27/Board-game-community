@@ -12,9 +12,9 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | # | Feature | Phase | Status |
 |---|---------|-------|--------|
 | 1 | Stack & architecture | Foundation | done |
-| 2 | Coding standards & tooling | Foundation | in-progress |
+| 2 | Coding standards & tooling | Foundation | done |
 | 3 | Data model | Foundation | done |
-| 4 | Design system & mobile first UI | Foundation | planned |
+| 4 | Design system & mobile first UI | Foundation | done |
 | 5 | Two languages (English + Chinese) | Foundation | planned |
 | 6 | Member accounts | Slice 1 | planned |
 | 7 | Add a game I own | Slice 1 | planned |
@@ -43,14 +43,14 @@ Decide the stack and scaffold a runnable project so every later slice builds on 
 - [x] Test it: `/test stack & architecture`
 Spec [0001](../specs/0001-stack-architecture/index.md) · code in `src/`
 
-### 2. Coding standards & tooling · in-progress
+### 2. Coding standards & tooling · done
 Capture conventions, then install lint, format, and pre commit checks from the real scaffolded project.
 **Done when:** root `AGENTS.md` reflects the real stack, and lint, format, and pre commit run clean.
 - [x] Decide the standard (spec): `/architect coding standards & tooling`
 - [x] Install it and fix existing code: `/develop coding standards & tooling`
 - [x] Refresh root `AGENTS.md` with the real commands and tooling: `/audit`
-- [ ] Verify it: `/check verify coding standards & tooling`
-- [ ] Test it: `/test coding standards & tooling`
+- [x] Verify it: `/check verify coding standards & tooling`
+- [x] Test it: `/test coding standards & tooling`
 Spec [0003](../specs/0003-coding-standards-tooling.md) · code in repo root configs, `.husky/`, `.github/`
 
 ### 3. Data model · done
@@ -67,10 +67,19 @@ Core entities every feature builds on: members and roles, games (with where thei
 - [x] Test it: `/test data model`
 Spec [0002](../specs/0002-data-model/index.md) · code in `supabase/` and `src/lib/supabase/`
 
-### 4. Design system & mobile first UI · needs a decision
-Visual language, layout primitives, and base components (game card, rating sliders, forms), designed for a phone screen first and stretched to desktop second.
-**Done when:** `design.md` covers type, color, spacing, and components; base components work one handed on a phone and scale up cleanly on desktop.
-- [ ] Design it (spec): `/architect design system & mobile first UI`
+### 4. Design system & mobile first UI · done
+Visual language, layout primitives, and the app shell, designed for a phone screen first and stretched to desktop second. The game card, score input, form fields, and state blocks are specified here and built by the features that first use them (8, 12, 6 or 7).
+**Done when:** `docs/design.md` covers type, color, spacing, and the rules for every base component; the app shell works one handed on a phone and scales up cleanly on desktop.
+- [x] Design it (spec): `/architect design system & mobile first UI`
+- [x] Build it: `/develop design system & mobile first UI`
+  - [x] Thin thread: next-intl without routing, translated header shell on `/`, metadata (AC-8, part of AC-5, 6)
+  - [x] Tokens, pure CSS dark mode, font stack, and the contrast test (AC-2, 3, 4)
+  - [x] Navigation: nav config, bottom tab bar, desktop links, tap targets and focus (AC-5, 6, 7, 9)
+  - [x] `/design` preview, `docs/design.md`, and the Playwright check (AC-1, 10, 11)
+  - [x] Cover Tint: `cover-tint.ts` color rules and test, `/design` preview, and the game detail sheet rules in `docs/design.md` (AC-1, AC-12, amended 2026-11-01)
+- [x] Verify it: `/check verify design system & mobile first UI`
+- [x] Test it: `/test design system & mobile first UI`
+Spec [0004](../specs/0004-design-system-mobile-ui/index.md) · code in `src/components/app-shell/`, `src/components/design/`, `src/lib/app-shell/`, `src/lib/design/`, `src/app/globals.css`, `messages/`
 
 ### 5. Two languages (English + Chinese) · needs a decision
 A language switch and a pattern for translated text, set before pages exist so every page is built bilingual from the start.

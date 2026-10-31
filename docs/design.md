@@ -20,6 +20,17 @@ The token **values** live in [`src/app/globals.css`](../src/app/globals.css) and
 - All user facing text goes through next-intl (`messages/en.json`, `messages/zh.json`, same keys in both).
 - Every screen ships its empty, loading, and error states (see *State blocks*).
 
+## Visual reference
+
+Mobile reference: **Overboard, Board game manager** ([App Store](https://apps.apple.com/us/app/overboard-board-game-manager/id1662351733)). We borrow patterns, never assets:
+
+- **Cover art leads.** A game's detail view opens with its cover at the top; the interface stays quiet around it.
+- **One glance stats.** Three equal columns: a small uppercase label over a big number.
+- **Floating dock.** The detail view's actions float in a blurred pill near the bottom, in thumb reach.
+- **The cover sets the color.** The game detail sheet takes its whole theme from its cover (see *Game detail sheet*).
+
+Not borrowed: the Overboard name, logo, icons, screenshots, or BGG data fields (year, rank, weight). Our brand (`Dices` mark, terracotta, Game Shelf) stays. The five explored sheet designs live on the [Game Detail Sheet canvas](https://claude.ai/artifact/PBVkW9skcPLVmEjDbS8Bog); Design 5, Cover Tint, is the one we build.
+
 ## Color tokens
 
 Light sits in `:root`, dark in `@media (prefers-color-scheme: dark) { :root { } }`. The site follows the device setting with pure CSS: no theme library, no `.dark` class, no toggle. The `dark:` Tailwind variant is redefined to the same media query, so `dark:` classes still work. If the shadcn CLI ever appends a `.dark { }` block, move its values into the media query.
@@ -106,11 +117,45 @@ Server Action plus `useActionState`, one Zod schema shared by server and client,
 - **Error**: the Empty layout with a `destructive` icon and a Retry action.
 - All of their text goes through next-intl.
 
+### Game detail sheet (feature 9, Cover Tint)
+
+Tapping a game on the shelf opens this sheet over the shelf. Its colors come from the game's own cover, so every game gets its own theme. The color math is built and tested ([`src/lib/design/cover-tint.ts`](../src/lib/design/cover-tint.ts)); `/design` shows four sample sheets ([`src/components/design/cover-tint-preview.tsx`](../src/components/design/cover-tint-preview.tsx)). Feature 9 builds the real sheet.
+
+**Anatomy, top to bottom**:
+1. **Cover**: full bleed, `object-cover`, about half the sheet (`h-[52dvh] max-h-[30rem]`). No cover: the cover placeholder tile, stretched.
+2. **Fade**: the lower part of the cover melts into the theme tint, reaching solid tint before any text starts. Text never sits on raw art.
+3. **Body**: a gradient from tint (held to 55%) down to deep.
+4. **Glass buttons**: Close top left, Share top right, 44px, round, glass fill, line border.
+5. **Title**, centered, `text-3xl font-bold tracking-tight`, clamp 2 lines; then two chips: rating (`Star`, hidden with no ratings) and owners (`Users`).
+6. **Stats card**: Players, Minutes, Owners. `rounded-[22px]`, card fill, line border and dividers; label `text-xs uppercase` in muted ink over a `text-2xl font-bold tabular-nums whitespace-nowrap` value. Missing value: "?".
+7. **Description**: clamp 4 lines, then an underlined "More".
+8. **Owners list** (feature 9).
+9. **Dock**: floating pill, dock fill with blur. "I own this" is filled with ink, its text in inverse ink. Beside it: Add to a list, or Share. Guest: Sign in to add.
+
+**Cover Tint colors**: the server samples the average color of the bottom 20% of the cover once, when the cover is saved, and stores it as `games.cover_tint` (`#rrggbb`). On render, `coverTheme(cover_tint)` returns every color the sheet needs:
+
+| Variable | What it is |
+|---|---|
+| `--sheet-tint` / `--sheet-deep` | the calmed cover color (chroma at most 0.14, a bit darker), and a darker shade for the bottom |
+| `--sheet-ink` | text and icons: white, or `#1b1410` on pale tints, always 4.5:1 or better |
+| `--sheet-ink-muted` | secondary text (ink at 82% or more, still 4.5:1) |
+| `--sheet-ink-inverse` | text on an ink filled button |
+| `--sheet-line`, `--sheet-chip`, `--sheet-card`, `--sheet-glass`, `--sheet-dock` | borders, chips, stats card, glass buttons, dock |
+
+- Set the variables inline on the sheet's root (`style={{ "--sheet-tint": theme.tint, ... }}`) and style with `bg-(--sheet-tint)`, `text-(--sheet-ink)` and so on. This is the **one** place colors come from data; everywhere else stays on tokens.
+- Focus rings on the themed controls use ink: `focus-visible:ring-(--sheet-ink) focus-visible:ring-offset-(--sheet-tint)`.
+- No cover: call `coverTheme` with the placeholder tile's `--cover-N` color.
+- The sheet ignores the device's light or dark setting: the cover decides. The page behind still follows the device.
+
+**Frame and motion**: phones get a bottom sheet (`h-[96dvh]`, `rounded-t-[32px]`, dimmed page behind); from `md` a centered dialog (`max-w-lg`, `rounded-[28px]`) with a soft blurred glow in the tint behind it. Open: slide up 280ms ease out, the cover settles from `scale-105`; close 200ms. All behind `motion-safe:`.
+
+**Route and accessibility**: the sheet is `/games/[id]`, opened over the shelf by an intercepting route, so Back closes it and the link can be shared; a direct visit renders the same layout as a page. `role="dialog"`, labelled by the game name, focus trapped, `Esc` closes, focus returns to the card.
+
 When a feature builds one of these, it adds a block for it to `/design` and updates its rules here if the build changed them.
 
 ## Do and don't
 
-- Do take every color from a token. Don't write `#hex`, `oklch()`, or `bg-[...]` colors in components.
+- Do take every color from a token. Don't write `#hex`, `oklch()`, or `bg-[...]` colors in components. The one exception is the game detail sheet, whose colors come from `coverTheme()` through the `--sheet-*` variables.
 - Do use `text-muted-foreground` for secondary text. Don't fade text with opacity, which breaks the contrast test's guarantee.
 - Do keep the shell a Server Component. Only `NavLink` is client code; pass it translated labels as props.
 - Don't add a `.dark` class strategy or a theme toggle without a new spec.

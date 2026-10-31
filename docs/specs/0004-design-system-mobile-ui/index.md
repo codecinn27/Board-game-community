@@ -1,11 +1,14 @@
 # 0004. Design system and mobile first app shell
 
 **Date**: 2026-10-30
-**Status**: In Progress
+**Status**: Accepted
+**Amended**: 2026-10-31 (visual reference and the game detail sheet); 2026-11-01 (sheet redesigned as Cover Tint, design 5 of 5)
 
 ## Summary
 
 This spec sets the look of the whole site: a warm "tabletop" style (cream and wood tones with a terracotta accent), light and dark modes that follow the phone's setting, the Geist font for English and the phone's own Chinese font for Chinese, and rounded, thumb friendly controls. It builds the app shell now (a slim top header plus a bottom tab bar on phones, an inline nav on desktop), and it writes the rules for the game card, score picker, form fields, and empty or loading states into `docs/design.md`, so the features that need them later build them the same way. A hidden `/design` page shows everything in one place for checking.
+
+The mobile visual reference is the iOS app Overboard (see *Visual reference*). Its strongest pattern is adopted as a specified component: tapping a game opens a **game detail sheet** that slides up over the shelf. The sheet uses **Cover Tint**: the cover fades into a color picked from the bottom of the cover itself, and the whole sheet takes on that color, with white or black text, whichever reads better. So every game gets its own theme. This feature builds the color math and a preview; feature 9 builds the real sheet. The design canvas with all five explored options is the visual record ([Game Detail Sheet](https://claude.ai/artifact/PBVkW9skcPLVmEjDbS8Bog), Design 5).
 
 ## Requirements
 
@@ -16,7 +19,7 @@ This spec sets the look of the whole site: a warm "tabletop" style (cream and wo
 - As the maintainer, I want one written design reference and one preview page so that every later feature looks consistent without me redeciding colors, spacing, or component behavior.
 
 **Acceptance criteria**:
-- **AC-1**: `docs/design.md` exists and covers color tokens (light and dark), typography (Latin and Chinese font stacks, type scale), spacing and layout (page gutter, max widths, breakpoints, shelf grid columns), radius, elevation, motion, icons, and a component section that specifies the app shell, game card, cover placeholder tile, score input, form fields, and state blocks (empty, loading, error).
+- **AC-1**: `docs/design.md` exists and covers color tokens (light and dark), typography (Latin and Chinese font stacks, type scale), spacing and layout (page gutter, max widths, breakpoints, shelf grid columns), radius, elevation, motion, icons, and a component section that specifies the app shell, game card, cover placeholder tile, score input, form fields, state blocks (empty, loading, error), and the game detail sheet (anatomy, the Cover Tint color rules, motion, desktop behavior, accessibility, and which data fills each slot). It also records the visual reference and what the site borrows from it.
 - **AC-2**: `src/app/globals.css` defines every color token in OKLCH for light and dark, mapped to the shadcn slots. The site follows the device's color scheme on first paint with no flash of the wrong theme and no manual toggle.
 - **AC-3**: Latin text renders in Geist. Chinese text falls back to the device's system Chinese font (PingFang SC, Hiragino Sans GB, Microsoft YaHei, Noto Sans CJK SC). No Chinese web font is downloaded.
 - **AC-4**: Every text on background token pair meets WCAG 2.2 AA contrast (4.5:1 for body text; 3:1 for large text, borders of inputs, and the focus ring) in both modes, checked by an automated test.
@@ -27,6 +30,7 @@ This spec sets the look of the whole site: a warm "tabletop" style (cream and wo
 - **AC-9**: Every interactive control in the shell is at least 44 by 44px, shows a visible focus ring on keyboard focus, is reachable by keyboard in a sensible order, and animations stop when the device asks for reduced motion.
 - **AC-10**: `/design` renders the foundations (color swatches in the device's current scheme, type scale, spacing, radius) and an inline shell preview showing both the guest and member sets with every tab on. It works in local dev and Vercel preview deploys, returns 404 on the production deploy, and is marked `noindex`.
 - **AC-11**: A Playwright check visits `/` and `/design` at 360px and 1280px wide, in light and dark, and confirms no horizontal scroll and every shell control at least 44px tall and wide, saving screenshots for a human look.
+- **AC-12**: `src/lib/design/cover-tint.ts` turns one sampled cover color into a sheet theme (tint, deep, ink, muted ink, line, chip, card, dock). The ink is white or near black, and every text pair in the theme reaches 4.5:1 on both tint and deep for any input color, checked by an automated test across a sweep of colors (including pure white, pure black, saturated reds, and middle greys). `/design` shows a static Cover Tint preview for at least four sample colors, one of them pale enough that the ink turns black.
 
 ## Decision
 
@@ -41,6 +45,18 @@ Restyle the existing shadcn base-nova setup with a warm tabletop token set (OKLC
 Reasoning and options: see [rationale.md](rationale.md).
 
 ## Feature design
+
+### Visual reference
+
+Mobile reference: **Overboard, Board game manager** (iOS, [App Store](https://apps.apple.com/us/app/overboard-board-game-manager/id1662351733)). Its palette (cream, warm brown text, orange accent) already sits close to the tokens below, so no token changes. The site borrows these patterns, not assets:
+
+- **Cover art leads.** A game's detail view opens with its cover full bleed at the top; the interface stays quiet around it.
+- **One glance stats strip.** Three equal columns, each a small uppercase label, a big `tabular-nums` value, and a muted sub line.
+- **Floating action pill.** The detail view's actions sit in a rounded, blurred pill above the bottom edge, inside the thumb zone.
+- **Glass over art.** The close button and the dock use a translucent surface with backdrop blur, the "futuristic" layer.
+- **The cover sets the color.** The sheet below the cover takes its color from the cover, so a red box gives a red sheet (the engineer's direction, from Overboard screenshots of Rebirth, Magical Athlete, Ark Nova, and SETI).
+
+Not borrowed: the Overboard name, logo, icons, screenshots, or its BGG data fields (year, rank, weight). Screenshots stay out of the repo; the link above is the record. Our own brand (`Dices` mark, terracotta, Game Shelf) stays.
 
 ### Visual foundations (the values `docs/design.md` records and `globals.css` implements)
 
@@ -141,6 +157,50 @@ Order: guest is home, shelf, signIn. Member is home, shelf, add, me. The feature
 | Score input | feature 12 (Rating form) | shadcn `ToggleGroup`, single choice, inside a `Field` with `FieldLabel` and the chosen value shown large beside the label. 1 to 10 scales: `grid-cols-5` (two rows of 5, about 60 by 44px each on a 360px phone) and `sm:grid-cols-10`. 1 to 5 scale: always one row of 5. Each item 44px tall minimum, `tabular-nums`, `aria-label` like "Luck 7 of 10". Arrow keys move between values. |
 | Form fields | feature 6 or 7 (whichever builds the first form) | Server Action plus `useActionState`, Zod schema shared by server and client, shadcn `FieldGroup`/`Field`/`FieldLabel`/`FieldDescription`/`FieldError` layout. Error text under the field, `aria-invalid` on the control. Inputs `text-base` (16px). Submit is full width on phones, shows a spinner and is disabled while pending. |
 | State blocks | feature 8 | Empty: shadcn `Empty` (icon, title, one line, optional action). Loading: `Skeleton` shaped like the real content. Error: same layout as Empty with a `destructive` icon and a Retry action. All text through next-intl. |
+| Game detail sheet | feature 9 (Game page with owners) | See *Game detail sheet* below. |
+
+### Game detail sheet (specified now, built by feature 9)
+
+Tapping a game card on the shelf opens this sheet over the shelf instead of leaving the page.
+
+**Anatomy, top to bottom** (Design 5, Cover Tint; no arch):
+
+1. **Cover hero**: the cover, full bleed, `object-cover`, about half the sheet (`h-[52dvh] max-h-[30rem]`). No cover: the cover placeholder tile, stretched to the same box.
+2. **The fade**: the lower 160px of the hero is covered by a gradient from transparent to the theme **tint**, so the cover melts into its own color with no hard edge.
+3. **Theme background**: the sheet body is a vertical gradient from **tint** (top, held to 55%) to **deep** (bottom).
+4. **Glass buttons**: Close top left and Share top right, 44 by 44px, round, `backdrop-blur-md`, filled with the theme **glass** color, 1px **line** border, icons in **ink**.
+5. **Title block**, centered, overlapping the bottom of the fade: game name (`text-3xl font-bold tracking-tight`, clamp 2 lines) in **ink**, then two chips (`h-[30px] rounded-full`, **chip** fill): rating (`Star`, one decimal, hidden while there are no ratings) and owner count (`Users`).
+6. **Stats card**: three equal columns, `rounded-[22px]`, **card** fill, **line** border and dividers: **Players** (`players_min` to `players_max`), **Minutes** (`play_time_min` to `play_time_max`), **Owners** (count). Label `text-xs uppercase tracking-wide` in **muted ink**, value `text-2xl font-bold tabular-nums` in **ink**. A missing value shows "?" in muted ink, never a blank column.
+7. **Description**: `text-base` in **ink**, clamped to 4 lines, then an underlined "More" button in **ink** that expands in place.
+8. **Owners list**: the members who own it (feature 9's own content), in **ink**.
+9. **Dock**: floating, centered, `rounded-full`, **dock** fill with `backdrop-blur-lg`, **line** border, soft shadow, sitting `bottom-[calc(1.5rem+env(safe-area-inset-bottom))]`. "I own this" is filled with **ink** and its text is the opposite (so on a dark theme a white button with dark text, on a pale theme a dark button with white text). Beside it, Add to a list (feature 18) or Share. Guest: Sign in to add. Every control 44px.
+
+**The Cover Tint rules** (pure functions in `src/lib/design/cover-tint.ts`, built in this feature):
+- **Input**: one sRGB hex, the average color of the bottom 20% of the cover (sampled by the server on upload, see *Data*).
+- **Calm it**: convert to OKLCH, cap chroma at `min(C × 0.85, 0.14)`, and lower lightness by 0.06. The result is **tint**: same family as the cover, never the exact color.
+- **Deep**: tint with lightness lowered by a further 0.1 for dark tints, or 0.06 for pale ones, same hue.
+- **Ink**: white if white reaches 4.5:1 on both tint and deep; else near black `#1b1410` if it does; else darken tint and deep in 0.02 lightness steps until white passes. A middle grey therefore always ends as a darker theme with white text.
+- **Derived surfaces**: muted ink is ink at 82% (its composite must still reach 4.5:1 on deep, or rise to 90%); line is ink at 22%; chip is ink at 16% (white ink) or 8% (black ink); card is black at 20% (white ink) or white at 45% (black ink); glass is black at 28% or white at 50%; dock is deep at 82%.
+- **Output**: a plain object of CSS color strings. The sheet sets them as CSS variables inline (`--sheet-tint`, `--sheet-deep`, `--sheet-ink`, `--sheet-ink-muted`, `--sheet-line`, `--sheet-chip`, `--sheet-card`, `--sheet-glass`, `--sheet-dock`, `--sheet-ink-inverse`), and its classes read only those variables. This is the one sanctioned place where colors come from data instead of tokens.
+- **No cover**: the sample is the placeholder tile's own `--cover-N` color, so a coverless game still gets a matching theme.
+
+**Sheet frame**:
+- Phones (below `md`): a bottom sheet, `h-[96dvh]`, `rounded-t-[32px]`, dimmed page behind (`bg-black/60`). Drag down or tap the backdrop to close.
+- `md` and up: a centered dialog, `max-w-lg`, `max-h-[88dvh]`, `rounded-[28px]`, same inside layout, over a dimmed page with a soft blurred glow in the theme tint behind the dialog (`blur-[90px]`, 45% opacity).
+- Built on shadcn `Drawer` for phones and `Dialog` for desktop (add through the CLI when feature 9 builds it), or one responsive `Sheet` if the CLI version offers it.
+- The theme ignores the device light or dark setting: the cover decides. The page behind still follows the device.
+
+**Motion** (all behind `motion-safe:`; reduced motion shows and hides it instantly):
+- Open: the sheet slides up 280ms with an ease out curve; the cover settles from `scale-105` to `scale-100`; the content fades up 8px, 60ms behind it.
+- Close: reverse, 200ms.
+
+**Route and URL** (feature 9's spec confirms): the sheet is the game page `/games/[id]`. On the shelf it opens through an intercepting route (`@modal/(.)games/[id]`), so the URL changes, Back closes it, and the link can be shared. Loading `/games/[id]` directly renders the same layout as a full page (cover hero, fade, themed body, no sheet frame).
+
+**Accessibility**: `role="dialog"`, `aria-modal`, labelled by the game name. Focus moves to the close button on open, stays trapped inside, and returns to the card that opened it. `Esc` closes it. Text never sits on raw cover art, only on the solid tint below the fade, so the AC-12 test covers every text pair. Focus rings on the themed controls use **ink**, not `--ring`, so they show on any tint.
+
+**Data** (owned by later features, recorded here): a new nullable column `games.cover_tint text` (check `^#[0-9a-f]{6}$`), written by the server whenever a cover is saved (features 7 and 10; covers are already written only by the server). The sample uses `sharp`: crop the bottom 20% of the image, resize to 1 by 1, read the pixel. The page reads `cover_tint` and calls `coverTheme()` on the server, so there is no color flash and no work in the browser.
+
+**Messages** (added by feature 9 under `game.sheet.*`): close, share, players, minutes, owners, more, less, iOwnThis, addToList, signInToAdd, rating, ownersCount, noRatings.
 
 ### Preview page
 
@@ -203,6 +263,11 @@ Order: guest is home, shelf, signIn. Member is home, shelf, add, me. The feature
 | Game card (feature 8) | owner count, average recommendation | shelf read and game stats from spec 0002 |
 | Cover tile (feature 8) | tint | hash of game id mod 6 to `--cover-N` |
 | Cover tile (feature 8) | initial | first character of the game name |
+| Game detail sheet (feature 9) | cover, name, players, play time, description | `games` row from spec 0002 (`cover_path`, `name`, `players_min/max`, `play_time_min/max`, `description`) |
+| Game detail sheet (feature 9) | rating badge, owner count, owners | game stats and ownership reads from spec 0002 |
+| Game detail sheet (feature 9) | theme colors | `coverTheme(games.cover_tint)`; no cover: `coverTheme` of the placeholder's `--cover-N` |
+| Upload a cover (features 7, 10) | `games.cover_tint` | server side `sharp` sample of the cover's bottom 20% |
+| `/design` Cover Tint preview | theme colors | `coverTheme()` on four fixed sample hexes |
 
 **Key invariants**:
 - No color, radius, or font value appears as a literal in components; everything goes through tokens or Tailwind classes mapped to them.
@@ -211,6 +276,7 @@ Order: guest is home, shelf, signIn. Member is home, shelf, add, me. The feature
 - One nav config is the only source of tabs for both the bottom bar and the desktop header.
 - The shell stays a Server Component; only `NavLink` is client code.
 - The two message files always have the same keys.
+- Every theme `coverTheme()` returns has all text pairs at 4.5:1 or better; colors from data reach components only through the `--sheet-*` variables.
 
 **Security model**: public, read only UI. No user data shown in the shell yet. `/design` contains no data, is unreachable in production, and is `noindex` elsewhere. When feature 6 passes a real viewer, the member set only hides or shows links; access to member pages is still enforced by their own pages and RLS (spec 0001).
 
@@ -225,6 +291,7 @@ Order: guest is home, shelf, signIn. Member is home, shelf, add, me. The feature
 - Production gate: run once by hand, `VERCEL_ENV=production pnpm build && pnpm start`, then `/design` returns 404 (a unit test can't meaningfully call the page), verifies **AC-10**
 - Accessibility: at 1280, Tab reaches the wordmark then each header link in order with a visible ring; every shell control at least 44px at both widths, verifies **AC-9**, **AC-11**
 - Translation: switching the fixed locale in `request.ts` to `zh` shows Chinese labels and title with no missing keys (both message files have the same keys), verifies **AC-8**
+- Cover Tint: a sweep of inputs (black, white, `#e0452e` red, `#4b6b4f` green, `#3fa6c2` teal, `#f3ead2` cream, `#808080` grey, and a grid across hue and lightness) always yields ink with 4.5:1 or better on tint and deep, muted ink 4.5:1 or better on deep; pale inputs give black ink, dark and saturated inputs give white; tint chroma never exceeds 0.14, verifies **AC-12**
 
 ## Build plan
 
@@ -237,7 +304,9 @@ Tracer Bullet: first prove one thin thread (tokens, next-intl text, shell header
 5. **Preview page**: add `/design` with foundations and the static shell preview for both viewer sets with all tabs forced on and Shelf active; `notFound()` in production and `noindex`. Satisfies **AC-10**
 6. **design.md and the Playwright check**: write `docs/design.md` (foundations plus the component rules table above, written for builders), then set up Playwright per *End to end check* and run it. Satisfies **AC-1**, **AC-11**
 
-**Files touched**: `next.config.ts`, `package.json` (`@playwright/test`, `test:e2e`), `.gitignore`, `vitest.config.ts` (new or edited, for the `e2e/` exclude), `playwright.config.ts`, `src/app/globals.css`, `src/app/layout.tsx`, `src/app/page.tsx`, `src/app/design/page.tsx`, `src/i18n/request.ts`, `messages/en.json`, `messages/zh.json`, `src/lib/app-shell/nav.ts` and `nav.test.ts`, `src/lib/design/contrast.ts` and `contrast.test.ts`, `src/components/app-shell/` (`app-shell.tsx`, `site-header.tsx`, `bottom-tab-bar.tsx`, `nav-link.tsx`), `src/components/ui/button.tsx` (CLI generated), `e2e/design-system.spec.ts`, `docs/design.md`.
+7. **Cover Tint and the game detail sheet** (amended 2026-11-01): add `src/lib/design/cover-tint.ts` (`coverTheme(hex)`, reusing the OKLCH and contrast helpers in `contrast.ts`) with `cover-tint.test.ts`; add a static Cover Tint preview block to `/design` (four sample themes, each a small sheet mock with a cover placeholder, fade, title, chips, stats card, and dock); add the *Visual reference* and a *Game detail sheet* section to `docs/design.md` with the rules above, written for builders. Satisfies **AC-1**, **AC-12**
+
+**Files touched**: `next.config.ts`, `package.json` (`@playwright/test`, `test:e2e`), `.gitignore`, `vitest.config.ts` (new or edited, for the `e2e/` exclude), `playwright.config.ts`, `src/app/globals.css`, `src/app/layout.tsx`, `src/app/page.tsx`, `src/app/design/page.tsx`, `src/i18n/request.ts`, `messages/en.json`, `messages/zh.json`, `src/lib/app-shell/nav.ts` and `nav.test.ts`, `src/lib/design/contrast.ts` and `contrast.test.ts`, `src/lib/design/cover-tint.ts` and `cover-tint.test.ts`, `src/components/app-shell/` (`app-shell.tsx`, `site-header.tsx`, `bottom-tab-bar.tsx`, `nav-link.tsx`), `src/components/ui/button.tsx` (CLI generated), `e2e/design-system.spec.ts`, `docs/design.md`.
 
 ## Consequences
 
@@ -266,5 +335,7 @@ Tracer Bullet: first prove one thin thread (tokens, next-intl text, shell header
 - [ ] Root `AGENTS.md` should link `docs/design.md` under `## Context files` and add a rule that UI uses design tokens only (no literal colors) (owned by `/sync`).
 - [ ] Feature 5 (Two languages) builds on the `src/i18n/request.ts` added here: its spec decides locale routing and replaces the fixed `en`. If it reads cookies or headers, the root layout's `getLocale()` becomes runtime data under `cacheComponents` and needs a Suspense boundary or a `[locale]` segment.
 - [ ] Feature 6 (Member accounts) passes the real viewer to `AppShell` and turns on the Sign in and Me tabs.
+- [ ] Feature 9 (Game page with owners) builds the game detail sheet to the rules here with `coverTheme()`, confirms the intercepting route, and adds the `game.sheet.*` messages. Its spec should also decide whether to add year or complexity to `games` (not in the data model today, so the stats card shows Owners instead).
+- [ ] Spec 0002 (data model) gains `games.cover_tint` (nullable hex text with a check constraint), with a migration and a pgTAP test, in whichever of features 7 or 10 first saves a cover. That feature samples the color with `sharp` on the server when the cover is saved, and backfills existing covers once.
 - [ ] Feature 15 (Home page) takes over `/`, moves the shelf to `/shelf`, swaps the two hrefs in the nav config, and turns on Home.
 - [ ] Spec 0001 lists `src/components/` but no `src/i18n/` or `messages/`; `/sync` should record where translations live once this lands.

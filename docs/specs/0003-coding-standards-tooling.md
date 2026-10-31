@@ -1,7 +1,7 @@
 # 0003. Coding standards and tooling
 
 **Date**: 2026-10-27
-**Status**: In Progress
+**Status**: Accepted
 
 ## Summary
 

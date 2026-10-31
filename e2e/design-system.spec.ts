@@ -1,6 +1,8 @@
 import { expect, test } from "@playwright/test";
+import { contrastRatio, parseHex } from "../src/lib/design/contrast";
+import { DARK_INK, WHITE_INK } from "../src/lib/design/cover-tint";
 
-// Spec 0004, AC-2, AC-5, AC-6, AC-9, AC-10, AC-11.
+// Spec 0004, AC-2, AC-5, AC-6, AC-9, AC-10, AC-11, AC-12.
 
 // Mirrors `themeColors` in src/lib/design/theme-color.ts (each within 2 sRGB
 // steps of its `--background` token), so first paint must land close to these.
@@ -130,3 +132,75 @@ test("/design walks the member header links in order at desktop", async ({
     await page.keyboard.press("Tab");
   }
 });
+
+// Spec 0004, AC-12: the static Cover Tint preview.
+test("/design shows four readable Cover Tint sheets, one with black text", async ({
+  page,
+}) => {
+  await page.goto("/design");
+  const section = page.locator("section", {
+    has: page.getByRole("heading", { name: "Cover Tint (game detail sheet)" }),
+  });
+  const sheets = section.getByRole("figure");
+  await expect(sheets).toHaveCount(4);
+
+  const inks: string[] = [];
+  for (let i = 0; i < 4; i++) {
+    const sheet = sheets.nth(i);
+    // Each sheet's title reaches 4.5:1 on its own tint, as painted.
+    const { color, tint } = await sheet
+      .locator("p.text-3xl")
+      .evaluate((title) => {
+        const root = title.closest<HTMLElement>("[style]");
+        return {
+          color: getComputedStyle(title).color,
+          tint: root
+            ? getComputedStyle(root).getPropertyValue("--sheet-tint").trim()
+            : "",
+        };
+      });
+    const ink = rgbToHex(color);
+    inks.push(ink);
+    expect(
+      contrastRatio(parseHex(ink), parseHex(tint)),
+      `sheet ${i} title on tint`,
+    ).toBeGreaterThanOrEqual(4.5);
+
+    // Every control is at least 44px tall; the icon only ones are named and
+    // 44px wide too (the text button "More" may be narrower).
+    const buttons = sheet.getByRole("button");
+    for (let b = 0; b < (await buttons.count()); b++) {
+      const box = await buttons.nth(b).boundingBox();
+      expect(box, `sheet ${i} button ${b} has a box`).not.toBeNull();
+      expect(box?.height, `sheet ${i} button ${b}`).toBeGreaterThanOrEqual(44);
+    }
+    for (const name of ["Close", "Share", "Add to a list"]) {
+      const icon = sheet.getByRole("button", { name });
+      await expect(icon).toBeVisible();
+      const box = await icon.boundingBox();
+      expect(box?.width, `sheet ${i} ${name}`).toBeGreaterThanOrEqual(44);
+      expect(box?.height, `sheet ${i} ${name}`).toBeGreaterThanOrEqual(44);
+    }
+
+    // Stat values fit their column, even "40–160" at 360px.
+    const spills = await sheet.locator("dd").evaluateAll((values) =>
+      values.some((dd) => {
+        const own = dd.getBoundingClientRect();
+        const column = dd.parentElement?.getBoundingClientRect();
+        return (
+          !column || own.left < column.left - 1 || own.right > column.right + 1
+        );
+      }),
+    );
+    expect(spills, `sheet ${i} stat values fit`).toBe(false);
+  }
+
+  // One pale sample turns the ink near black; the others stay white.
+  expect(inks.filter((ink) => ink === DARK_INK)).toHaveLength(1);
+  expect(inks.filter((ink) => ink === WHITE_INK)).toHaveLength(3);
+});
+
+function rgbToHex(color: string): string {
+  const [r = 0, g = 0, b = 0] = (color.match(/\d+/g) ?? []).map(Number);
+  return `#${[r, g, b].map((v) => v.toString(16).padStart(2, "0")).join("")}`;
+}

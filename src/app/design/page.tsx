@@ -4,6 +4,10 @@ import { type ReactNode } from "react";
 import { BottomTabBar } from "@/components/app-shell/bottom-tab-bar";
 import { getShellTabs } from "@/components/app-shell/shell-tabs";
 import { SiteHeader } from "@/components/app-shell/site-header";
+import {
+  CoverTintPreview,
+  type CoverTintSample,
+} from "@/components/design/cover-tint-preview";
 import { navItems, type NavItem, type Viewer } from "@/lib/app-shell/nav";
 
 // A developer page (spec 0004): its own headings stay English, the shell
@@ -53,6 +57,51 @@ const radii = [
   ["xl", "rounded-xl", "cards, sheets"],
   ["full", "rounded-full", "raised Add"],
 ] as const;
+
+// Four fixed sample colors, one pale enough for black text (AC-12). Names and
+// numbers are sample data for the preview only.
+const coverTintSamples: CoverTintSample[] = [
+  {
+    name: "Cascadia",
+    sampleHex: "#4b6b4f",
+    rating: "8.2",
+    owners: 3,
+    players: "1–4",
+    minutes: "30–45",
+    description:
+      "Draft habitat tiles and wildlife tokens to grow your own corner of the Pacific Northwest.",
+  },
+  {
+    name: "Magical Athlete",
+    sampleHex: "#e0452e",
+    rating: "7.9",
+    owners: 2,
+    players: "2–6",
+    minutes: "30",
+    description:
+      "Roll and race, but every racer has a wild power that bends the rules. Most points after four races wins.",
+  },
+  {
+    name: "SETI",
+    sampleHex: "#3fa6c2",
+    rating: "8.6",
+    owners: 1,
+    players: "1–4",
+    minutes: "40–160",
+    description:
+      "Launch probes and scan the sky with radio telescopes to find signs of life before your rivals.",
+  },
+  {
+    name: "Wingspan",
+    sampleHex: "#f3ead2",
+    rating: "8.0",
+    owners: 4,
+    players: "1–5",
+    minutes: "40–70",
+    description:
+      "Attract birds to your preserves; each one adds a power that chains across its habitat.",
+  },
+];
 
 // Every tab on, with Home on `/` and the Shelf on `/shelf` (the layout once
 // feature 15 ships), so `/shelf` shows the Shelf tab as active.
@@ -183,6 +232,20 @@ export default function DesignPage() {
         <div className="grid gap-6 lg:grid-cols-2">
           <ShellPreview viewer="guest" title="Guest set" />
           <ShellPreview viewer="member" title="Member set" />
+        </div>
+      </Section>
+
+      <Section title="Cover Tint (game detail sheet)">
+        <p className="max-w-xl text-muted-foreground">
+          Each sheet takes its color from the bottom of its cover. The color is
+          calmed, the text turns white or black, and every pair reaches 4.5:1.
+          The real sheet ships with feature 9.
+        </p>
+        {/* Two across at most, so each mock stays phone sized */}
+        <div className="grid justify-items-center gap-6 md:grid-cols-2">
+          {coverTintSamples.map((sample) => (
+            <CoverTintPreview key={sample.name} sample={sample} />
+          ))}
         </div>
       </Section>
     </div>
