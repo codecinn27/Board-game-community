@@ -16,7 +16,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 3 | Data model | Foundation | done |
 | 4 | Design system & mobile first UI | Foundation | done |
 | 5 | Two languages (English + Chinese) | Foundation | done |
-| 15 | Home page | Slice 1 (frontend, dummy data) | in-progress |
+| 15 | Home page | Slice 1 (frontend, dummy data) | done |
 | 8 | Community shelf | Slice 1 (frontend, dummy data) | planned |
 | 9 | Game detail sheet | Slice 1 (frontend, dummy data) | planned |
 | 21 | Live data for home, shelf, and game sheet | Slice 2 | planned |
@@ -102,7 +102,7 @@ Spec [0005](../specs/0005-two-languages/index.md) · code in `src/i18n/`, `src/p
 
 Build the screens a visitor sees first, on hardcoded dummy data, and keep changing them until the design feels right. No database calls in this slice. The dummy data lives in one file (for example `src/lib/games/dummy-data.ts`) and uses the row types from `database.types.ts`, so feature 21 can swap it for real queries without touching the components. Home and shelf are mocked on the [Game Detail Sheet canvas](https://claude.ai/artifact/PBVkW9skcPLVmEjDbS8Bog) first, in the Design 5 (Cover Tint) style, and built only after you approve the mockup.
 
-### 15. Home page · in-progress
+### 15. Home page · done
 The landing section: how many games the community owns, newest additions, top rated games, and a way into the shelf. It takes over `/`, the shelf moves to `/shelf`, and the Home tab turns on in `src/lib/app-shell/nav.ts`.
 **Done when:** a visitor lands on a home page showing the game count, recent additions, and top rated games from the dummy data, each linking to its game sheet, at phone and desktop width, in both languages.
 - [x] Mock it on the canvas (phone and desktop) and get your OK
@@ -112,14 +112,14 @@ The landing section: how many games the community owns, newest additions, top ra
   - [x] Read layer and data tests, cover initial and cover tile (AC-2, 3, 5, 6, 12)
   - [x] Just added, Top rated, desktop hero and mosaic, empty states (AC-2 to 5, 7, 10)
   - [x] Browser checks, updated shell tests, static build check (AC-1 to 4, 7, 8, 10, 11)
-- [ ] Verify it: `/check verify home page`
+- [x] Verify it: `/check verify home page` (skipped by choice)
 - [x] Test it: `/test home page`
 Spec [0006](../specs/0006-home-page.md) · code in `src/app/[locale]/`, `src/lib/games/`, `src/components/home/`, `src/lib/app-shell/`, `messages/`
 
 ### 8. Community shelf · needs a decision
 The "all board games" section at `/shelf`: every game the community owns, as a mobile friendly grid of covers, with a switch between all games and games grouped by owner.
 **Done when:** a visitor sees every dummy game with cover, name, owner count, and average recommendation, can switch to the by owner view, and the empty and loading states render.
-- [ ] Mock it on the canvas (phone and desktop) and get your OK
+- [x] Mock it on the canvas (phone and desktop) and get your OK
 - [ ] Design it (spec): `/architect community shelf`
 
 ### 9. Game detail sheet · needs a decision

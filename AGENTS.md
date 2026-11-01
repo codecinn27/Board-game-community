@@ -62,6 +62,7 @@ Stored in `docs/specs/`. Format: `docs/specs/NNNN-title.md`. Feature scope lives
 - Import `Link`, `redirect`, `usePathname`, and `useRouter` from `@/i18n/navigation`, never `next/link` or `next/navigation`; send messages to the browser only through `IntlClientProvider` with picked namespaces. Raw text in JSX under `src/app/` and `src/components/` fails lint (the `/design` page, `src/components/ui/`, and tests are exempt).
 - Show timestamps with `LocalTime` (`src/components/time/local-time.tsx`), never format dates by hand.
 - next-intl's middleware does not load under Vitest, so proxy redirects and the language cookie are tested in `e2e/two-languages.spec.ts`.
+- Home reads dummy data through `src/lib/games/home.ts` (`buildHomeData`) from `src/lib/games/dummy-data.ts`, typed like the real rows; live data (scope feature 21) swaps those read functions, not the components.
 - Shell tabs come only from `src/lib/app-shell/nav.ts` (`enabled` plus `audience`); the bottom tab bar shows only at 2 or more visible tabs.
 
 ## Tooling
