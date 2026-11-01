@@ -41,7 +41,7 @@ export async function SiteHeader({
         position === "sticky" && "sticky top-0",
       )}
     >
-      <div className="mx-auto flex h-14 w-full max-w-6xl items-center justify-between gap-4 px-4 md:px-6">
+      <div className="mx-auto flex h-14 w-full max-w-screen-2xl items-center justify-between gap-4 px-(--page-gutter)">
         <Link
           href="/"
           className="-ml-2 inline-flex min-h-11 min-w-11 shrink-0 items-center gap-2 rounded-lg px-2 text-lg font-semibold tracking-tight whitespace-nowrap outline-none focus-visible:ring-3 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"

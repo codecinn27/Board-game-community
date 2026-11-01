@@ -8,6 +8,9 @@ import {
   CoverTintPreview,
   type CoverTintSample,
 } from "@/components/design/cover-tint-preview";
+import { ShelfEmpty } from "@/components/shelf/shelf-empty";
+import { ShelfError } from "@/components/shelf/shelf-error";
+import { ShelfSkeleton } from "@/components/shelf/shelf-skeleton";
 import { LocalTime } from "@/components/time/local-time";
 import { getAlternates } from "@/i18n/alternates";
 import { navItems, type NavItem, type Viewer } from "@/lib/app-shell/nav";
@@ -260,6 +263,31 @@ export default function DesignPage() {
             </li>
           ))}
         </ul>
+      </Section>
+
+      <Section title="State blocks (shelf)">
+        <p className="max-w-xl text-muted-foreground">
+          Loading, empty, and error blocks from the shelf. Each takes its text
+          as props, so this page shows them in English with no message provider.
+        </p>
+        <div className="flex flex-col gap-6">
+          <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-4 rounded-xl border bg-card p-4 md:items-center">
+            <ShelfSkeleton label="Loading games" />
+          </div>
+          <div className="flex flex-wrap rounded-xl border bg-card">
+            <ShelfEmpty
+              title="The shelf is empty"
+              body="Nobody has added a game yet. Members can add the games they own, and they show up here."
+            />
+          </div>
+          <div className="flex flex-wrap rounded-xl border bg-card">
+            <ShelfError
+              title="Could not load the shelf"
+              body="Something went wrong on our side. Try again in a moment."
+              retryLabel="Try again"
+            />
+          </div>
+        </div>
       </Section>
 
       <Section title="Cover Tint (game detail sheet)">

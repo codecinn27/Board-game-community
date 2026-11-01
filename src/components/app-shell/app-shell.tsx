@@ -20,7 +20,7 @@ export async function AppShell({ viewer, children }: AppShellProps) {
       <main
         id="main"
         className={cn(
-          "mx-auto flex w-full max-w-6xl flex-1 flex-col px-4 pt-6 pb-10 md:px-6",
+          "mx-auto flex w-full max-w-screen-2xl flex-1 flex-col px-(--page-gutter) pt-6 pb-10",
           // Clears the 64px bar, the raised Add, and the iPhone home indicator.
           hasBottomBar &&
             "pb-[calc(5.5rem+env(safe-area-inset-bottom))] md:pb-10",
