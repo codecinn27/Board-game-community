@@ -6,10 +6,7 @@ import { DARK_INK, WHITE_INK } from "../src/lib/design/cover-tint";
 
 // Mirrors `themeColors` in src/lib/design/theme-color.ts (each within 2 sRGB
 // steps of its `--background` token), so first paint must land close to these.
-const expectedBackground = {
-  light: [254, 250, 241],
-  dark: [24, 18, 15],
-} as const;
+const expectedBackground = [254, 250, 241] as const;
 
 const pages = ["/en", "/en/design"] as const;
 
@@ -40,8 +37,6 @@ for (const path of pages) {
     }
 
     // Background follows the device scheme on first paint.
-    const scheme =
-      testInfo.project.use.colorScheme === "dark" ? "dark" : "light";
     const rgb = await page.evaluate(() => {
       // Let the browser resolve oklch() to sRGB by painting it on a canvas.
       const canvas = document.createElement("canvas");
@@ -53,7 +48,7 @@ for (const path of pages) {
       return Array.from(ctx.getImageData(0, 0, 1, 1).data.slice(0, 3));
     });
     expect(rgb).not.toBeNull();
-    const expected = expectedBackground[scheme];
+    const expected = expectedBackground;
     rgb?.forEach((channel, i) => {
       expect(Math.abs(channel - (expected[i] ?? 0))).toBeLessThanOrEqual(3);
     });
@@ -65,13 +60,15 @@ for (const path of pages) {
   });
 }
 
-test("the phone shelf has no bottom bar with a single tab", async ({
+test("the phone shows a bottom bar with Home and Shelf, Home active", async ({
   page,
 }, testInfo) => {
   test.skip(testInfo.project.name.startsWith("desktop"), "phone only");
   await page.goto("/en");
-  // The only navigation landmarks on `/en` today are none: one tab, no nav.
-  await expect(page.locator("body > nav")).toHaveCount(0);
+  const bar = page.locator("body > nav");
+  await expect(bar).toHaveCount(1);
+  await expect(bar.getByRole("link")).toHaveText(["Home", "Shelf"]);
+  await expect(bar.locator('a[aria-current="page"]')).toHaveText("Home");
   await expect(page.getByRole("link", { name: "Game Shelf" })).toBeVisible();
 });
 
@@ -83,12 +80,14 @@ test("/design previews both tab sets with the raised Add and an active Shelf", a
     "content",
     /noindex/,
   );
-  const bars = page.getByRole("navigation", { name: "Main navigation" });
+  // Only the previews: the page's own shell bar is not one of them.
+  const previews = page.getByRole("figure");
+  const bars = previews.getByRole("navigation", { name: "Main navigation" });
   // Each preview has a bottom bar, plus header links from 768px up.
   const desktop = testInfo.project.name.startsWith("desktop");
   await expect(bars).toHaveCount(desktop ? 4 : 2);
   await expect(page.getByRole("link", { name: "Add" }).first()).toBeAttached();
-  const active = page.locator('a[aria-current="page"]');
+  const active = previews.locator('a[aria-current="page"]');
   await expect(active.first()).toContainText("Shelf");
 });
 

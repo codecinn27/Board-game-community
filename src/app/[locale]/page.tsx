@@ -1,34 +1,39 @@
 import { type Metadata } from "next";
-import { Suspense } from "react";
+import { getTranslations } from "next-intl/server";
+import { HomeHero } from "@/components/home/home-hero";
+import { JustAdded } from "@/components/home/just-added";
+import { TopRated } from "@/components/home/top-rated";
 import { getAlternates } from "@/i18n/alternates";
-import { getShelfGames } from "@/lib/games/shelf";
-
-// Tracer bullet thread: one typed read from the database to the page.
-// Replaced by the real shelf (feature 8). Game names show as stored in both
-// languages (spec 0005, AC-10).
-async function Shelf() {
-  const games = await getShelfGames();
-  return (
-    <ul>
-      {games.map((game) => (
-        <li key={game.id}>
-          {game.name} ({game.owner_count})
-        </li>
-      ))}
-    </ul>
-  );
-}
+import { getHomeData } from "@/lib/games/home";
 
 export async function generateMetadata(): Promise<Metadata> {
-  return { alternates: await getAlternates("/") };
+  const [t, tShell] = await Promise.all([
+    getTranslations("home.meta"),
+    getTranslations("shell"),
+  ]);
+  return {
+    title: { absolute: tShell("brand") },
+    description: t("description"),
+    alternates: await getAlternates("/"),
+  };
 }
 
-export default function Home() {
+export default async function HomePage() {
+  const { gameCount, memberCount, newest, topRated } = await getHomeData();
+
   return (
-    <div>
-      <Suspense fallback={null}>
-        <Shelf />
-      </Suspense>
+    <div className="flex flex-col gap-6 lg:gap-12">
+      <HomeHero
+        gameCount={gameCount}
+        memberCount={memberCount}
+        mosaic={newest}
+      />
+      {gameCount > 0 ? (
+        <>
+          <JustAdded games={newest} />
+          <TopRated games={topRated} />
+        </>
+      ) : null}
     </div>
   );
 }

@@ -108,8 +108,8 @@ const coverTintSamples: CoverTintSample[] = [
   },
 ];
 
-// Every tab on, with Home on `/` and the Shelf on `/shelf` (the layout once
-// feature 15 ships), so `/shelf` shows the Shelf tab as active.
+// Every tab on, with Home on `/` and the Shelf on `/shelf`, so `/shelf` shows
+// the Shelf tab as active.
 const previewItems: NavItem[] = navItems.map((item) => ({
   ...item,
   enabled: true,
@@ -130,9 +130,9 @@ export default function DesignPage() {
         <p className="text-sm font-medium text-primary">Spec 0004</p>
         <h1 className="text-2xl font-semibold md:text-3xl">Design system</h1>
         <p className="max-w-xl text-muted-foreground">
-          Tabletop tokens and the app shell in one place. Colors show the scheme
-          your device is using; switch it in devtools to check the other one.
-          Rules live in <code className="font-mono">docs/design.md</code>.
+          Tabletop tokens and the app shell in one place. The site is always
+          light. Rules live in <code className="font-mono">docs/design.md</code>
+          .
         </p>
       </header>
 

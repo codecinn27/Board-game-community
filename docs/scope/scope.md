@@ -2,7 +2,7 @@
 
 A shared, public board game shelf for your local community: it shows every game the group owns and who owns it, so nobody buys a duplicate. Members register to add their games, fill in a standard rating form, comment, keep a top 5, and grow a wishlist of games still to conquer. Mobile first, desktop second, in English and Chinese.
 
-**Build approach:** Tracer Bullet (prove one real thread through every layer first, then thicken it one strand at a time).
+**Build approach:** Tracer Bullet (prove one real thread through every layer first, then thicken it one strand at a time). After the foundations, the front end comes first: home, shelf, and game sheet are built on hardcoded dummy data until the design is right (Slice 1), and only then wired to the database (Slice 2 onward).
 **Workflow:** Beta (after `/develop`: `/check verify`, then `/test`). The project default level of rigor. `/architect` is the recommended first stop for a feature with a real decision, but skippable when you already know the build. Any feature can carry its own tag (e.g. `· GA`) to do more or less.
 
 _These are recommendations to keep your build orderly, not requirements. Skip anything that does not fit: if you already know how to build a feature, use `/develop` and skip `/architect`. You decide when a feature is `done`._
@@ -16,21 +16,24 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 3 | Data model | Foundation | done |
 | 4 | Design system & mobile first UI | Foundation | done |
 | 5 | Two languages (English + Chinese) | Foundation | done |
-| 6 | Member accounts | Slice 1 | planned |
-| 7 | Add a game I own | Slice 1 | planned |
-| 8 | Community shelf | Slice 1 | planned |
-| 9 | Game page with owners | Slice 1 | planned |
-| 10 | Online game lookup | Slice 2 | planned |
-| 11 | Paste a link to auto fill | Slice 2 | planned |
-| 12 | Rating form | Slice 3 | planned |
-| 13 | Comments | Slice 3 | planned |
-| 14 | Search & filters | Slice 4 | planned |
-| 15 | Home page | Slice 5 | planned |
+| 15 | Home page | Slice 1 (frontend, dummy data) | in-progress |
+| 8 | Community shelf | Slice 1 (frontend, dummy data) | planned |
+| 9 | Game detail sheet | Slice 1 (frontend, dummy data) | planned |
+| 21 | Live data for home, shelf, and game sheet | Slice 2 | planned |
+| 6 | Member accounts | Slice 2 | planned |
+| 7 | Add a game I own | Slice 2 | planned |
+| 10 | Online game lookup | Slice 3 | planned |
+| 11 | Paste a link to auto fill | Slice 3 | planned |
+| 12 | Rating form | Slice 4 | planned |
+| 13 | Comments | Slice 4 | planned |
+| 14 | Search & filters | Slice 5 | planned |
 | 16 | Top 5 favorites | Slice 6 | planned |
 | 17 | Member profile page | Slice 6 | planned |
 | 18 | Wishlist (games to conquer) | Slice 7 | planned |
 | 19 | Admin tools | Slice 8 | planned |
 | 20 | SEO & share previews | Slice 9 | planned |
+
+Feature numbers are fixed IDs (specs and `docs/design.md` refer to them), so the table is in build order, not number order.
 
 ## Foundations
 
@@ -95,7 +98,43 @@ A language switch and a pattern for translated text, set before pages exist so e
 - [x] Test it: `/test two languages`
 Spec [0005](../specs/0005-two-languages/index.md) · code in `src/i18n/`, `src/proxy.ts`, `src/app/[locale]/`, `src/components/app-shell/`, `src/components/time/`, `src/lib/time/`, `messages/`
 
-## Slice 1: Core loop (shelf + who owns it)
+## Slice 1: Frontend first (dummy data)
+
+Build the screens a visitor sees first, on hardcoded dummy data, and keep changing them until the design feels right. No database calls in this slice. The dummy data lives in one file (for example `src/lib/games/dummy-data.ts`) and uses the row types from `database.types.ts`, so feature 21 can swap it for real queries without touching the components. Home and shelf are mocked on the [Game Detail Sheet canvas](https://claude.ai/artifact/PBVkW9skcPLVmEjDbS8Bog) first, in the Design 5 (Cover Tint) style, and built only after you approve the mockup.
+
+### 15. Home page · in-progress
+The landing section: how many games the community owns, newest additions, top rated games, and a way into the shelf. It takes over `/`, the shelf moves to `/shelf`, and the Home tab turns on in `src/lib/app-shell/nav.ts`.
+**Done when:** a visitor lands on a home page showing the game count, recent additions, and top rated games from the dummy data, each linking to its game sheet, at phone and desktop width, in both languages.
+- [x] Mock it on the canvas (phone and desktop) and get your OK
+- [x] Design it (spec): `/architect home page`
+- [x] Build it: `/develop home page`
+  - [x] Thin thread: shelf moved to `/shelf`, Home tab on, dummy data and `buildHomeData`, translated hero at `/` (AC-1, 8, 9, 11)
+  - [x] Read layer and data tests, cover initial and cover tile (AC-2, 3, 5, 6, 12)
+  - [x] Just added, Top rated, desktop hero and mosaic, empty states (AC-2 to 5, 7, 10)
+  - [x] Browser checks, updated shell tests, static build check (AC-1 to 4, 7, 8, 10, 11)
+- [ ] Verify it: `/check verify home page`
+- [x] Test it: `/test home page`
+Spec [0006](../specs/0006-home-page.md) · code in `src/app/[locale]/`, `src/lib/games/`, `src/components/home/`, `src/lib/app-shell/`, `messages/`
+
+### 8. Community shelf · needs a decision
+The "all board games" section at `/shelf`: every game the community owns, as a mobile friendly grid of covers, with a switch between all games and games grouped by owner.
+**Done when:** a visitor sees every dummy game with cover, name, owner count, and average recommendation, can switch to the by owner view, and the empty and loading states render.
+- [ ] Mock it on the canvas (phone and desktop) and get your OK
+- [ ] Design it (spec): `/architect community shelf`
+
+### 9. Game detail sheet · needs a decision
+Tap a game on the shelf or home page to open its sheet, built to Design 5 (Cover Tint): the cover on top fading into its own color, name, rating and owner chips, a stats card, the description, the list of owners, and the "I own this" dock. Already designed on the canvas (phone and desktop dialog); the color rules are built in `src/lib/design/cover-tint.ts`.
+**Done when:** every dummy game opens its own tinted sheet at `/games/[id]` over the shelf (Back closes it, a direct visit shows it as a page), it shows the details and every owner, and "I own this" is visible but not wired up yet.
+- [ ] Design it (spec): `/architect game detail sheet`
+
+## Slice 2: Real data behind the screens
+
+Starts once you are happy with the Slice 1 design.
+
+### 21. Live data for home, shelf, and game sheet · needs a decision
+Replace the dummy data with real reads from Supabase (public read, no sign in needed), and move the dummy games into `supabase/seed.sql` so local development looks the same as before.
+**Done when:** home, shelf, and the game sheet show real database rows with no visual change, the dummy data file is deleted, and the cover tint comes from `games.cover_tint`.
+- [ ] Design it (spec): `/architect live data for home, shelf, and game sheet`
 
 ### 6. Member accounts · needs a decision
 Register, sign in, sign out. Anyone can browse without an account; only members can add games, rate, and comment.
@@ -103,21 +142,11 @@ Register, sign in, sign out. Anyone can browse without an account; only members 
 - [ ] Design it (spec): `/architect member accounts`
 
 ### 7. Add a game I own · needs a decision
-A member searches your own database first; if the game is there they mark "I own this", if not they enter it manually. Seeing who already owns a game helps avoid duplicate buys, but it is information only, never a block.
-**Done when:** a member can add a game they own; the search shows if the community already owns it (and who), and the member can still add themselves as an owner; the game's details are stored once and shared by all its owners.
+A member searches your own database first; if the game is there they mark "I own this", if not they enter it manually. Seeing who already owns a game helps avoid duplicate buys, but it is information only, never a block. This also wires up the "I own this" button on the game sheet.
+**Done when:** a member can add a game they own; the search shows if the community already owns it (and who), and the member can still add themselves as an owner; the game's details are stored once and shared by all its owners; a member can add or remove themselves as an owner from the game sheet.
 - [ ] Design it (spec): `/architect add a game I own`
 
-### 8. Community shelf · needs a decision
-The "all board games" section: every game the community owns, as a mobile friendly grid of covers, with a switch between all games and games grouped by owner.
-**Done when:** a visitor sees every owned game with cover, name, and owner count, can switch to the by owner view, and empty and loading states render.
-- [ ] Design it (spec): `/architect community shelf`
-
-### 9. Game page with owners · needs a decision
-Tap a game on the shelf to open its page: details plus the list of members who own it.
-**Done when:** the game page shows its details and every owner, and a member can add or remove themselves as an owner from there.
-- [ ] Design it (spec): `/architect game page with owners`
-
-## Slice 2: Fill game details from online
+## Slice 3: Fill game details from online
 
 ### 10. Online game lookup · needs a decision
 When a game is not in your own database, search an online board game source and copy the chosen result (cover, player count, play time, description) into your own database.
@@ -129,31 +158,24 @@ A member pastes a link to a game's page on a board game site and the form fills 
 **Done when:** a pasted link pre fills the add game form for supported sites, the member can correct any field before saving, and an unreadable link falls back to manual entry with a clear message.
 - [ ] Design it (spec): `/architect paste a link to auto fill`
 
-## Slice 3: Rate and discuss
+## Slice 4: Rate and discuss
 
 ### 12. Rating form · needs a decision
-The standard form every member can fill once per game: best player count, time to learn (1 to 5), luck, strategy, entertainment, personal recommendation (each 1 to 10), and a comment. The game page and shelf show the community averages.
-**Done when:** a member can submit and edit their own form for any game, the game page shows each member's answers and the community averages, and the shelf card shows the average recommendation.
+The standard form every member can fill once per game: best player count, time to learn (1 to 5), luck, strategy, entertainment, personal recommendation (each 1 to 10), and a comment. The game sheet and shelf show the community averages.
+**Done when:** a member can submit and edit their own form for any game, the game sheet shows each member's answers and the community averages, and the shelf card shows the average recommendation.
 - [ ] Design it (spec): `/architect rating form`
 
 ### 13. Comments
 Free discussion under each game, separate from the rating form comment.
-**Done when:** members can post, edit, and delete their own comments on a game page; visitors can read them.
+**Done when:** members can post, edit, and delete their own comments on a game sheet; visitors can read them.
 - [ ] Build it: `/develop comments`
 
-## Slice 4: Find games fast
+## Slice 5: Find games fast
 
 ### 14. Search & filters · needs a decision
 Search the shelf by name and filter by player count, owner, time to learn, luck, strategy, and recommendation.
 **Done when:** search and filters narrow the shelf, filters combine, the URL reflects them so a filtered view can be shared, and a no results state renders.
 - [ ] Design it (spec): `/architect search & filters`
-
-## Slice 5: Front door
-
-### 15. Home page · needs a decision
-The landing section: how many games the community owns, newest additions, top rated games, and a way into the shelf.
-**Done when:** a visitor lands on a home page showing the game count, recent additions, and top rated games, each linking to its game page.
-- [ ] Design it (spec): `/architect home page`
 
 ## Slice 6: Personal touches
 
@@ -164,7 +186,7 @@ Each member picks and orders their personal top 5 games.
 
 ### 17. Member profile page · needs a decision
 A page per member showing the games they own, their ratings, and their top 5.
-**Done when:** anyone can open a member's profile from a game page or the shelf and see their games, ratings, and top 5.
+**Done when:** anyone can open a member's profile from a game sheet or the shelf and see their games, ratings, and top 5.
 - [ ] Design it (spec): `/architect member profile page`
 
 ## Slice 7: Games to conquer

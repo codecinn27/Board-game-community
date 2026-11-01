@@ -20,7 +20,7 @@
     "notFound": {
       "title": "Page not found",
       "body": "We could not find that page. It may have moved, or the link may be wrong.",
-      "home": "Back to the shelf"
+      "home": "Back to home"
     },
     "language": {
       "label": "Language: {name}",
@@ -31,6 +31,33 @@
     },
     "time": {
       "justNow": "just now"
+    }
+  },
+  "home": {
+    "meta": {
+      "description": "See every board game our group owns, and who owns it, before you buy."
+    },
+    "hero": {
+      "label": "{count, plural, one {game on the shelf} other {games on the shelf}}",
+      "members": "{count, plural, one {Owned by # member.} other {Owned by # members.}}",
+      "tagline": "Check here before you buy.",
+      "empty": "No games on the shelf yet",
+      "browse": "Browse the shelf"
+    },
+    "justAdded": {
+      "title": "Just added",
+      "seeAll": "See all"
+    },
+    "topRated": {
+      "title": "Top rated",
+      "owners": "{count, plural, one {# owner} other {# owners}}",
+      "ratingLabel": "{rating} out of 10"
+    }
+  },
+  "shelf": {
+    "meta": {
+      "title": "Shelf",
+      "description": "Every board game the group owns."
     }
   }
 }

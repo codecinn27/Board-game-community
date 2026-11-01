@@ -33,7 +33,7 @@ Not borrowed: the Overboard name, logo, icons, screenshots, or BGG data fields (
 
 ## Color tokens
 
-Light sits in `:root`, dark in `@media (prefers-color-scheme: dark) { :root { } }`. The site follows the device setting with pure CSS: no theme library, no `.dark` class, no toggle. The `dark:` Tailwind variant is redefined to the same media query, so `dark:` classes still work. If the shadcn CLI ever appends a `.dark { }` block, move its values into the media query.
+The site is always light: tokens sit in `:root` with `color-scheme: light`, and there is no dark theme, no toggle, and no device setting follow. The `dark:` Tailwind variant is redefined to match only a `.dark` class that nothing sets, so `dark:` classes from shadcn never apply.
 
 | Token | Role |
 |---|---|
@@ -145,7 +145,7 @@ Tapping a game on the shelf opens this sheet over the shelf. Its colors come fro
 - Set the variables inline on the sheet's root (`style={{ "--sheet-tint": theme.tint, ... }}`) and style with `bg-(--sheet-tint)`, `text-(--sheet-ink)` and so on. This is the **one** place colors come from data; everywhere else stays on tokens.
 - Focus rings on the themed controls use ink: `focus-visible:ring-(--sheet-ink) focus-visible:ring-offset-(--sheet-tint)`.
 - No cover: call `coverTheme` with the placeholder tile's `--cover-N` color.
-- The sheet ignores the device's light or dark setting: the cover decides. The page behind still follows the device.
+- The sheet ignores the device's light or dark setting: the cover decides. The page behind is light too.
 
 **Frame and motion**: phones get a bottom sheet (`h-[96dvh]`, `rounded-t-[32px]`, dimmed page behind); from `md` a centered dialog (`max-w-lg`, `rounded-[28px]`) with a soft blurred glow in the tint behind it. Open: slide up 280ms ease out, the cover settles from `scale-105`; close 200ms. All behind `motion-safe:`.
 
@@ -158,5 +158,5 @@ When a feature builds one of these, it adds a block for it to `/design` and upda
 - Do take every color from a token. Don't write `#hex`, `oklch()`, or `bg-[...]` colors in components. The one exception is the game detail sheet, whose colors come from `coverTheme()` through the `--sheet-*` variables.
 - Do use `text-muted-foreground` for secondary text. Don't fade text with opacity, which breaks the contrast test's guarantee.
 - Do keep the shell a Server Component. Only `NavLink` is client code; pass it translated labels as props.
-- Don't add a `.dark` class strategy or a theme toggle without a new spec.
+- Don't add a dark theme or a theme toggle without a new spec.
 - Don't put anything interactive under 44px, even an icon button.
