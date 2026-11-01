@@ -45,6 +45,27 @@
   --cover-6: oklch(0.88 0.04 75);
 }
 
+/* Left and right page padding, shared by the header and <main>. Edit these
+   four values to try a different ratio; nothing else needs to change. */
+:root {
+  --page-gutter: 24px; /* mobile, up to 767px */
+}
+@media (min-width: 768px) {
+  :root {
+    --page-gutter: 52px; /* tablet */
+  }
+}
+@media (min-width: 1024px) {
+  :root {
+    --page-gutter: 60px; /* laptop */
+  }
+}
+@media (min-width: 1440px) {
+  :root {
+    --page-gutter: 80px; /* large laptop */
+  }
+}
+
 @theme inline {
   /* Geist for Latin, the device's own font for Chinese (no CJK download). */
   --font-sans:

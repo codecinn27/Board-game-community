@@ -5,7 +5,7 @@ import { LocalTime } from "@/components/time/local-time";
 import { Link } from "@/i18n/navigation";
 import { type HomeGame } from "@/lib/games/home";
 import { cn } from "@/lib/utils";
-import { CoverTile } from "./cover-tile";
+import { CoverTile } from "@/components/games/cover-tile";
 
 type JustAddedProps = {
   games: HomeGame[];
@@ -37,8 +37,8 @@ export async function JustAdded({ games }: JustAddedProps) {
 
       {/* A phone row scrolls inside itself and bleeds to the screen edge; from
           `md` all six sit in a grid. The sixth is hidden below `md`. */}
-      <ScrollArea className="-mx-4 md:mx-0">
-        <ul className="flex w-max gap-3 px-4 pb-2 md:grid md:w-full md:grid-cols-6 md:gap-4 md:px-0 md:pb-0">
+      <ScrollArea className="-mx-(--page-gutter) md:mx-0">
+        <ul className="flex w-max gap-3 px-(--page-gutter) pb-2 md:grid md:w-full md:grid-cols-6 md:gap-4 md:px-0 md:pb-0">
           {games.map((game, index) => (
             <li
               key={game.id}

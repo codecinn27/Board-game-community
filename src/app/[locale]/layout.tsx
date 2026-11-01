@@ -57,11 +57,17 @@ export default async function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
-        {/* Locale and time zone flow through. Only `common.time` (for
-            LocalTime, used anywhere) ships to the browser here; other client
+        {/* Locale and time zone flow through. `common.time` (for
+            LocalTime, used anywhere) and the shelf error backstop ship to the browser here; other client
             components pick their own namespace, never the whole file. */}
         <IntlClientProvider
-          messages={{ common: { time: messages.common.time } }}
+          messages={{
+            common: { time: messages.common.time },
+            shelf: {
+              heading: messages.shelf.heading,
+              error: messages.shelf.error,
+            },
+          }}
         >
           {/* "guest" until feature 6 (Member accounts) reads the session. */}
           <AppShell viewer="guest">{children}</AppShell>

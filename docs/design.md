@@ -72,7 +72,7 @@ Numbers in stats and scores use `tabular-nums`.
 
 - Tailwind's 4px scale. Page gutter `px-4`, `md:px-6`. Between sections `gap-6`; inside cards `gap-2`.
 - Breakpoints: Tailwind defaults (`sm` 640, `md` 768, `lg` 1024). The phone layout is everything below `md`.
-- Content container: `mx-auto w-full max-w-6xl` (the app shell's `<main>` already applies it). Forms and long text: `max-w-xl`.
+- Content container: `mx-auto w-full max-w-screen-2xl` (the app shell's `<main>` already applies it). Forms and long text: `max-w-xl`.
 - Shelf grid: `grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 md:gap-4 lg:grid-cols-6`.
 
 ## Shape, elevation, motion, icons

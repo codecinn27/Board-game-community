@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { coverTheme } from "@/lib/design/cover-tint";
 import { CoverTile } from "./cover-tile";
-import { render } from "./test-intl";
+import { render } from "@/components/home/test-intl";
 
 // Spec 0006, AC-6.
 describe("CoverTile", () => {

@@ -58,6 +58,33 @@
     "meta": {
       "title": "Shelf",
       "description": "Every board game the group owns."
+    },
+    "heading": "Shelf",
+    "count": "{count, plural, one {# game} other {# games}}",
+    "switch": {
+      "label": "Show games",
+      "all": "All games",
+      "owner": "By owner"
+    },
+    "card": {
+      "owners": "{count, plural, one {# owner} other {# owners}}",
+      "ratingLabel": "{rating} out of 10"
+    },
+    "empty": {
+      "title": "The shelf is empty",
+      "body": "Nobody has added a game yet. Members can add the games they own, and they show up here."
+    },
+    "loading": "Loading games",
+    "error": {
+      "title": "Could not load the shelf",
+      "body": "Something went wrong on our side. Try again in a moment.",
+      "retry": "Try again"
+    },
+    "byOwner": {
+      "soon": {
+        "title": "By owner is coming soon",
+        "body": "Soon you will see each member's games here."
+      }
     }
   }
 }

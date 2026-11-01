@@ -58,6 +58,33 @@
     "meta": {
       "title": "游戏架",
       "description": "群组拥有的所有桌游。"
+    },
+    "heading": "游戏架",
+    "count": "{count, plural, other {# 款游戏}}",
+    "switch": {
+      "label": "显示方式",
+      "all": "全部游戏",
+      "owner": "按主人"
+    },
+    "card": {
+      "owners": "{count, plural, other {# 位主人}}",
+      "ratingLabel": "{rating} 分（满分 10）"
+    },
+    "empty": {
+      "title": "游戏架还是空的",
+      "body": "还没有人添加游戏。成员可以添加自己拥有的游戏，它们会显示在这里。"
+    },
+    "loading": "正在加载游戏",
+    "error": {
+      "title": "无法加载游戏架",
+      "body": "我们这边出了点问题，请稍后再试。",
+      "retry": "重试"
+    },
+    "byOwner": {
+      "soon": {
+        "title": "按主人查看即将上线",
+        "body": "很快就能在这里看到每位成员的游戏。"
+      }
     }
   }
 }

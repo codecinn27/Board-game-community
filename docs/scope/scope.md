@@ -17,7 +17,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 4 | Design system & mobile first UI | Foundation | done |
 | 5 | Two languages (English + Chinese) | Foundation | done |
 | 15 | Home page | Slice 1 (frontend, dummy data) | done |
-| 8 | Community shelf | Slice 1 (frontend, dummy data) | planned |
+| 8 | Community shelf | Slice 1 (frontend, dummy data) | in-progress |
 | 9 | Game detail sheet | Slice 1 (frontend, dummy data) | planned |
 | 21 | Live data for home, shelf, and game sheet | Slice 2 | planned |
 | 6 | Member accounts | Slice 2 | planned |
@@ -116,11 +116,19 @@ The landing section: how many games the community owns, newest additions, top ra
 - [x] Test it: `/test home page`
 Spec [0006](../specs/0006-home-page.md) · code in `src/app/[locale]/`, `src/lib/games/`, `src/components/home/`, `src/lib/app-shell/`, `messages/`
 
-### 8. Community shelf · needs a decision
+### 8. Community shelf · in-progress
 The "all board games" section at `/shelf`: every game the community owns, as a mobile friendly grid of covers, with a switch between all games and games grouped by owner.
 **Done when:** a visitor sees every dummy game with cover, name, owner count, and average recommendation, can switch to the by owner view, and the empty and loading states render.
 - [x] Mock it on the canvas (phone and desktop) and get your OK
-- [ ] Design it (spec): `/architect community shelf`
+- [x] Design it (spec): `/architect community shelf`
+- [ ] Build it: `/develop community shelf`
+  - [x] Part 1, thin thread: `CoverTile` moved to `src/components/games/`, read layer and `compareNames` replace the tracer, cards in the grid at `/shelf` (AC-1 to 4, 11)
+  - [x] Part 1, the rest: view switch from `?view=`, loading skeleton, empty and error states, By owner placeholder, messages in both languages (AC-5 to 10)
+  - [x] Part 1, checks: component tests for the states, `/design` previews, browser checks, updated home checks (AC-7 to 9, 12)
+  - [ ] Part 2, By owner: owner rows in the read layer, member sections with game strips, browser checks (AC-13 to 15)
+- [ ] Verify it: `/check verify community shelf`
+- [x] Test it: `/test community shelf`
+Spec [0007](../specs/0007-community-shelf.md) · code in `src/app/[locale]/shelf/`, `src/lib/games/`, `src/components/shelf/`, `src/components/games/`, `messages/`
 
 ### 9. Game detail sheet · needs a decision
 Tap a game on the shelf or home page to open its sheet, built to Design 5 (Cover Tint): the cover on top fading into its own color, name, rating and owner chips, a stats card, the description, the list of owners, and the "I own this" dock. Already designed on the canvas (phone and desktop dialog); the color rules are built in `src/lib/design/cover-tint.ts`.
