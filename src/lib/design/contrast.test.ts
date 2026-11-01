@@ -29,16 +29,6 @@ function lightTokens(): Map<string, string> {
   return declarations(match[1]);
 }
 
-function darkTokens(): Map<string, string> {
-  const match =
-    /@media\s*\(prefers-color-scheme:\s*dark\)\s*\{\s*:root\s*\{([^}]*)\}/.exec(
-      css,
-    );
-  if (!match?.[1]) throw new Error("No dark :root block in globals.css");
-  // Dark overrides light; anything not overridden keeps its light value.
-  return new Map([...lightTokens(), ...declarations(match[1])]);
-}
-
 function resolve(tokens: Map<string, string>, name: string): Rgba {
   let value = tokens.get(name);
   // Resolve `var(--x)` one level deep.
@@ -70,13 +60,8 @@ const pairs: [string, string[], number][] = [
   ["--ring", ["--background", "--card"], 3],
 ];
 
-const modes = [
-  ["light", lightTokens],
-  ["dark", darkTokens],
-] as const;
-
-describe.each(modes)("%s mode token contrast (WCAG 2.2 AA)", (_mode, load) => {
-  const tokens = load();
+describe("token contrast (WCAG 2.2 AA)", () => {
+  const tokens = lightTokens();
   const cases = pairs.flatMap(([text, surfaces, min]) =>
     surfaces.map((surface) => [text, surface, min] as const),
   );
@@ -91,12 +76,9 @@ describe.each(modes)("%s mode token contrast (WCAG 2.2 AA)", (_mode, load) => {
 });
 
 describe("themeColor hex mirrors --background", () => {
-  it.each([
-    ["light", themeColors.light, lightTokens],
-    ["dark", themeColors.dark, darkTokens],
-  ] as const)("%s %s", (_mode, hex, load) => {
-    const token = resolve(load(), "--background");
-    const meta = parseHex(hex);
+  it("matches the light background", () => {
+    const token = resolve(lightTokens(), "--background");
+    const meta = parseHex(themeColors.light);
     for (const channel of ["r", "g", "b"] as const) {
       // Within 2 sRGB steps per channel.
       expect(

@@ -20,7 +20,7 @@
     "notFound": {
       "title": "找不到页面",
       "body": "我们找不到这个页面。它可能已经移动，或者链接有误。",
-      "home": "返回游戏架"
+      "home": "返回首页"
     },
     "language": {
       "label": "语言：{name}",
@@ -31,6 +31,33 @@
     },
     "time": {
       "justNow": "刚刚"
+    }
+  },
+  "home": {
+    "meta": {
+      "description": "看看我们群组拥有的所有桌游和主人，买之前先查一查。"
+    },
+    "hero": {
+      "label": "{count, plural, other {款游戏在架上}}",
+      "members": "{count, plural, other {由 # 位成员拥有。}}",
+      "tagline": "买之前先来这里看看。",
+      "empty": "架上还没有游戏",
+      "browse": "浏览游戏架"
+    },
+    "justAdded": {
+      "title": "最新加入",
+      "seeAll": "查看全部"
+    },
+    "topRated": {
+      "title": "最高评分",
+      "owners": "{count, plural, other {# 位主人}}",
+      "ratingLabel": "{rating} 分（满分 10）"
+    }
+  },
+  "shelf": {
+    "meta": {
+      "title": "游戏架",
+      "description": "群组拥有的所有桌游。"
     }
   }
 }

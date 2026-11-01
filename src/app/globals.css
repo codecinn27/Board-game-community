@@ -3,25 +3,27 @@
 @import "shadcn/tailwind.css";
 
 /*
- * Dark mode follows the device setting with pure CSS (spec 0004): no theme
- * library, no `.dark` class, no wrong theme flash. If the shadcn CLI appends a
- * `.dark { }` block, move its values into the media query below.
+ * The site is always light (no dark theme, no toggle). `color-scheme: light`
+ * on :root keeps form controls and scrollbars light too.
  */
-@custom-variant dark (@media (prefers-color-scheme: dark));
+/* Light only: nothing sets `.dark`, so `dark:` classes never apply. */
+@custom-variant dark (&:where(.dark, .dark *));
 
 /* Tabletop light: cream table, warm ink, terracotta accent. */
 :root {
+  /* The site is always light, whatever the device setting. */
+  color-scheme: light;
   --radius: 0.75rem;
 
-  --background: oklch(0.985 0.012 85);
+  --background: oklch(0.986 0.013 87); /* #fefaf1 */
   --foreground: oklch(0.24 0.02 50);
   --card: oklch(0.995 0.006 85);
   --card-foreground: oklch(0.24 0.02 50);
   --popover: oklch(0.995 0.006 85);
   --popover-foreground: oklch(0.24 0.02 50);
-  --primary: oklch(0.55 0.15 42);
+  --primary: oklch(0.543 0.148 40); /* #b44a20 */
   --primary-foreground: oklch(0.99 0.01 85);
-  --secondary: oklch(0.92 0.03 75);
+  --secondary: oklch(0.954 0.016 83); /* #f5efe4 */
   --secondary-foreground: oklch(0.3 0.03 50);
   --muted: oklch(0.955 0.015 80);
   --muted-foreground: oklch(0.48 0.025 60);
@@ -29,7 +31,7 @@
   --accent-foreground: oklch(0.24 0.02 50);
   --destructive: oklch(0.55 0.2 27);
   /* Decorative dividers and card outlines only; not a contrast pair. */
-  --border: oklch(0.86 0.02 75);
+  --border: oklch(0.871 0.023 78); /* #ddd3c4 */
   /* Form field borders: must reach 3:1 on background and card. */
   --input: oklch(0.6 0.02 70);
   --ring: var(--primary);
@@ -41,37 +43,6 @@
   --cover-4: oklch(0.85 0.05 200);
   --cover-5: oklch(0.85 0.05 330);
   --cover-6: oklch(0.88 0.04 75);
-}
-
-/* Tabletop dark: warm charcoal, lifted terracotta. */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: oklch(0.19 0.012 50);
-    --foreground: oklch(0.95 0.012 85);
-    --card: oklch(0.23 0.014 50);
-    --card-foreground: oklch(0.95 0.012 85);
-    --popover: oklch(0.23 0.014 50);
-    --popover-foreground: oklch(0.95 0.012 85);
-    --primary: oklch(0.7 0.15 45);
-    --primary-foreground: oklch(0.2 0.02 45);
-    --secondary: oklch(0.29 0.02 55);
-    --secondary-foreground: oklch(0.93 0.015 80);
-    --muted: oklch(0.27 0.014 50);
-    --muted-foreground: oklch(0.72 0.02 70);
-    --accent: oklch(0.31 0.03 50);
-    --accent-foreground: oklch(0.95 0.012 85);
-    --destructive: oklch(0.68 0.19 25);
-    --border: oklch(1 0 0 / 14%);
-    --input: oklch(0.6 0.02 70);
-    --ring: var(--primary);
-
-    --cover-1: oklch(0.35 0.06 40);
-    --cover-2: oklch(0.36 0.06 90);
-    --cover-3: oklch(0.35 0.05 145);
-    --cover-4: oklch(0.35 0.05 200);
-    --cover-5: oklch(0.35 0.05 330);
-    --cover-6: oklch(0.37 0.04 75);
-  }
 }
 
 @theme inline {

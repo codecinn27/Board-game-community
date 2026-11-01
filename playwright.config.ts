@@ -6,7 +6,8 @@ const sizes = [
   { name: "phone", width: 360, height: 800 },
   { name: "desktop", width: 1280, height: 800 },
 ] as const;
-const schemes = ["light", "dark"] as const;
+// The site is always light (spec 0004 follow up), so there is no dark project.
+const schemes = ["light"] as const;
 
 export default defineConfig({
   testDir: "e2e",

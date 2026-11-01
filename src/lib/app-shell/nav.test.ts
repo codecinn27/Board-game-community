@@ -4,12 +4,12 @@ import { isActiveTab, navItems, visibleTabs } from "./nav";
 const allOn = navItems.map((item) => ({ ...item, enabled: true }));
 
 describe("visibleTabs", () => {
-  it("gives a guest only the shelf today", () => {
-    expect(visibleTabs("guest").map((i) => i.key)).toEqual(["shelf"]);
+  it("gives a guest home and shelf today", () => {
+    expect(visibleTabs("guest").map((i) => i.key)).toEqual(["home", "shelf"]);
   });
 
-  it("gives a member only the shelf today", () => {
-    expect(visibleTabs("member").map((i) => i.key)).toEqual(["shelf"]);
+  it("gives a member home and shelf today", () => {
+    expect(visibleTabs("member").map((i) => i.key)).toEqual(["home", "shelf"]);
   });
 
   it("orders the guest set home, shelf, sign in", () => {

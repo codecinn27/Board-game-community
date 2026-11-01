@@ -22,19 +22,19 @@ export type NavItem = {
 // Order matters: guest is home, shelf, signIn; member is home, shelf, add, me.
 export const navItems: readonly NavItem[] = [
   {
-    // Moves to `/` when feature 15 (Home page) ships.
+    // Feature 15 (Home page).
     key: "home",
     href: "/",
     icon: "House",
     labelKey: "home",
     audience: "all",
     raised: false,
-    enabled: false,
+    enabled: true,
   },
   {
-    // `/` today, `/shelf` once Home ships.
+    // The tracer list today; the real shelf is feature 8.
     key: "shelf",
-    href: "/",
+    href: "/shelf",
     icon: "LibraryBig",
     labelKey: "shelf",
     audience: "all",
