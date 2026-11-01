@@ -86,5 +86,45 @@
         "body": "很快就能在这里看到每位成员的游戏。"
       }
     }
+  },
+  "game": {
+    "meta": {
+      "description": "查看书架上这款桌游的详情、评分和拥有者。"
+    },
+    "close": "关闭",
+    "share": {
+      "label": "分享",
+      "copied": "链接已复制",
+      "copyFailed": "无法复制，请使用地址栏"
+    },
+    "chips": {
+      "rating": "平均 {rating} 分（满分 10 分），共 {count, plural, other {# 人评分}}",
+      "owners": "{count, plural, other {# 位拥有者}}"
+    },
+    "stats": {
+      "players": "玩家",
+      "minutes": "分钟",
+      "owners": "拥有者",
+      "unknown": "?"
+    },
+    "description": {
+      "more": "更多",
+      "less": "收起"
+    },
+    "owners": {
+      "heading": "拥有者（{count}）",
+      "since": "自 <date></date>",
+      "none": "还没有人拥有这款游戏"
+    },
+    "dock": {
+      "own": "我有这款游戏",
+      "soon": "即将推出"
+    },
+    "loading": "正在加载游戏",
+    "error": {
+      "title": "无法加载这款游戏",
+      "body": "我们这边出了点问题，请稍后再试。",
+      "retry": "重试"
+    }
   }
 }

@@ -12,6 +12,7 @@ function run(
     locale = "en" as Locale,
     at = now as Date | null,
     timeZone = KL as string | undefined,
+    monthYear = false,
   } = {},
 ) {
   const format = createFormatter({ locale, timeZone: KL });
@@ -21,6 +22,7 @@ function run(
     timeZone,
     format,
     justNow,
+    monthYear,
   });
 }
 
@@ -57,5 +59,33 @@ describe("formatLocalTime", () => {
     });
     expect(result.text).toBe("Oct 31, 2026");
     expect(result.title).toMatch(/5:00\s?PM$/);
+  });
+});
+
+describe("formatLocalTime month and year", () => {
+  // Spec 0008, AC-9: "Since Aug 2026", never relative.
+  it("shows only the month and year, even for a recent value", () => {
+    expect(run("2026-08-02T11:00:00Z", { monthYear: true }).text).toBe(
+      "Aug 2026",
+    );
+    expect(run("2026-11-01T09:00:00Z", { monthYear: true }).text).toBe(
+      "Nov 2026",
+    );
+  });
+
+  it("reads in Chinese, and the title keeps the full date and time", () => {
+    const result = run("2026-08-02T11:00:00Z", {
+      locale: "zh",
+      monthYear: true,
+    });
+
+    expect(result.text).toBe("2026年8月");
+    expect(result.title).toContain("19:00");
+  });
+
+  it("uses the first render zone when now is null", () => {
+    expect(
+      run("2026-07-31T17:00:00Z", { at: null, monthYear: true }).text,
+    ).toBe("Aug 2026");
   });
 });

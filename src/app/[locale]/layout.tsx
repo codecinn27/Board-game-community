@@ -46,6 +46,7 @@ export const viewport: Viewport = {
 
 export default async function RootLayout({
   children,
+  modal,
 }: LayoutProps<"/[locale]">) {
   const locale = await rootLocale();
   if (!hasLocale(locale)) notFound();
@@ -71,6 +72,8 @@ export default async function RootLayout({
         >
           {/* "guest" until feature 6 (Member accounts) reads the session. */}
           <AppShell viewer="guest">{children}</AppShell>
+          {/* The game sheet overlay (spec 0008): outside <main>, above the shell. */}
+          {modal}
         </IntlClientProvider>
       </body>
     </html>

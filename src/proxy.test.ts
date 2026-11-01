@@ -25,13 +25,38 @@ describe("proxy", () => {
   });
 
   // covers: AC-1
-  it("passes each request to the middleware and returns its response", () => {
+  it("passes each request to the middleware and returns its response", async () => {
     const request = new NextRequest("http://localhost:3000/design?x=1");
 
-    const response = proxy(request);
+    const response = await proxy(request);
 
     expect(handleIntl).toHaveBeenCalledWith(request);
     expect(response.status).toBe(307);
+  });
+});
+
+describe("proxy game ids", () => {
+  // covers: spec 0008 AC-1
+  it.each(["/en/games/999", "/zh/games/abc", "/en/games/0", "/en/games/1.5"])(
+    "rewrites %s to the catch all 404",
+    async (path) => {
+      handleIntl.mockClear();
+      const response = await proxy(
+        new NextRequest(`http://localhost:3000${path}`),
+      );
+
+      expect(response.headers.get("x-middleware-rewrite")).toMatch(
+        /\/(en|zh)\/_missing$/,
+      );
+      expect(handleIntl).not.toHaveBeenCalled();
+    },
+  );
+
+  it("leaves a real game id to the middleware", async () => {
+    handleIntl.mockClear();
+    await proxy(new NextRequest("http://localhost:3000/en/games/3"));
+
+    expect(handleIntl).toHaveBeenCalledTimes(1);
   });
 });
 

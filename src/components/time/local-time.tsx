@@ -8,6 +8,8 @@ type LocalTimeProps = {
   /** ISO 8601 timestamp, as Supabase returns `timestamptz`. */
   value: string;
   className?: string;
+  /** Month and year only, such as "Aug 2026". Never relative. */
+  monthYear?: boolean;
 };
 
 const SERVER_ZONE = "Asia/Kuala_Lumpur";
@@ -17,7 +19,7 @@ const SERVER_ZONE = "Asia/Kuala_Lumpur";
  * render show the UTC+8 date, so they match; after load it switches to the
  * visitor's zone and relative text, once, without ticking.
  */
-export function LocalTime({ value, className }: LocalTimeProps) {
+export function LocalTime({ value, className, monthYear }: LocalTimeProps) {
   const format = useFormatter();
   const t = useTranslations("common.time");
   const [now, setNow] = useState<Date | null>(null);
@@ -42,6 +44,7 @@ export function LocalTime({ value, className }: LocalTimeProps) {
     timeZone: now === null ? SERVER_ZONE : undefined,
     format,
     justNow: t("justNow"),
+    monthYear,
   });
 
   return (

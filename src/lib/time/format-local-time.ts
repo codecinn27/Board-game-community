@@ -16,6 +16,8 @@ type FormatLocalTimeOptions = {
   format: Formatter;
   /** The translated "just now" (`common.time.justNow`). */
   justNow: string;
+  /** Month and year only (`Aug 2026`), never relative: for "Since" dates. */
+  monthYear?: boolean;
 };
 
 /**
@@ -25,7 +27,7 @@ type FormatLocalTimeOptions = {
  */
 export function formatLocalTime(
   value: Date,
-  { now, timeZone, format, justNow }: FormatLocalTimeOptions,
+  { now, timeZone, format, justNow, monthYear }: FormatLocalTimeOptions,
 ): { text: string; title: string } {
   // next-intl falls back to its configured zone, not the browser's, when
   // given none, so read the browser's zone here.
@@ -35,7 +37,15 @@ export function formatLocalTime(
     timeStyle: "short",
     timeZone: zone,
   });
-  const date = format.dateTime(value, { dateStyle: "medium", timeZone: zone });
+  const date = monthYear
+    ? format.dateTime(value, {
+        month: "short",
+        year: "numeric",
+        timeZone: zone,
+      })
+    : format.dateTime(value, { dateStyle: "medium", timeZone: zone });
+
+  if (monthYear) return { text: date, title };
 
   if (now === null) return { text: date, title };
 

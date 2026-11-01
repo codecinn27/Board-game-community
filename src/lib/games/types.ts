@@ -12,6 +12,17 @@ export type ShelfGame = Present<"id" | "name" | "created_at" | "rating_count"> &
     cover_tint: string | null;
   };
 
+/** A shelf game plus the detail columns of `games` (spec 0008). */
+export type DummyGame = ShelfGame &
+  Pick<
+    Tables<"games">,
+    | "description"
+    | "players_min"
+    | "players_max"
+    | "play_time_min"
+    | "play_time_max"
+  >;
+
 export type DummyProfile = Pick<Tables<"profiles">, "id" | "display_name">;
 export type DummyOwner = Pick<
   Tables<"game_owners">,

@@ -4,15 +4,16 @@ import { type ReactNode } from "react";
 import { BottomTabBar } from "@/components/app-shell/bottom-tab-bar";
 import { getShellTabs } from "@/components/app-shell/shell-tabs";
 import { SiteHeader } from "@/components/app-shell/site-header";
-import {
-  CoverTintPreview,
-  type CoverTintSample,
-} from "@/components/design/cover-tint-preview";
+import { CloseLink } from "@/components/game-sheet/close-link";
+import { GameSheet } from "@/components/game-sheet/game-sheet";
+import { SheetError } from "@/components/game-sheet/sheet-error";
+import { SheetSkeleton } from "@/components/game-sheet/sheet-skeleton";
 import { ShelfEmpty } from "@/components/shelf/shelf-empty";
 import { ShelfError } from "@/components/shelf/shelf-error";
 import { ShelfSkeleton } from "@/components/shelf/shelf-skeleton";
 import { LocalTime } from "@/components/time/local-time";
 import { getAlternates } from "@/i18n/alternates";
+import { getGameDetail, type GameDetail } from "@/lib/games/detail";
 import { navItems, type NavItem, type Viewer } from "@/lib/app-shell/nav";
 
 // A developer page (spec 0004): its own headings stay English, the shell
@@ -66,49 +67,18 @@ const radii = [
   ["full", "rounded-full", "raised Add"],
 ] as const;
 
-// Four fixed sample colors, one pale enough for black text (AC-12). Names and
-// numbers are sample data for the preview only.
-const coverTintSamples: CoverTintSample[] = [
+// The real sheet in the four states the dummy routes cannot all reach
+// (spec 0008, AC-20): complete, no tint, no description and no ratings, and no
+// owners. Built from the same dummy rows the live route reads.
+const sheetStates: { name: string; id: number; over: Partial<GameDetail> }[] = [
+  { name: "Complete", id: 1, over: {} },
+  { name: "No tint", id: 7, over: { coverTint: null } },
   {
-    name: "Cascadia",
-    sampleHex: "#4b6b4f",
-    rating: "8.2",
-    owners: 3,
-    players: "1–4",
-    minutes: "30–45",
-    description:
-      "Draft habitat tiles and wildlife tokens to grow your own corner of the Pacific Northwest.",
+    name: "No description and no ratings",
+    id: 11,
+    over: {},
   },
-  {
-    name: "Magical Athlete",
-    sampleHex: "#e0452e",
-    rating: "7.9",
-    owners: 2,
-    players: "2–6",
-    minutes: "30",
-    description:
-      "Roll and race, but every racer has a wild power that bends the rules. Most points after four races wins.",
-  },
-  {
-    name: "SETI",
-    sampleHex: "#3fa6c2",
-    rating: "8.6",
-    owners: 1,
-    players: "1–4",
-    minutes: "40–160",
-    description:
-      "Launch probes and scan the sky with radio telescopes to find signs of life before your rivals.",
-  },
-  {
-    name: "Wingspan",
-    sampleHex: "#f3ead2",
-    rating: "8.0",
-    owners: 4,
-    players: "1–5",
-    minutes: "40–70",
-    description:
-      "Attract birds to your preserves; each one adds a power that chains across its habitat.",
-  },
+  { name: "No owners", id: 5, over: { owners: [], ownerCount: 0 } },
 ];
 
 // Every tab on, with Home on `/` and the Shelf on `/shelf`, so `/shelf` shows
@@ -290,20 +260,61 @@ export default function DesignPage() {
         </div>
       </Section>
 
-      <Section title="Cover Tint (game detail sheet)">
+      <Section title="Game detail sheet">
         <p className="max-w-xl text-muted-foreground">
-          Each sheet takes its color from the bottom of its cover. The color is
-          calmed, the text turns white or black, and every pair reaches 4.5:1.
-          The real sheet ships with feature 9.
+          The real sheet, as the page version, in four states. Each takes its
+          color from the bottom of its cover: the color is calmed, the text
+          turns white or near black, and every pair reaches 4.5:1.
         </p>
-        {/* Two across at most, so each mock stays phone sized */}
-        <div className="grid justify-items-center gap-6 md:grid-cols-2">
-          {coverTintSamples.map((sample) => (
-            <CoverTintPreview key={sample.name} sample={sample} />
+        {/* Two across at most, so each sheet stays phone sized */}
+        <div className="grid items-start justify-items-center gap-6 md:grid-cols-2">
+          {sheetStates.map((state) => (
+            <SheetPreview key={state.name} {...state} />
           ))}
+        </div>
+        <p className="max-w-xl text-muted-foreground">
+          Loading and error blocks. Each takes its text as props, so this page
+          shows them in English with no message provider.
+        </p>
+        <div className="grid items-start justify-items-center gap-6 md:grid-cols-2">
+          <div className="w-full max-w-lg overflow-clip rounded-[28px] border">
+            <SheetSkeleton label="Loading game" />
+          </div>
+          <div className="w-full max-w-lg overflow-clip rounded-[28px] border">
+            <SheetError
+              title="Could not load this game"
+              body="Something went wrong on our side. Try again in a moment."
+              retryLabel="Try again"
+            />
+          </div>
         </div>
       </Section>
     </div>
+  );
+}
+
+async function SheetPreview({
+  name,
+  id,
+  over,
+}: {
+  name: string;
+  id: number;
+  over: Partial<GameDetail>;
+}) {
+  const game = await getGameDetail(String(id));
+  if (game === null) return null;
+
+  return (
+    <figure className="flex w-full max-w-lg flex-col gap-2">
+      <figcaption className="text-sm text-muted-foreground">{name}</figcaption>
+      <GameSheet
+        game={{ ...game, ...over }}
+        variant="page"
+        headingLevel={3}
+        closeControl={<CloseLink label="Close" />}
+      />
+    </figure>
   );
 }
 

@@ -18,7 +18,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 5 | Two languages (English + Chinese) | Foundation | done |
 | 15 | Home page | Slice 1 (frontend, dummy data) | done |
 | 8 | Community shelf | Slice 1 (frontend, dummy data) | in-progress |
-| 9 | Game detail sheet | Slice 1 (frontend, dummy data) | planned |
+| 9 | Game detail sheet | Slice 1 (frontend, dummy data) | in-progress |
 | 21 | Live data for home, shelf, and game sheet | Slice 2 | planned |
 | 6 | Member accounts | Slice 2 | planned |
 | 7 | Add a game I own | Slice 2 | planned |
@@ -130,10 +130,19 @@ The "all board games" section at `/shelf`: every game the community owns, as a m
 - [x] Test it: `/test community shelf`
 Spec [0007](../specs/0007-community-shelf.md) · code in `src/app/[locale]/shelf/`, `src/lib/games/`, `src/components/shelf/`, `src/components/games/`, `messages/`
 
-### 9. Game detail sheet · needs a decision
+### 9. Game detail sheet · in-progress
 Tap a game on the shelf or home page to open its sheet, built to Design 5 (Cover Tint): the cover on top fading into its own color, name, rating and owner chips, a stats card, the description, the list of owners, and the "I own this" dock. Already designed on the canvas (phone and desktop dialog); the color rules are built in `src/lib/design/cover-tint.ts`.
 **Done when:** every dummy game opens its own tinted sheet at `/games/[id]` over the shelf (Back closes it, a direct visit shows it as a page), it shows the details and every owner, and "I own this" is visible but not wired up yet.
-- [ ] Design it (spec): `/architect game detail sheet`
+- [x] Design it (spec): `/architect game detail sheet`
+- [ ] Build it: `/develop game detail sheet`
+  - [ ] Thin thread: dummy data with details, `getGameDetail`, bare `/games/[id]` page, 404 and static ids (AC-1, 18, 19)
+  - [ ] Overlay slot: `@modal` intercepting route, layout prop, open, Back, and refresh proven (AC-2, 3)
+  - [ ] The sheet: tinted anatomy, chips, stats, owners, disabled dock, messages in both languages (AC-4 to 7, 9, 10, 16)
+  - [ ] Islands and frame: description "More", Share, shadcn Dialog frames, focus and motion, loading, error, metadata (AC-8, 11 to 15, 17)
+  - [ ] Tests, `/design` previews, `docs/design.md` update, browser checks (AC-20)
+- [ ] Verify it: `/check verify game detail sheet`
+- [ ] Test it: `/test game detail sheet`
+Spec [0008](../specs/0008-game-detail-sheet.md) · code in `src/app/[locale]/games/`, `src/app/[locale]/@modal/`, `src/components/game-sheet/`, `src/lib/games/`, `messages/`
 
 ## Slice 2: Real data behind the screens
 

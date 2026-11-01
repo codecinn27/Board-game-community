@@ -119,7 +119,7 @@ Server Action plus `useActionState`, one Zod schema shared by server and client,
 
 ### Game detail sheet (feature 9, Cover Tint)
 
-Tapping a game on the shelf opens this sheet over the shelf. Its colors come from the game's own cover, so every game gets its own theme. The color math is built and tested ([`src/lib/design/cover-tint.ts`](../src/lib/design/cover-tint.ts)); `/design` shows four sample sheets ([`src/components/design/cover-tint-preview.tsx`](../src/components/design/cover-tint-preview.tsx)). Feature 9 builds the real sheet.
+Tapping a game on the shelf opens this sheet over the shelf. Its colors come from the game's own cover, so every game gets its own theme. The color math is built and tested ([`src/lib/design/cover-tint.ts`](../src/lib/design/cover-tint.ts)); The real sheet is built (feature 9, spec 0008): code in [`src/components/game-sheet/`](../src/components/game-sheet/), data from `getGameDetail` in [`src/lib/games/detail.ts`](../src/lib/games/detail.ts). `/design` shows it in four states (complete, no tint, no description and no ratings, no owners), plus the loading and error blocks.
 
 **Anatomy, top to bottom**:
 1. **Cover**: full bleed, `object-cover`, about half the sheet (`h-[52dvh] max-h-[30rem]`). No cover: the cover placeholder tile, stretched.
@@ -130,7 +130,7 @@ Tapping a game on the shelf opens this sheet over the shelf. Its colors come fro
 6. **Stats card**: Players, Minutes, Owners. `rounded-[22px]`, card fill, line border and dividers; label `text-xs uppercase` in muted ink over a `text-2xl font-bold tabular-nums whitespace-nowrap` value. Missing value: "?".
 7. **Description**: clamp 4 lines, then an underlined "More".
 8. **Owners list** (feature 9).
-9. **Dock**: floating pill, dock fill with blur. "I own this" is filled with ink, its text in inverse ink. Beside it: Add to a list, or Share. Guest: Sign in to add.
+9. **Dock**: floating pill, dock fill with blur. "I own this" is filled with ink, its text in inverse ink; until feature 7 it is disabled with a "Coming soon" hint inside it. Beside it: Share.
 
 **Cover Tint colors**: the server samples the average color of the bottom 20% of the cover once, when the cover is saved, and stores it as `games.cover_tint` (`#rrggbb`). On render, `coverTheme(cover_tint)` returns every color the sheet needs:
 
@@ -144,12 +144,12 @@ Tapping a game on the shelf opens this sheet over the shelf. Its colors come fro
 
 - Set the variables inline on the sheet's root (`style={{ "--sheet-tint": theme.tint, ... }}`) and style with `bg-(--sheet-tint)`, `text-(--sheet-ink)` and so on. This is the **one** place colors come from data; everywhere else stays on tokens.
 - Focus rings on the themed controls use ink: `focus-visible:ring-(--sheet-ink) focus-visible:ring-offset-(--sheet-tint)`.
-- No cover: call `coverTheme` with the placeholder tile's `--cover-N` color.
+- No cover tint: `coverTheme(NEUTRAL_SHEET_TINT)`, one fixed warm sand (`src/lib/games/detail.ts`). The cover area then shows the placeholder tile in that same tint, so the fade is seamless.
 - The sheet ignores the device's light or dark setting: the cover decides. The page behind is light too.
 
 **Frame and motion**: phones get a bottom sheet (`h-[96dvh]`, `rounded-t-[32px]`, dimmed page behind); from `md` a centered dialog (`max-w-lg`, `rounded-[28px]`) with a soft blurred glow in the tint behind it. Open: slide up 280ms ease out, the cover settles from `scale-105`; close 200ms. All behind `motion-safe:`.
 
-**Route and accessibility**: the sheet is `/games/[id]`, opened over the shelf by an intercepting route, so Back closes it and the link can be shared; a direct visit renders the same layout as a page. `role="dialog"`, labelled by the game name, focus trapped, `Esc` closes, focus returns to the card.
+**Route and accessibility**: the sheet is `/games/[id]`, opened over the current page by an intercepting route in the `@modal` slot of `[locale]` (`@modal/(.)games/[id]`), so Back closes it and the link can be shared; a direct visit renders the same `GameSheet` as a page inside the shell. The overlay frame is `SheetFrame` (shadcn Dialog, Base UI): `role="dialog"` labelled by the title, focus trapped, `Esc` and the dimmed area close, focus returns to the tapped card. Close plays the 200ms exit, then calls `router.back()` (or goes to `/shelf` with no history). Share is one behavior for both Share buttons (`ShareProvider`): the native sheet, else copy the link with a polite "Link copied" message.
 
 When a feature builds one of these, it adds a block for it to `/design` and updates its rules here if the build changed them.
 
