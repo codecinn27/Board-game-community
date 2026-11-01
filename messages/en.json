@@ -15,5 +15,22 @@
     "nav": {
       "label": "Main navigation"
     }
+  },
+  "common": {
+    "notFound": {
+      "title": "Page not found",
+      "body": "We could not find that page. It may have moved, or the link may be wrong.",
+      "home": "Back to the shelf"
+    },
+    "language": {
+      "label": "Language: {name}",
+      "names": {
+        "en": "English",
+        "zh": "中文"
+      }
+    },
+    "time": {
+      "justNow": "just now"
+    }
   }
 }

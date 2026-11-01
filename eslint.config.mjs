@@ -3,6 +3,24 @@ import nextVitals from "eslint-config-next/core-web-vitals";
 import nextTs from "eslint-config-next/typescript";
 import prettier from "eslint-config-prettier/flat";
 
+// Links and redirects keep the language only through @/i18n/navigation, and
+// messages reach the browser only through IntlClientProvider (spec 0005).
+const navigationMessage =
+  "Import from @/i18n/navigation so links keep the language.";
+const languagePaths = [
+  { name: "next/link", message: navigationMessage },
+  {
+    name: "next/navigation",
+    importNames: ["redirect", "permanentRedirect", "usePathname", "useRouter"],
+    message: navigationMessage,
+  },
+  {
+    name: "next-intl",
+    importNames: ["NextIntlClientProvider"],
+    message: "Use IntlClientProvider so messages are always picked.",
+  },
+];
+
 const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
@@ -31,6 +49,7 @@ const eslintConfig = defineConfig([
       "no-restricted-imports": [
         "error",
         {
+          paths: languagePaths,
           patterns: [
             {
               group: ["@/lib/supabase/admin", "**/supabase/admin"],
@@ -50,7 +69,49 @@ const eslintConfig = defineConfig([
       "src/proxy.ts",
       "src/**/*.test.{ts,tsx}",
     ],
-    rules: { "no-restricted-imports": "off" },
+    // Admin client allowed here; the language rules still apply.
+    rules: { "no-restricted-imports": ["error", { paths: languagePaths }] },
+  },
+  {
+    files: ["src/i18n/intl-client-provider.tsx"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          paths: languagePaths.filter((path) => path.name !== "next-intl"),
+          patterns: [
+            {
+              group: ["@/lib/supabase/admin", "**/supabase/admin"],
+              message:
+                "Use createAdminClient only in server actions, route handlers, proxy.ts, or src/lib/supabase.",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    // Interface text goes through next-intl, never raw JSX text (spec 0005).
+    files: ["src/app/**/*.tsx", "src/components/**/*.tsx"],
+    rules: {
+      "react/jsx-no-literals": [
+        "error",
+        {
+          noStrings: false,
+          ignoreProps: true,
+          allowedStrings: ["·", "(", ")", "/", ":", ",", "+"],
+        },
+      ],
+    },
+  },
+  {
+    files: [
+      "src/components/ui/**",
+      "src/app/[[]locale]/design/**",
+      "src/components/design/**",
+      "src/**/*.test.{ts,tsx}",
+    ],
+    rules: { "react/jsx-no-literals": "off" },
   },
   prettier,
   // Override default ignores of eslint-config-next.

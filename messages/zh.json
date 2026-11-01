@@ -15,5 +15,22 @@
     "nav": {
       "label": "主导航"
     }
+  },
+  "common": {
+    "notFound": {
+      "title": "找不到页面",
+      "body": "我们找不到这个页面。它可能已经移动，或者链接有误。",
+      "home": "返回游戏架"
+    },
+    "language": {
+      "label": "语言：{name}",
+      "names": {
+        "en": "English",
+        "zh": "中文"
+      }
+    },
+    "time": {
+      "justNow": "刚刚"
+    }
   }
 }
