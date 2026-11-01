@@ -11,7 +11,7 @@ const expectedBackground = {
   dark: [24, 18, 15],
 } as const;
 
-const pages = ["/", "/design"] as const;
+const pages = ["/en", "/en/design"] as const;
 
 for (const path of pages) {
   test(`${path} fits the screen, has 44px targets, and paints the right theme`, async ({
@@ -59,7 +59,7 @@ for (const path of pages) {
     });
 
     await page.screenshot({
-      path: testInfo.outputPath(`${path === "/" ? "home" : "design"}.png`),
+      path: testInfo.outputPath(`${path === "/en" ? "home" : "design"}.png`),
       fullPage: true,
     });
   });
@@ -69,8 +69,8 @@ test("the phone shelf has no bottom bar with a single tab", async ({
   page,
 }, testInfo) => {
   test.skip(testInfo.project.name.startsWith("desktop"), "phone only");
-  await page.goto("/");
-  // The only navigation landmarks on `/` today are none: one tab, no nav.
+  await page.goto("/en");
+  // The only navigation landmarks on `/en` today are none: one tab, no nav.
   await expect(page.locator("body > nav")).toHaveCount(0);
   await expect(page.getByRole("link", { name: "Game Shelf" })).toBeVisible();
 });
@@ -78,7 +78,7 @@ test("the phone shelf has no bottom bar with a single tab", async ({
 test("/design previews both tab sets with the raised Add and an active Shelf", async ({
   page,
 }, testInfo) => {
-  await page.goto("/design");
+  await page.goto("/en/design");
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
     "content",
     /noindex/,
@@ -96,7 +96,7 @@ test("keyboard reaches the wordmark first, with a visible ring", async ({
   page,
 }, testInfo) => {
   test.skip(!testInfo.project.name.startsWith("desktop"), "desktop only");
-  await page.goto("/");
+  await page.goto("/en");
   await page.keyboard.press("Tab");
   const focused = page.locator(":focus");
   await expect(focused).toHaveAccessibleName("Game Shelf");
@@ -108,7 +108,7 @@ test("/design walks the member header links in order at desktop", async ({
   page,
 }, testInfo) => {
   test.skip(!testInfo.project.name.startsWith("desktop"), "desktop only");
-  await page.goto("/design");
+  await page.goto("/en/design");
   const memberHeaderLinks = page
     .getByRole("figure")
     .filter({ hasText: "Member set" })
@@ -137,7 +137,7 @@ test("/design walks the member header links in order at desktop", async ({
 test("/design shows four readable Cover Tint sheets, one with black text", async ({
   page,
 }) => {
-  await page.goto("/design");
+  await page.goto("/en/design");
   const section = page.locator("section", {
     has: page.getByRole("heading", { name: "Cover Tint (game detail sheet)" }),
   });

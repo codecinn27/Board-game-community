@@ -1,8 +1,11 @@
+import { type Metadata } from "next";
 import { Suspense } from "react";
+import { getAlternates } from "@/i18n/alternates";
 import { getShelfGames } from "@/lib/games/shelf";
 
 // Tracer bullet thread: one typed read from the database to the page.
-// Replaced by the real shelf (feature 8) and translated text (feature 5).
+// Replaced by the real shelf (feature 8). Game names show as stored in both
+// languages (spec 0005, AC-10).
 async function Shelf() {
   const games = await getShelfGames();
   return (
@@ -14,6 +17,10 @@ async function Shelf() {
       ))}
     </ul>
   );
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+  return { alternates: await getAlternates("/") };
 }
 
 export default function Home() {

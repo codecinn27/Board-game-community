@@ -1,7 +1,9 @@
 import { Dices } from "lucide-react";
-import Link from "next/link";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
+import { Link } from "@/i18n/navigation";
+import { hasLocale, htmlLang, routing } from "@/i18n/routing";
 import { cn } from "@/lib/utils";
+import { LanguageMenu, type LanguageOption } from "./language-menu";
 import { NavLink } from "./nav-link";
 import { type ShellTab } from "./shell-tabs";
 
@@ -19,7 +21,18 @@ export async function SiteHeader({
   position = "sticky",
   pathname,
 }: SiteHeaderProps) {
-  const t = await getTranslations("shell");
+  const [t, tLanguage, locale] = await Promise.all([
+    getTranslations("shell"),
+    getTranslations("common.language"),
+    getLocale(),
+  ]);
+  const current = hasLocale(locale) ? locale : routing.defaultLocale;
+  const options: LanguageOption[] = routing.locales.map((value) => ({
+    locale: value,
+    name: tLanguage(`names.${value}`),
+    lang: htmlLang[value],
+  }));
+  const label = tLanguage("label", { name: tLanguage(`names.${current}`) });
 
   return (
     <header
@@ -37,23 +50,26 @@ export async function SiteHeader({
           <span>{t("brand")}</span>
         </Link>
 
-        {tabs.length > 0 ? (
-          <nav aria-label={t("nav.label")} className="hidden md:block">
-            <ul className="flex items-center gap-1">
-              {tabs.map((tab) => (
-                <li key={tab.key}>
-                  <NavLink
-                    href={tab.href}
-                    icon={tab.icon}
-                    label={tab.label}
-                    variant={tab.raised ? "action" : "inline"}
-                    pathname={pathname}
-                  />
-                </li>
-              ))}
-            </ul>
-          </nav>
-        ) : null}
+        <div className="flex items-center gap-1">
+          {tabs.length > 0 ? (
+            <nav aria-label={t("nav.label")} className="hidden md:block">
+              <ul className="flex items-center gap-1">
+                {tabs.map((tab) => (
+                  <li key={tab.key}>
+                    <NavLink
+                      href={tab.href}
+                      icon={tab.icon}
+                      label={tab.label}
+                      variant={tab.raised ? "action" : "inline"}
+                      pathname={pathname}
+                    />
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          ) : null}
+          <LanguageMenu current={current} label={label} options={options} />
+        </div>
       </div>
     </header>
   );

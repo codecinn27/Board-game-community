@@ -57,7 +57,11 @@ Stored in `docs/specs/`. Format: `docs/specs/NNNN-title.md`. Feature scope lives
 - Files and folders are lowercase kebab case. Import with `@/`. Group by feature: `src/lib/<feature>/`, `src/components/<feature>/`. `src/components/ui/` is shadcn generated, edit it only through the shadcn CLI.
 - New logic and every RLS policy change need a test. No coverage gate.
 - Mobile first UI; all user facing text goes through next-intl (English and Chinese).
-- Messages live in `messages/en.json` and `messages/zh.json` with the same keys (checked by `src/i18n/messages.test.ts`); the locale is set in `src/i18n/request.ts`.
+- Messages live in `messages/en.json` and `messages/zh.json` with the same keys (checked by `src/i18n/messages.test.ts`); the locale comes from the `[locale]` URL segment (languages in `src/i18n/routing.ts`), and `src/i18n/request.ts` loads the messages, Chinese over English as a fallback.
+- Pages live under `src/app/[locale]/` (`/en/...`, `/zh/...`); `src/proxy.ts` redirects unprefixed paths. Each page's `generateMetadata` returns `alternates: await getAlternates("<path>")` from `@/i18n/alternates` (canonical plus hreflang).
+- Import `Link`, `redirect`, `usePathname`, and `useRouter` from `@/i18n/navigation`, never `next/link` or `next/navigation`; send messages to the browser only through `IntlClientProvider` with picked namespaces. Raw text in JSX under `src/app/` and `src/components/` fails lint (the `/design` page, `src/components/ui/`, and tests are exempt).
+- Show timestamps with `LocalTime` (`src/components/time/local-time.tsx`), never format dates by hand.
+- next-intl's middleware does not load under Vitest, so proxy redirects and the language cookie are tested in `e2e/two-languages.spec.ts`.
 - Shell tabs come only from `src/lib/app-shell/nav.ts` (`enabled` plus `audience`); the bottom tab bar shows only at 2 or more visible tabs.
 
 ## Tooling
@@ -66,6 +70,7 @@ Stored in `docs/specs/`. Format: `docs/specs/NNNN-title.md`. Feature scope lives
 - Husky hooks: `pre-commit` runs lint-staged (ESLint fix and Prettier on staged files), `commit-msg` runs commitlint, `pre-push` runs `pnpm typecheck && pnpm test`. `--no-verify` only for an emergency, and CI still has to pass.
 - CI (`checks` job) runs format check, lint, typecheck, tests, Gitleaks, and a commitlint check of the PR title. Dependabot sends grouped weekly PRs. `next build`, pgTAP, and Playwright are not in CI yet.
 - Merge with squash, and write the PR title as a Conventional Commit.
+- PRs use `.github/pull_request_template.md`, which asks for a native reader check of any changed Chinese text.
 - Generated and vendored files are not formatted or linted: `database.types.ts`, `next-env.d.ts`, `.claude`, `.agents`, `supabase/`, and Markdown under `docs/`.
 
 ## Git

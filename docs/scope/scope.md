@@ -15,7 +15,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 2 | Coding standards & tooling | Foundation | done |
 | 3 | Data model | Foundation | done |
 | 4 | Design system & mobile first UI | Foundation | done |
-| 5 | Two languages (English + Chinese) | Foundation | planned |
+| 5 | Two languages (English + Chinese) | Foundation | done |
 | 6 | Member accounts | Slice 1 | planned |
 | 7 | Add a game I own | Slice 1 | planned |
 | 8 | Community shelf | Slice 1 | planned |
@@ -81,10 +81,19 @@ Visual language, layout primitives, and the app shell, designed for a phone scre
 - [x] Test it: `/test design system & mobile first UI`
 Spec [0004](../specs/0004-design-system-mobile-ui/index.md) · code in `src/components/app-shell/`, `src/components/design/`, `src/lib/app-shell/`, `src/lib/design/`, `src/app/globals.css`, `messages/`
 
-### 5. Two languages (English + Chinese) · needs a decision
+### 5. Two languages (English + Chinese) · done
 A language switch and a pattern for translated text, set before pages exist so every page is built bilingual from the start.
 **Done when:** a visitor can switch between English and Chinese, the choice is remembered, and the UI text pattern is in place for every later page (game names and descriptions stay as fetched).
-- [ ] Design it (spec): `/architect two languages`
+- [x] Design it (spec): `/architect two languages`
+- [x] Build it: `/develop two languages`
+  - [x] Thin thread: proxy, `[locale]` segment, root params, translated 404, both languages prerender (AC-1, 2, 5, 6)
+  - [x] Language menu in the header and the one year cookie (AC-3, 4)
+  - [x] Text pattern guards: typed keys, English fallback merge, lint rules and their tests (AC-8, 10, 12)
+  - [x] hreflang per page, `LocalTime`, and the PR template (AC-7, 9, 11)
+  - [x] Playwright checks for both languages at 360px and 1280px (AC-1 to 5, 7, 9)
+- [x] Verify it: `/check verify two languages`
+- [x] Test it: `/test two languages`
+Spec [0005](../specs/0005-two-languages/index.md) · code in `src/i18n/`, `src/proxy.ts`, `src/app/[locale]/`, `src/components/app-shell/`, `src/components/time/`, `src/lib/time/`, `messages/`
 
 ## Slice 1: Core loop (shelf + who owns it)
 

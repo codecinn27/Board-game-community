@@ -21,6 +21,22 @@ describe("message files", () => {
     }
   });
 
+  // The parity test cannot catch a wrong name, so pin them: each language is
+  // named in its own script, the same in both files (spec 0005, AC-3).
+  it("name each language in its own script in both files", () => {
+    for (const messages of [en, zh]) {
+      expect(messages.common.language.names).toEqual({
+        en: "English",
+        zh: "中文",
+      });
+    }
+  });
+
+  it("keep the {name} slot in the language menu label", () => {
+    expect(en.common.language.label).toContain("{name}");
+    expect(zh.common.language.label).toContain("{name}");
+  });
+
   it("keep the %s slot in the title template", () => {
     expect(en.shell.meta.titleTemplate).toContain("%s");
     expect(zh.shell.meta.titleTemplate).toContain("%s");

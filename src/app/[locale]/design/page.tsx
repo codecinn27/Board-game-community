@@ -8,15 +8,20 @@ import {
   CoverTintPreview,
   type CoverTintSample,
 } from "@/components/design/cover-tint-preview";
+import { LocalTime } from "@/components/time/local-time";
+import { getAlternates } from "@/i18n/alternates";
 import { navItems, type NavItem, type Viewer } from "@/lib/app-shell/nav";
 
 // A developer page (spec 0004): its own headings stay English, the shell
 // inside it uses the real translations. Hidden on the production deploy.
 
-export const metadata: Metadata = {
-  title: "Design system",
-  robots: { index: false, follow: false },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: "Design system",
+    robots: { index: false, follow: false },
+    alternates: await getAlternates("/design"),
+  };
+}
 
 const colorPairs = [
   ["background", "foreground"],
@@ -111,6 +116,10 @@ const previewItems: NavItem[] = navItems.map((item) => ({
   href: item.key === "shelf" ? "/shelf" : item.href,
 }));
 const previewPath = "/shelf";
+
+// Fixed times, so the page stays static: one late in the UTC+8 day (a reader
+// west of Malaysia sees the day before after load) and one older.
+const timeSamples = ["2026-10-31T17:00:00Z", "2026-01-15T09:30:00Z"] as const;
 
 export default function DesignPage() {
   if (process.env.VERCEL_ENV === "production") notFound();
@@ -233,6 +242,24 @@ export default function DesignPage() {
           <ShellPreview viewer="guest" title="Guest set" />
           <ShellPreview viewer="member" title="Member set" />
         </div>
+      </Section>
+
+      <Section title="Language and time">
+        <p className="max-w-xl text-muted-foreground">
+          The globe menu in each header switches between English and 中文 on the
+          same page. Times render with LocalTime: the UTC+8 date first, then
+          your own zone after load (hover for the full time).
+        </p>
+        <ul className="flex flex-col gap-2 rounded-xl border bg-card p-4 text-sm">
+          {timeSamples.map((value) => (
+            <li key={value} className="flex flex-wrap items-baseline gap-3">
+              <span className="font-mono text-xs text-muted-foreground">
+                {value}
+              </span>
+              <LocalTime value={value} className="tabular-nums" />
+            </li>
+          ))}
+        </ul>
       </Section>
 
       <Section title="Cover Tint (game detail sheet)">
