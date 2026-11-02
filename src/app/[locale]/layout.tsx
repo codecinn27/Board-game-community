@@ -4,6 +4,7 @@ import { locale as rootLocale } from "next/root-params";
 import { notFound } from "next/navigation";
 import { getMessages, getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/app-shell/app-shell";
+import { SheetHost } from "@/components/game-sheet/sheet-host";
 import { IntlClientProvider } from "@/i18n/intl-client-provider";
 import { hasLocale, htmlLang, routing } from "@/i18n/routing";
 import { themeColors } from "@/lib/design/theme-color";
@@ -46,7 +47,6 @@ export const viewport: Viewport = {
 
 export default async function RootLayout({
   children,
-  modal,
 }: LayoutProps<"/[locale]">) {
   const locale = await rootLocale();
   if (!hasLocale(locale)) notFound();
@@ -72,8 +72,19 @@ export default async function RootLayout({
         >
           {/* "guest" until feature 6 (Member accounts) reads the session. */}
           <AppShell viewer="guest">{children}</AppShell>
-          {/* The game sheet overlay (spec 0008): outside <main>, above the shell. */}
-          {modal}
+          {/* The game sheet (spec 0008): one client dialog, outside <main>,
+              above the shell. Cards open it; no navigation happens. */}
+          <SheetHost
+            labels={{
+              close: messages.game.close,
+              loading: messages.game.loading,
+              errorTitle: messages.game.error.title,
+              errorBody: messages.game.error.body,
+              errorRetry: messages.game.error.retry,
+              notFoundTitle: messages.common.notFound.title,
+              notFoundBody: messages.common.notFound.body,
+            }}
+          />
         </IntlClientProvider>
       </body>
     </html>

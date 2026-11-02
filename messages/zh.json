@@ -113,7 +113,7 @@
     },
     "owners": {
       "heading": "拥有者（{count}）",
-      "since": "自 <date></date>",
+      "since": "自 {date}",
       "none": "还没有人拥有这款游戏"
     },
     "dock": {

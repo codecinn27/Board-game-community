@@ -113,7 +113,7 @@
     },
     "owners": {
       "heading": "Owners ({count})",
-      "since": "Since <date></date>",
+      "since": "Since {date}",
       "none": "Nobody owns this yet"
     },
     "dock": {

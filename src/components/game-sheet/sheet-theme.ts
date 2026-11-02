@@ -1,6 +1,6 @@
 import { type CSSProperties } from "react";
 import { coverTheme } from "@/lib/design/cover-tint";
-import { NEUTRAL_SHEET_TINT } from "@/lib/games/detail";
+import { NEUTRAL_SHEET_TINT } from "@/lib/games/neutral-tint";
 
 /**
  * The `--sheet-*` variables for a sheet: the one place colors come from data

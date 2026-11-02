@@ -2,7 +2,7 @@
 
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useSheetClose } from "./sheet-frame";
+import { useSheetClose } from "./sheet-host";
 import { glassButton, sheetFocusRing } from "./sheet-theme";
 
 type CloseButtonProps = {

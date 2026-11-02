@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { LocalTime } from "@/components/time/local-time";
 import { Link } from "@/i18n/navigation";
+import { SheetLink } from "@/components/game-sheet/sheet-link";
 import { type HomeGame } from "@/lib/games/home";
 import { cn } from "@/lib/utils";
 import { CoverTile } from "@/components/games/cover-tile";
@@ -47,8 +48,14 @@ export async function JustAdded({ games }: JustAddedProps) {
                 index >= 5 && "hidden md:block",
               )}
             >
-              <Link
-                href={`/games/${game.id}`}
+              <SheetLink
+                card={{
+                  id: game.id,
+                  name: game.name,
+                  coverTint: game.coverTint,
+                  ownerCount: null,
+                  avgRecommendation: null,
+                }}
                 className={cn("flex flex-col gap-2 rounded-xl", focusRing)}
               >
                 <CoverTile
@@ -65,7 +72,7 @@ export async function JustAdded({ games }: JustAddedProps) {
                   ) : null}
                   <LocalTime value={game.addedAt} />
                 </span>
-              </Link>
+              </SheetLink>
             </li>
           ))}
         </ul>

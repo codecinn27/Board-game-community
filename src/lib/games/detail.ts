@@ -2,8 +2,7 @@ import { dummyGames, dummyOwners, dummyProfiles } from "./dummy-data";
 import { compareNames } from "./shelf";
 import { type DummyGame, type DummyOwner, type DummyProfile } from "./types";
 
-/** The sheet's tint for a game with no `cover_tint`: one fixed warm sand. */
-export const NEUTRAL_SHEET_TINT = "#e8dcc4";
+export { NEUTRAL_SHEET_TINT } from "./neutral-tint";
 
 export type GameOwner = {
   memberId: string;

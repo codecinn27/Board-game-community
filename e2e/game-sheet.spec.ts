@@ -1,72 +1,80 @@
 import { expect, test, type Page } from "@playwright/test";
 
-// Spec 0008, AC-1 to AC-3 and AC-11 to AC-14, on the real intercepting route.
+// Spec 0008, AC-1 to AC-3, AC-11 to AC-14, and AC-21: the client side modal on
+// the shelf, and the page version at /games/{id}.
 
 const copy = {
   en: {
     close: "Close",
-    shelf: "Shelf",
     notFound: "Page not found",
     owners: "4 owners",
     rating: "8.0 out of 10, from 5 ratings",
-    none: "Just One",
+    share: "Share",
+    copied: "Link copied",
   },
   zh: {
     close: "关闭",
-    shelf: "书架",
     notFound: "找不到页面",
     owners: "4 位拥有者",
     rating: "平均 8.0 分（满分 10 分），共 5 人评分",
-    none: "Just One",
+    share: "分享",
+    copied: "链接已复制",
   },
 } as const;
 
-async function openFromShelf(page: Page, locale: "en" | "zh") {
+/** Opens the page, waits for it to be interactive, and returns the Wingspan card. */
+async function shelf(page: Page, locale: "en" | "zh", id = 1) {
   await page.goto(`/${locale}/shelf`);
   await page.waitForLoadState("networkidle");
-  const card = page.locator(`a[href='/${locale}/games/1']`);
+  const card = page.locator(`a[href='/${locale}/games/${id}']`);
   await card.scrollIntoViewIfNeeded();
-  await card.focus();
-  await card.click();
-  await expect(page).toHaveURL(`/${locale}/games/1`);
-  // Let the open motion finish: a close press during it can be ignored.
-  await expect(page.getByRole("dialog")).not.toHaveAttribute(
-    "data-starting-style",
-    "",
-  );
   return card;
+}
+
+async function settled(page: Page) {
+  const dialog = page.getByRole("dialog");
+  await expect(dialog).toBeVisible();
+  // Let the open motion finish: a close press during it can be ignored.
+  await expect(dialog).not.toHaveAttribute("data-starting-style", "");
+  return dialog;
 }
 
 for (const locale of ["en", "zh"] as const) {
   const t = copy[locale];
 
   test.describe(`game sheet in ${locale}`, () => {
-    test("opens over the shelf as a labelled dialog, and Back closes it", async ({
+    test("opens as a modal on the same page within 500ms, and Back closes it", async ({
       page,
     }) => {
-      await openFromShelf(page, locale);
+      const card = await shelf(page, locale);
+      await card.focus();
+      await card.click();
+      await expect(page.getByRole("dialog")).toBeVisible({ timeout: 500 });
+
       const dialog = page.getByRole("dialog", { name: "Wingspan" });
-      await expect(dialog).toBeVisible();
-      await expect(dialog).toContainText(t.owners);
+      await expect(dialog).toContainText(t.owners, { timeout: 1500 });
       await expect(dialog).toContainText(t.rating);
-      // The page behind stays rendered.
+      // The page does not navigate, and the page behind stays rendered.
+      await expect(page).toHaveURL(`/${locale}/shelf`);
       await expect(page.locator("main ul > li a").first()).toBeAttached();
 
       await page.goBack();
       await expect(dialog).toHaveCount(0);
       await expect(page).toHaveURL(`/${locale}/shelf`);
 
+      // Forward does not reopen it.
       await page.goForward();
-      await expect(dialog).toBeVisible();
+      await expect(page.getByRole("dialog")).toHaveCount(0);
     });
 
-    test("Close, Esc, and the dimmed area each go back and return focus to the card", async ({
+    test("Close, Esc, and the dimmed area each close it and return focus to the card", async ({
       page,
     }) => {
+      const card = await shelf(page, locale);
       for (const how of ["button", "escape", "backdrop"] as const) {
-        const card = await openFromShelf(page, locale);
-        const dialog = page.getByRole("dialog");
-        await expect(dialog).toBeVisible();
+        await card.focus();
+        await card.click();
+        const dialog = await settled(page);
 
         if (how === "button") {
           await dialog.getByRole("button", { name: t.close }).click();
@@ -82,19 +90,26 @@ for (const locale of ["en", "zh"] as const) {
       }
     });
 
+    test("closing leaves no extra history behind it", async ({ page }) => {
+      await page.goto(`/${locale}`);
+      const card = await shelf(page, locale);
+      await card.click();
+      const dialog = await settled(page);
+      await dialog.getByRole("button", { name: t.close }).click();
+      await expect(dialog).toHaveCount(0);
+
+      await page.goBack();
+      await expect(page).toHaveURL(new RegExp(`/${locale}/?$`));
+    });
+
     test("keeps the shelf scroll position and traps focus", async ({
       page,
     }) => {
-      await page.goto(`/${locale}/shelf`);
-      await page.waitForLoadState("networkidle");
-      const card = page.locator(`a[href='/${locale}/games/12']`);
-      await card.scrollIntoViewIfNeeded();
+      const card = await shelf(page, locale, 12);
       await page.evaluate(() => window.scrollBy(0, 40));
       const before = await page.evaluate(() => window.scrollY);
       await card.click();
-      const dialog = page.getByRole("dialog");
-      await expect(dialog).toBeVisible();
-      await expect(dialog).not.toHaveAttribute("data-starting-style", "");
+      const dialog = await settled(page);
 
       for (let i = 0; i < 12; i++) {
         await page.keyboard.press("Tab");
@@ -111,6 +126,19 @@ for (const locale of ["en", "zh"] as const) {
       await page.keyboard.press("Escape");
       await expect(dialog).toHaveCount(0);
       expect(await page.evaluate(() => window.scrollY)).toBe(before);
+    });
+
+    test("a modifier click keeps the normal link and does not open the modal", async ({
+      page,
+      context,
+    }) => {
+      const card = await shelf(page, locale);
+      const opened = context.waitForEvent("page");
+      await card.click({ modifiers: ["Control"] });
+      const other = await opened;
+
+      await expect(page.getByRole("dialog")).toHaveCount(0);
+      expect(other.url()).toContain(`/${locale}/games/1`);
     });
 
     test("a direct visit renders the page version with no dialog", async ({
@@ -148,7 +176,7 @@ for (const locale of ["en", "zh"] as const) {
       await expect(sheet.getByText(/\d\.\d/)).toHaveCount(0);
     });
 
-    test("Share copies the link when there is no share sheet", async ({
+    test("Share from the modal copies the game's own link, not the shelf's", async ({
       page,
       context,
     }) => {
@@ -156,27 +184,26 @@ for (const locale of ["en", "zh"] as const) {
       await page.addInitScript(() => {
         Object.defineProperty(navigator, "share", { value: undefined });
       });
-      await page.goto(`/${locale}/games/1`);
-      await page.waitForLoadState("networkidle");
-      await page
-        .getByRole("button", { name: locale === "en" ? "Share" : "分享" })
-        .last()
-        .click();
-      await expect(page.getByRole("status")).toContainText(
-        locale === "en" ? "Link copied" : "链接已复制",
-      );
+      const card = await shelf(page, locale);
+      await card.click();
+      const dialog = await settled(page);
+      await expect(dialog).toContainText(t.owners, { timeout: 5000 });
+
+      await dialog.getByRole("button", { name: t.share }).last().click();
+      await expect(page.getByRole("status").last()).toContainText(t.copied);
       expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(
         new URL(`/${locale}/games/1`, page.url()).href,
       );
+      await expect(page).toHaveURL(`/${locale}/shelf`);
     });
   });
 }
 
-test("with reduced motion the overlay closes at once", async ({ page }) => {
+test("with reduced motion the modal closes at once", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
-  await openFromShelf(page, "en");
-  const dialog = page.getByRole("dialog");
-  await expect(dialog).toBeVisible();
+  const card = await shelf(page, "en");
+  await card.click();
+  const dialog = await settled(page);
   await page.keyboard.press("Escape");
   await expect(dialog).toHaveCount(0, { timeout: 500 });
 });
@@ -194,4 +221,63 @@ test("every control in the sheet is at least 44px", async ({ page }) => {
         .map((r) => `${r.width}x${r.height}`),
     );
   expect(small).toEqual([]);
+});
+
+// Spec 0008, AC-22: the stock fade ended early and the backdrop snapped back
+// to full dark for a frame before unmount (a visible flash), and the phone
+// sheet never slid because its transition named `transform`, not `translate`.
+test("closing fades the backdrop out in step with the sheet, with no flash", async ({
+  page,
+}) => {
+  type Sample = { backdrop: number; sheet: string };
+  const card = await shelf(page, "en");
+  await card.click();
+  await settled(page);
+  // The open fade is still running just after the starting style clears.
+  await expect
+    .poll(() =>
+      page.evaluate(() => {
+        const backdrop = document.querySelector(
+          "div.fixed.inset-0.z-50:not([role=dialog])",
+        );
+        return backdrop ? Number(getComputedStyle(backdrop).opacity) : 0;
+      }),
+    )
+    .toBe(1);
+  await page.evaluate(() => {
+    const samples: Sample[] = [];
+    (window as unknown as { __close: Sample[] }).__close = samples;
+    const start = performance.now();
+    const tick = () => {
+      const backdrop = document.querySelector(
+        "div.fixed.inset-0.z-50:not([role=dialog])",
+      );
+      const sheet = document.querySelector("[role=dialog]");
+      if (backdrop && sheet) {
+        const style = getComputedStyle(sheet);
+        samples.push({
+          backdrop: Number(getComputedStyle(backdrop).opacity),
+          sheet: `${style.translate} ${style.opacity}`,
+        });
+      }
+      if (performance.now() - start < 600) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  });
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await page.waitForTimeout(500);
+
+  const samples = await page.evaluate(
+    () => (window as unknown as { __close: Sample[] }).__close,
+  );
+  expect(samples.length).toBeGreaterThan(3);
+  // The backdrop only ever gets lighter while the sheet leaves.
+  for (let i = 1; i < samples.length; i++) {
+    expect(samples[i]?.backdrop).toBeLessThanOrEqual(
+      (samples[i - 1]?.backdrop ?? 1) + 0.01,
+    );
+  }
+  // And the sheet really animates out (several positions or fades), not vanishes.
+  expect(new Set(samples.map((s) => s.sheet)).size).toBeGreaterThan(2);
 });

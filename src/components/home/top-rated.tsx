@@ -2,7 +2,7 @@ import { Star } from "lucide-react";
 import { getFormatter, getTranslations } from "next-intl/server";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { Link } from "@/i18n/navigation";
+import { SheetLink } from "@/components/game-sheet/sheet-link";
 import { type TopGame } from "@/lib/games/home";
 import { cn } from "@/lib/utils";
 import { CoverTile } from "@/components/games/cover-tile";
@@ -41,8 +41,14 @@ export async function TopRated({ games }: TopRatedProps) {
                   key={game.id}
                   className="md:rounded-2xl md:bg-card md:ring-1 md:ring-foreground/10"
                 >
-                  <Link
-                    href={`/games/${game.id}`}
+                  <SheetLink
+                    card={{
+                      id: game.id,
+                      name: game.name,
+                      coverTint: game.coverTint,
+                      ownerCount: game.ownerCount,
+                      avgRecommendation: game.avgRecommendation,
+                    }}
                     className={cn(
                       "relative flex min-h-15 items-center gap-3 rounded-xl px-3 py-2 md:grid md:grid-cols-[1fr_auto] md:items-center md:gap-x-2 md:gap-y-2 md:rounded-2xl md:p-3",
                       focusRing,
@@ -79,7 +85,7 @@ export async function TopRated({ games }: TopRatedProps) {
                       />
                       {rating}
                     </span>
-                  </Link>
+                  </SheetLink>
                 </li>
               );
             })}

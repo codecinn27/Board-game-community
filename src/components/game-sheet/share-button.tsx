@@ -19,6 +19,8 @@ const ShareContext = createContext<(() => void) | null>(null);
 type ShareProviderProps = {
   /** The shared title: the game name. */
   title: string;
+  /** The game's address, such as `/en/games/1`. Default: the current page. */
+  path?: string;
   labels: ShareLabels;
   children: ReactNode;
 };
@@ -28,9 +30,14 @@ const MESSAGE_MS = 2000;
 /**
  * One Share behavior for every Share button on the sheet (spec 0008, AC-11):
  * the native share sheet where it exists, otherwise copy the link and say so
- * in a polite live region. The link is always the current page address.
+ * in a polite live region. The link is always the game's own address, never an overlay only one.
  */
-export function ShareProvider({ title, labels, children }: ShareProviderProps) {
+export function ShareProvider({
+  title,
+  path,
+  labels,
+  children,
+}: ShareProviderProps) {
   const [message, setMessage] = useState("");
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -57,7 +64,10 @@ export function ShareProvider({ title, labels, children }: ShareProviderProps) {
   }
 
   async function share() {
-    const url = window.location.href;
+    const url =
+      path === undefined
+        ? window.location.href
+        : new URL(path, window.location.origin).href;
     if (typeof navigator.share === "function") {
       try {
         await navigator.share({ title, url });

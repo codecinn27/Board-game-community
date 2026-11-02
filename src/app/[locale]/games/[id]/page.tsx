@@ -36,5 +36,5 @@ export default async function GamePage({
   params,
 }: PageProps<"/[locale]/games/[id]">) {
   const { id } = await params;
-  return <GameSheetLoader id={id} variant="page" />;
+  return <GameSheetLoader id={id} />;
 }

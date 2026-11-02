@@ -2,7 +2,11 @@ import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { render, setLocale, textOf } from "@/components/home/test-intl";
-import { buildGameDetail, type GameDetail } from "@/lib/games/detail";
+import {
+  buildGameDetail,
+  type GameDetail,
+  type GameOwner,
+} from "@/lib/games/detail";
 import { dummyGames, dummyOwners, dummyProfiles } from "@/lib/games/dummy-data";
 import { GameSheet } from "./game-sheet";
 
@@ -15,16 +19,7 @@ vi.mock(
   async () => (await import("@/components/home/test-intl")).navigationMock,
 );
 
-// The async parts are tested in sheet-parts.test.tsx; stand-ins keep the
-// sheet renderable to a string.
-vi.mock("./stats-card", () => ({ StatsCard: () => <dl data-part="stats" /> }));
-vi.mock("./owners-list", () => ({
-  OwnersList: ({ owners }: { owners: unknown[] }) => (
-    <section data-part="owners">Owners ({owners.length})</section>
-  ),
-}));
-
-// Spec 0008, AC-4 to AC-6, AC-8, AC-10, AC-11.
+// Spec 0008, AC-4 to AC-11.
 
 function detail(id: number, over: Partial<GameDetail> = {}): GameDetail {
   const game = buildGameDetail(id, dummyGames, dummyProfiles, dummyOwners);
@@ -92,7 +87,7 @@ describe("GameSheet", () => {
   it("writes no hex, oklch, or bracket colors in the sheet components", () => {
     const dir = __dirname;
     const files = readdirSync(dir).filter(
-      (f) => /\.tsx?$/.test(f) && !f.endsWith(".test.tsx"),
+      (f) => /\.tsx?$/.test(f) && !/\.test\.tsx?$/.test(f),
     );
     expect(files.length).toBeGreaterThan(5);
     for (const file of files) {
@@ -182,5 +177,108 @@ describe("GameSheet", () => {
     const html = await sheet(detail(1));
 
     expect(html.match(/aria-live="polite"/g)).toHaveLength(1);
+  });
+});
+
+describe("sheet stats", () => {
+  beforeEach(() => setLocale("en"));
+
+  async function stats(over: Partial<GameDetail>) {
+    const html = await sheet(detail(1, over));
+    const card = /<dl[\s\S]*?<\/dl>/.exec(html)?.[0] ?? "";
+    return textOf(card);
+  }
+
+  // covers: AC-7
+  it("shows ranges, single values, and the owner count", async () => {
+    expect(await stats({})).toBe(
+      "Players 1\u20135 Minutes 40\u201370 Owners 4",
+    );
+    expect(await stats({ playersMin: 4, playersMax: 4 })).toContain(
+      "Players 4 ",
+    );
+  });
+
+  // covers: AC-7
+  it("shows ? for a missing end, never a half range", async () => {
+    const text = await stats({ playersMin: null, playTimeMax: null });
+
+    expect(text).toBe("Players ? Minutes ? Owners 4");
+  });
+
+  // covers: AC-7
+  it("keeps values on one line, with tabular numbers", async () => {
+    const html = await sheet(detail(1));
+
+    expect(html).toContain("whitespace-nowrap");
+    expect(html).toContain("tabular-nums");
+  });
+});
+
+describe("sheet owners", () => {
+  beforeEach(() => setLocale("en"));
+
+  const owners: GameOwner[] = [
+    { memberId: "a", displayName: "Mei", since: "2026-08-02T11:00:00Z" },
+    {
+      memberId: "b",
+      displayName: "\u4e09\u90ce",
+      since: "2026-09-02T11:00:00Z",
+    },
+  ];
+
+  // covers: AC-9
+  it("shows the count, every owner, an initial, and a month year date", async () => {
+    const html = await sheet(detail(1, { owners, ownerCount: 2 }));
+    const list =
+      /<section aria-labelledby="game-owners"[\s\S]*?<\/section>/.exec(
+        html,
+      )?.[0] ?? "";
+
+    expect(textOf(list)).toContain("Owners (2)");
+    expect(list.match(/<li /g)).toHaveLength(2);
+    expect(textOf(list)).toContain("Since Aug 2026");
+    expect(textOf(list)).toContain("Since Sep 2026");
+    expect(list).toMatch(/aria-hidden="true"[^>]*>\u4e09<\/span>/);
+    expect(list).not.toContain("<a ");
+  });
+
+  // covers: AC-9
+  it("shows every owner with no cap", async () => {
+    const many = Array.from({ length: 40 }, (_, i) => ({
+      memberId: `m${i}`,
+      displayName: `Member ${i}`,
+      since: "2026-08-02T11:00:00Z",
+    }));
+
+    const html = await sheet(detail(1, { owners: many, ownerCount: 40 }));
+    const list =
+      /<section aria-labelledby="game-owners"[\s\S]*?<\/section>/.exec(
+        html,
+      )?.[0] ?? "";
+
+    expect(list.match(/<li /g)).toHaveLength(40);
+  });
+
+  // covers: AC-9
+  it("says nobody owns it, with no rows", async () => {
+    const html = await sheet(detail(1, { owners: [], ownerCount: 0 }));
+    const list =
+      /<section aria-labelledby="game-owners"[\s\S]*?<\/section>/.exec(
+        html,
+      )?.[0] ?? "";
+
+    expect(textOf(list)).toContain("Nobody owns this yet");
+    expect(list).not.toContain("<li ");
+  });
+
+  // covers: AC-16
+  it("reads the same in Chinese", async () => {
+    setLocale("zh");
+
+    const html = await sheet(detail(1, { owners, ownerCount: 2 }));
+
+    expect(textOf(html)).toContain("\u62e5\u6709\u8005\uff082\uff09");
+    expect(textOf(html)).toContain("\u81ea 2026");
   });
 });
