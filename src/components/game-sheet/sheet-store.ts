@@ -1,6 +1,7 @@
 import { useSyncExternalStore } from "react";
 import { loadGameSheet, type SheetResult } from "./actions";
 import { type SheetData } from "./sheet-data";
+import { type Box } from "./sheet-motion";
 
 // The client store behind the game modal (spec 0008, AC-21). A tap on a card
 // opens the modal in the same frame from the card's own data; the full sheet
@@ -18,8 +19,10 @@ export type SheetCard = {
 export type SheetStatus = "loading" | "ready" | "notfound" | "error";
 
 type SheetState = {
-  /** The modal is open (false while it plays its exit). */
+  /** The modal is mounted. It stays true while it animates out. */
   open: boolean;
+  /** The exit animation is playing; `finishClose` ends it. */
+  closing: boolean;
   card: SheetCard | null;
   status: SheetStatus;
   /** Everything the sheet shows, once `status` is ready. */
@@ -31,6 +34,7 @@ const ANSWER_TIMEOUT_MS = 10_000;
 
 const closed: SheetState = {
   open: false,
+  closing: false,
   card: null,
   status: "loading",
   data: null,
@@ -112,6 +116,7 @@ export function openSheet(
   const known = results.get(keyOf(card.id, locale));
   set({
     open: true,
+    closing: false,
     card,
     status: "loading",
     data: null,
@@ -132,25 +137,31 @@ export function openSheet(
 
 /** Close, Esc, or the dimmed area: start the exit. The entry goes back after it. */
 export function closeSheet() {
-  if (!state.open) return;
+  if (!state.open || state.closing) return;
   stopTimer();
-  set({ open: false });
+  set({ closing: true });
   if (pushed) {
     pushed = false;
     pendingBack = true;
   }
 }
 
-/** The browser's Back already popped our entry: just close. */
+/** The browser's Back already popped our entry: just play the exit. */
 export function closeFromBack() {
-  if (!state.open) return;
+  if (!state.open || state.closing) return;
   stopTimer();
   pushed = false;
   pendingBack = false;
-  set({ open: false });
+  set({ closing: true });
 }
 
-/** The exit finished: give back the history entry, and forget the game. */
+/** The exit animation ended: unmount the modal. */
+export function finishClose() {
+  if (!state.open) return;
+  set({ open: false, closing: false });
+}
+
+/** The modal has unmounted: give back the history entry, and forget the game. */
 export function resetSheet() {
   if (state.open) return;
   if (pendingBack) {
@@ -170,6 +181,28 @@ export function retrySheet() {
 /** The element to focus again when the modal closes. */
 export function getOpener(): HTMLElement | null {
   return opener;
+}
+
+/**
+ * Where the tapped card's cover is on screen now, for the open and close
+ * animation. Null when there is no card, or it is not in view (scrolled away,
+ * or the page changed), and the animation then falls back to a slide and fade.
+ */
+export function getOriginRect(): Box | null {
+  const card = opener;
+  if (card === null || !card.isConnected) return null;
+  const tile = card.querySelector<HTMLElement>(".aspect-square") ?? card;
+  const rect = tile.getBoundingClientRect();
+  const inView =
+    rect.width > 0 &&
+    rect.height > 0 &&
+    rect.bottom > 0 &&
+    rect.right > 0 &&
+    rect.top < window.innerHeight &&
+    rect.left < window.innerWidth;
+  return inView
+    ? { left: rect.left, top: rect.top, width: rect.width, height: rect.height }
+    : null;
 }
 
 /** The current state, for code outside React (and tests). */

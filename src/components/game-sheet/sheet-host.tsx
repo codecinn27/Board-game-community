@@ -1,16 +1,26 @@
 "use client";
 
 import { Dialog as DialogPrimitive } from "@base-ui/react/dialog";
-import { createContext, useContext, useEffect } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+} from "react";
 import { DialogPortal } from "@/components/ui/dialog";
+import { cn } from "@/lib/utils";
 import { CloseButton } from "./close-button";
 import { SheetError } from "./sheet-error";
 import { SheetPreview } from "./sheet-preview";
+import { animateClose, animateOpen } from "./sheet-motion";
 import { SheetView } from "./sheet-view";
 import {
   closeFromBack,
   closeSheet,
+  finishClose,
   getOpener,
+  getOriginRect,
   resetSheet,
   retrySheet,
   useSheetState,
@@ -45,7 +55,36 @@ type SheetHostProps = {
  * server rendered. The URL does not change.
  */
 export function SheetHost({ labels }: SheetHostProps) {
-  const { open, card, status, data, tint } = useSheetState();
+  const { open, closing, card, status, data, tint } = useSheetState();
+  const popup = useRef<HTMLDivElement | null>(null);
+
+  // The card grows into the modal as soon as the modal is on screen.
+  const setPopup = useCallback((element: HTMLDivElement | null) => {
+    popup.current = element;
+    if (element) animateOpen(element, getOriginRect());
+  }, []);
+
+  // The modal shrinks back into the card, and only then goes away.
+  useEffect(() => {
+    if (!closing) return;
+    const animation = popup.current
+      ? animateClose(popup.current, getOriginRect())
+      : null;
+    if (animation === null) {
+      finishClose();
+      return;
+    }
+    let cancelled = false;
+    animation.finished.then(
+      () => {
+        if (!cancelled) finishClose();
+      },
+      () => {},
+    );
+    return () => {
+      cancelled = true;
+    };
+  }, [closing]);
 
   // The browser's Back pops the modal's own history entry.
   useEffect(() => {
@@ -65,14 +104,20 @@ export function SheetHost({ labels }: SheetHostProps) {
         }}
       >
         <DialogPortal>
-          {/* Its own fade, timed with the sheet. The stock keyframe fade ended
-                early and snapped back to full dark for a frame before unmount. */}
-          <DialogPrimitive.Backdrop className="fixed inset-0 z-50 bg-foreground/50 data-ending-style:opacity-0 data-starting-style:opacity-0 motion-safe:transition-opacity motion-safe:duration-280 motion-safe:ease-out motion-safe:data-ending-style:duration-200" />
+          {/* Its own fade, timed with the motion of the modal. The stock keyframe
+              fade ended early and snapped back to full dark for a frame. */}
+          <DialogPrimitive.Backdrop
+            className={cn(
+              "fixed inset-0 z-50 bg-foreground/50 data-starting-style:opacity-0 motion-safe:transition-opacity motion-safe:duration-340 motion-safe:ease-out",
+              closing && "opacity-0 motion-safe:duration-260",
+            )}
+          />
           <DialogPrimitive.Popup
+            ref={setPopup}
             aria-labelledby={SHEET_TITLE_ID}
             finalFocus={() => getOpener() ?? true}
             style={sheetStyle(tint)}
-            className="fixed inset-x-0 bottom-0 z-50 h-[96dvh] outline-none data-ending-style:translate-y-full data-starting-style:translate-y-full motion-safe:transition-[translate,opacity] motion-safe:duration-280 motion-safe:ease-out motion-safe:data-ending-style:duration-200 md:inset-auto md:top-1/2 md:left-1/2 md:h-auto md:w-full md:max-w-lg md:-translate-x-1/2 md:-translate-y-1/2 md:data-ending-style:-translate-y-1/2 md:data-ending-style:opacity-0 md:data-starting-style:-translate-y-1/2 md:data-starting-style:opacity-0"
+            className="fixed inset-x-0 bottom-0 z-50 h-[96dvh] outline-none md:inset-auto md:top-1/2 md:left-1/2 md:h-auto md:w-full md:max-w-lg md:-translate-x-1/2 md:-translate-y-1/2"
           >
             <div
               aria-hidden

@@ -3,7 +3,7 @@
 A shared, public board game shelf for your local community: it shows every game the group owns and who owns it, so nobody buys a duplicate. Members register to add their games, fill in a standard rating form, comment, keep a top 5, and grow a wishlist of games still to conquer. Mobile first, desktop second, in English and Chinese.
 
 **Build approach:** Tracer Bullet (prove one real thread through every layer first, then thicken it one strand at a time). After the foundations, the front end comes first: home, shelf, and game sheet are built on hardcoded dummy data until the design is right (Slice 1), and only then wired to the database (Slice 2 onward).
-**Workflow:** Beta (after `/develop`: `/check verify`, then `/test`). The project default level of rigor. `/architect` is the recommended first stop for a feature with a real decision, but skippable when you already know the build. Any feature can carry its own tag (e.g. `· GA`) to do more or less.
+**Workflow:** Prototype (after `/develop`: nothing more, the engineer does the self check). The project default level of rigor. `/architect` is the recommended first stop for a feature with a real decision, but skippable when you already know the build. Any feature can carry its own tag (e.g. `· GA`) to do more or less.
 
 _These are recommendations to keep your build orderly, not requirements. Skip anything that does not fit: if you already know how to build a feature, use `/develop` and skip `/architect`. You decide when a feature is `done`._
 
@@ -135,13 +135,13 @@ Tap a game on the shelf or home page to open its sheet, built to Design 5 (Cover
 **Done when:** every dummy game opens its own tinted sheet at `/games/[id]` over the shelf (Back closes it, a direct visit shows it as a page), it shows the details and every owner, and "I own this" is visible but not wired up yet.
 - [x] Design it (spec): `/architect game detail sheet`
 - [ ] Build it: `/develop game detail sheet`
-  - [ ] Thin thread: dummy data with details, `getGameDetail`, bare `/games/[id]` page, 404 and static ids (AC-1, 18, 19)
+  - [x] Thin thread: dummy data with details, `getGameDetail`, bare `/games/[id]` page, 404 and static ids (AC-1, 18, 19)
   - [ ] Overlay slot: `@modal` intercepting route, layout prop, open, Back, and refresh proven (AC-2, 3)
-  - [ ] The sheet: tinted anatomy, chips, stats, owners, disabled dock, messages in both languages (AC-4 to 7, 9, 10, 16)
-  - [ ] Islands and frame: description "More", Share, shadcn Dialog frames, focus and motion, loading, error, metadata (AC-8, 11 to 15, 17)
+  - [x] The sheet: tinted anatomy, chips, stats, owners, disabled dock, messages in both languages (AC-4 to 7, 9, 10, 16)
+  - [x] Islands and frame: description "More", Share, shadcn Dialog frames, focus and motion, loading, error, metadata (AC-8, 11 to 15, 17)
   - [ ] Tests, `/design` previews, `docs/design.md` update, browser checks (AC-20)
 - [ ] Verify it: `/check verify game detail sheet`
-- [ ] Test it: `/test game detail sheet`
+- [x] Test it: `/test game detail sheet`
 Spec [0008](../specs/0008-game-detail-sheet.md) · code in `src/app/[locale]/games/`, `src/app/[locale]/@modal/`, `src/components/game-sheet/`, `src/lib/games/`, `messages/`
 
 ## Slice 2: Real data behind the screens

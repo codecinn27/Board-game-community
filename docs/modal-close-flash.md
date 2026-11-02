@@ -3,6 +3,8 @@
 Spec: [0008 game detail sheet](specs/0008-game-detail-sheet.md), AC-22.
 Code: `src/components/game-sheet/sheet-host.tsx`.
 
+> **Later change:** the open and close motion was then replaced by a card to modal morph (`sheet-motion.ts`, spec 0008 AC-14). The backdrop fade and the lesson about naming the right property still apply; the sheet's own slide is now that morph.
+
 ## 1. What the issue was
 
 When you closed the game modal (click outside, Esc, or Close), the screen

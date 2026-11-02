@@ -165,12 +165,22 @@ describe("closing", () => {
     store.openSheet(card, "en", null);
   });
 
-  // covers: AC-13
-  it("closes at once, and gives back the history entry once the exit ends", () => {
+  // covers: AC-13, AC-14
+  it("keeps the modal mounted while it animates out, then unmounts it", () => {
     store.closeSheet();
     store.closeSheet();
 
-    expect(state().open).toBe(false);
+    expect(state()).toMatchObject({ open: true, closing: true });
+
+    store.finishClose();
+
+    expect(state()).toMatchObject({ open: false, closing: false });
+  });
+
+  // covers: AC-13
+  it("gives back the history entry once the modal has unmounted, once", () => {
+    store.closeSheet();
+    store.finishClose();
     expect(back).not.toHaveBeenCalled();
 
     store.resetSheet();
@@ -188,14 +198,17 @@ describe("closing", () => {
 
     expect(pushState).toHaveBeenCalledTimes(1);
     expect(back).not.toHaveBeenCalled();
-    expect(state().open).toBe(true);
+    expect(state()).toMatchObject({ open: true, closing: false });
   });
 
   // covers: AC-13
-  it("does not pop history again when the browser's Back already did", () => {
+  it("plays the exit but does not pop history when the browser's Back already did", () => {
     store.closeFromBack();
+    expect(state().closing).toBe(true);
 
-    expect(state().open).toBe(false);
+    store.finishClose();
+    store.resetSheet();
+
     expect(back).not.toHaveBeenCalled();
   });
 
@@ -204,6 +217,7 @@ describe("closing", () => {
     store.closeSheet();
     expect(state().card).toEqual(card);
 
+    store.finishClose();
     store.resetSheet();
 
     expect(state().card).toBeNull();
@@ -213,6 +227,7 @@ describe("closing", () => {
   it("remembers the tapped element for focus return", () => {
     const link = {} as HTMLElement;
     store.closeSheet();
+    store.finishClose();
     store.resetSheet();
 
     store.openSheet(card, "en", link);
@@ -223,6 +238,7 @@ describe("closing", () => {
   // covers: AC-21
   it("ignores an answer for a game that is no longer showing", async () => {
     store.closeSheet();
+    store.finishClose();
     store.resetSheet();
     actions.loadGameSheet.mockResolvedValue({
       status: "ready",

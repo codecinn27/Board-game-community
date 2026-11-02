@@ -257,7 +257,7 @@ test("closing fades the backdrop out in step with the sheet, with no flash", asy
         const style = getComputedStyle(sheet);
         samples.push({
           backdrop: Number(getComputedStyle(backdrop).opacity),
-          sheet: `${style.translate} ${style.opacity}`,
+          sheet: `${style.translate} ${style.transform} ${style.clipPath} ${style.opacity}`,
         });
       }
       if (performance.now() - start < 600) requestAnimationFrame(tick);
@@ -280,4 +280,59 @@ test("closing fades the backdrop out in step with the sheet, with no flash", asy
   }
   // And the sheet really animates out (several positions or fades), not vanishes.
   expect(new Set(samples.map((s) => s.sheet)).size).toBeGreaterThan(2);
+});
+
+// Spec 0008, AC-14: the card grows into the modal and shrinks back into it.
+test("the modal grows out of the tapped card and shrinks back into it", async ({
+  page,
+}) => {
+  type Rect = { x: number; y: number; w: number };
+  const card = await shelf(page, "en");
+  const cover = await card.locator(".aspect-square").boundingBox();
+  if (cover === null) throw new Error("the card cover has no box");
+
+  const sample = (bucket: string) =>
+    page.evaluate((name) => {
+      const rects: Rect[] = [];
+      (window as unknown as Record<string, Rect[]>)[name] = rects;
+      const start = performance.now();
+      const tick = () => {
+        const modal = document.querySelector("[role=dialog]");
+        if (modal) {
+          const r = modal.getBoundingClientRect();
+          rects.push({ x: r.left, y: r.top, w: r.width });
+        }
+        if (performance.now() - start < 900) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    }, bucket);
+  const read = (bucket: string) =>
+    page.evaluate(
+      (name) => (window as unknown as Record<string, Rect[]>)[name] ?? [],
+      bucket,
+    );
+  const near = (rect: Rect | undefined) => {
+    expect(rect).toBeDefined();
+    expect(Math.abs((rect?.x ?? 0) - cover.x)).toBeLessThan(6);
+    expect(Math.abs((rect?.y ?? 0) - cover.y)).toBeLessThan(6);
+    expect(Math.abs((rect?.w ?? 0) - cover.width)).toBeLessThan(6);
+  };
+
+  await sample("__open");
+  await card.click();
+  await settled(page);
+  await page.waitForTimeout(500);
+  const opened = await read("__open");
+  // It starts on the card, and ends much bigger.
+  near(opened[0]);
+  expect(opened[opened.length - 1]?.w ?? 0).toBeGreaterThan(cover.width * 2);
+
+  await sample("__close");
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await page.waitForTimeout(300);
+  const closed = await read("__close");
+  // It shrinks back onto the card before it goes away.
+  expect(closed[0]?.w ?? 0).toBeGreaterThan(cover.width * 2);
+  near(closed[closed.length - 1]);
 });
