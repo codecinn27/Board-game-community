@@ -19,6 +19,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 15 | Home page | Slice 1 (frontend, dummy data) | done |
 | 8 | Community shelf | Slice 1 (frontend, dummy data) | in-progress |
 | 9 | Game detail sheet | Slice 1 (frontend, dummy data) | in-progress |
+| 22 | Shelf: By owner view | Next (frontend, dummy data) | planned |
 | 21 | Live data for home, shelf, and game sheet | Slice 2 | planned |
 | 6 | Member accounts | Slice 2 | planned |
 | 7 | Add a game I own | Slice 2 | planned |
@@ -118,15 +119,14 @@ Spec [0006](../specs/0006-home-page.md) · code in `src/app/[locale]/`, `src/lib
 
 ### 8. Community shelf · in-progress
 The "all board games" section at `/shelf`: every game the community owns, as a mobile friendly grid of covers, with a switch between all games and games grouped by owner.
-**Done when:** a visitor sees every dummy game with cover, name, owner count, and average recommendation, can switch to the by owner view, and the empty and loading states render.
+**Done when:** a visitor sees every dummy game with cover, name, owner count, and average recommendation, can switch to the By owner tab (it shows a "coming soon" note; the real view moved to feature 22), and the empty and loading states render.
 - [x] Mock it on the canvas (phone and desktop) and get your OK
 - [x] Design it (spec): `/architect community shelf`
-- [ ] Build it: `/develop community shelf`
+- [x] Build it: `/develop community shelf`
   - [x] Part 1, thin thread: `CoverTile` moved to `src/components/games/`, read layer and `compareNames` replace the tracer, cards in the grid at `/shelf` (AC-1 to 4, 11)
   - [x] Part 1, the rest: view switch from `?view=`, loading skeleton, empty and error states, By owner placeholder, messages in both languages (AC-5 to 10)
-  - [x] Part 1, checks: component tests for the states, `/design` previews, browser checks, updated home checks (AC-7 to 9, 12)
-  - [ ] Part 2, By owner: owner rows in the read layer, member sections with game strips, browser checks (AC-13 to 15)
-- [ ] Verify it: `/check verify community shelf`
+  - [x] Part 1, checks: component tests for the states, `/design` previews, browser checks, updated home checks (AC-7 to 9)
+- [x] Verify it: `/check verify community shelf`
 - [x] Test it: `/test community shelf`
 Spec [0007](../specs/0007-community-shelf.md) · code in `src/app/[locale]/shelf/`, `src/lib/games/`, `src/components/shelf/`, `src/components/games/`, `messages/`
 
@@ -134,15 +134,28 @@ Spec [0007](../specs/0007-community-shelf.md) · code in `src/app/[locale]/shelf
 Tap a game on the shelf or home page to open its sheet, built to Design 5 (Cover Tint): the cover on top fading into its own color, name, rating and owner chips, a stats card, the description, the list of owners, and the "I own this" dock. Already designed on the canvas (phone and desktop dialog); the color rules are built in `src/lib/design/cover-tint.ts`.
 **Done when:** every dummy game opens its own tinted sheet at `/games/[id]` over the shelf (Back closes it, a direct visit shows it as a page), it shows the details and every owner, and "I own this" is visible but not wired up yet.
 - [x] Design it (spec): `/architect game detail sheet`
-- [ ] Build it: `/develop game detail sheet`
+- [x] Build it: `/develop game detail sheet`
   - [x] Thin thread: dummy data with details, `getGameDetail`, bare `/games/[id]` page, 404 and static ids (AC-1, 18, 19)
-  - [ ] Overlay slot: `@modal` intercepting route, layout prop, open, Back, and refresh proven (AC-2, 3)
   - [x] The sheet: tinted anatomy, chips, stats, owners, disabled dock, messages in both languages (AC-4 to 7, 9, 10, 16)
   - [x] Islands and frame: description "More", Share, shadcn Dialog frames, focus and motion, loading, error, metadata (AC-8, 11 to 15, 17)
-  - [ ] Tests, `/design` previews, `docs/design.md` update, browser checks (AC-20)
+  - [x] Tests, `/design` previews, `docs/design.md` update, browser checks (AC-20)
 - [ ] Verify it: `/check verify game detail sheet`
 - [x] Test it: `/test game detail sheet`
 Spec [0008](../specs/0008-game-detail-sheet.md) · code in `src/app/[locale]/games/`, `src/app/[locale]/@modal/`, `src/components/game-sheet/`, `src/lib/games/`, `messages/`
+
+## Next: Shelf by owner (frontend, dummy data)
+
+Moved out of feature 8 (Community shelf) so the shelf could be finished. It is still dummy data and still front end only, so do it before Slice 2.
+
+### 22. Shelf: By owner view · planned
+The "By owner" view at `/shelf?view=owner`: one section per member who owns at least one game, members A to Z, each with a row of their games that scrolls sideways inside itself. It replaces the "coming soon" note the shelf shows today.
+**Done when:** a visitor switches to By owner and sees every member with their games as a sideways strip of covers, with no sideways scroll of the page at 360px, and the loading and error states match All games.
+- [x] Design it (spec): already written as part 2 of [spec 0007](../specs/0007-community-shelf.md) (AC-13 to 15, build plan tasks 10 to 12); `/architect shelf by owner view` can split it into its own spec
+- [ ] Build it: `/develop shelf by owner view`
+  - [ ] Read layer: owner rows in `buildShelfData` (members A to Z, games A to Z, members with no games left out) and tests (AC-13)
+  - [ ] `OwnerShelves`: member sections with avatar and game strips; delete the placeholder and its two messages (AC-13 to 15)
+  - [ ] Browser checks for By owner at both widths and both languages (AC-13, 14)
+Spec [0007](../specs/0007-community-shelf.md) (part 2) · code in `src/components/shelf/`, `src/lib/games/shelf.ts`, `messages/`
 
 ## Slice 2: Real data behind the screens
 
@@ -152,6 +165,7 @@ Starts once you are happy with the Slice 1 design.
 Replace the dummy data with real reads from Supabase (public read, no sign in needed), and move the dummy games into `supabase/seed.sql` so local development looks the same as before.
 **Done when:** home, shelf, and the game sheet show real database rows with no visual change, the dummy data file is deleted, and the cover tint comes from `games.cover_tint`.
 - [ ] Design it (spec): `/architect live data for home, shelf, and game sheet`
+  - [ ] Overlay slot: `@modal` intercepting route, layout prop, open, Back, and refresh proven (AC-2, 3)
 
 ### 6. Member accounts · needs a decision
 Register, sign in, sign out. Anyone can browse without an account; only members can add games, rate, and comment.

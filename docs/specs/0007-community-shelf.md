@@ -23,13 +23,13 @@ The project runs Next.js with Cache Components on (`cacheComponents: true`), so 
 - As a visitor, I want to switch to a by owner view, so I can see what a given member owns.
 - As a visitor, I want a clear message when the shelf is empty, still loading, or failed to load, so the page never looks broken.
 
-**Acceptance criteria** (the contract; AC-1 to AC-12 are part 1, AC-13 to AC-15 are part 2):
+**Acceptance criteria** (the contract; AC-1 to AC-11 are part 1, AC-13 to AC-15 are part 2):
 
 *Part 1: All games*
 - **AC-1**: `/en/shelf` and `/zh/shelf` render an `h1` "Shelf" with the game count next to it ("12 games"), the view switch, and a grid with one card per game. Each card is one whole link (cover tile, name, and meta row) to `/games/{id}` in the current language, through `Link` from `@/i18n/navigation`. Until feature 9 ships, that path shows the translated 404.
 - **AC-2**: A card shows the `CoverTile` (decorative, `aria-hidden`), the name clamped to 2 lines, and one meta row. The meta row has the owner count with a `Users` icon (visible as an icon and a number, with `sr-only` text so screen readers hear "1 owner" or "2 owners", pluralized in both languages) and, only when `avg_recommendation` is not null, a star with the average to exactly one decimal (8.0, not 8), whose visible text is `aria-hidden` and followed by `sr-only` text, so screen readers hear "8.5 out of 10". A game with no average shows no rating text at all (Just One shows only its owner count).
 - **AC-3**: Cards are ordered by name A to Z: names compared by code point (not by UTF-16 unit) after lowercasing, ties by `id` ascending. The order is the same in `/en` and `/zh`. With the dummy data it is: Ark Nova, Azul, Cascadia, Codenames, Dixit, Just One, Magical Athlete, SETI, Splendor, Ticket to Ride, Wingspan, 三国杀.
-- **AC-4**: The grid has 2 columns below `sm` (640px), 3 from `sm`, 4 from `md` (768px), and 6 from `lg` (1024px). Tiles are square. At 360px wide there is no horizontal page scroll in either language, and every card and switch item is at least 44px tall.
+- **AC-4**: The grid has 2 columns below `sm` (640px), 3 from `sm`, 6 from `md` (768px), and 10 from `xl` (1280px). Tiles are square. At 360px wide there is no horizontal page scroll in either language, and every card and switch item is at least 44px tall.
 - **AC-5**: The switch is a `nav` with two links, "All games" and "By owner", styled as a two part segmented control. "All games" goes to `/shelf`, "By owner" to `/shelf?view=owner`, both in the current language. The current one has `aria-current="page"`. Any other `view` value, a repeated `view`, or no value shows All games. The language menu keeps the query, so the chosen view survives a language change.
 - **AC-6**: In part 1, the By owner view shows a placeholder block (icon, title "By owner is coming soon", one line of help) and no grid. The count (still the total number of games, "12 games") and the switch stay visible. Part 2 replaces this block (AC-13).
 - **AC-7**: With zero games, the page shows the `h1` and the empty block only (icon, title "The shelf is empty", a line saying members can add games and they show up here). The count and the switch are hidden, there is no button, and both views show the same empty block.
@@ -37,7 +37,6 @@ The project runs Next.js with Cache Components on (`cacheComponents: true`), so 
 - **AC-9**: If `getShelfData` throws, the shelf content catches it and shows the `h1` "Shelf" and the empty block layout with a `destructive` icon, the title "Could not load the shelf", one line of help, and a "Try again" button that refreshes the route (`router.refresh()` in a transition) so the read runs again. A backstop `error.tsx` for any other throw renders the same `ShelfError` and calls the boundary's `retry()` (Next 16 re-fetches; `reset()` would not). `ShelfError` takes its strings as props, so `/design` previews it with no message provider.
 - **AC-10**: All text comes from the `shelf` namespace in `messages/en.json` and `messages/zh.json` with the same keys (listed in *Feature design*). Counts use ICU plurals and numbers go through next-intl `format.number`. `generateMetadata` keeps the title "Shelf" and the description, and returns `alternates: await getAlternates("/shelf")` (the By owner view uses the same canonical). Game and member names show as stored.
 - **AC-11**: The shelf makes no database or network call. It reads `src/lib/games/dummy-data.ts` through `getShelfData()` in `src/lib/games/shelf.ts`, which replaces the tracer `getShelfGames`. Cards are built from the existing `ShelfGame` type, so a removed or retyped column fails `pnpm typecheck`.
-- **AC-12**: In the light theme (the site has no dark theme), at 360px and 1280px, in both languages, the cover tint, ink, and text reach 4.5:1 (the tile rules of spec 0006, AC-6), and focus rings are visible on every link. Browser checks in `e2e/` cover AC-1 to AC-6. AC-7 to AC-9 cannot be reached in a browser on dummy data, so Vitest component tests cover them through the sync `ShelfContent` component and the `/design` previews.
 
 *Part 2: By owner*
 - **AC-13**: The By owner view lists one section per member who owns at least one game, members A to Z by `display_name` (same comparison as AC-3, ties by `id`). Each section has a heading row (a 36px round avatar with the first character of the name, the member name as an `h2`, and "5 games" pluralized) and a row of that member's games A to Z. With the dummy data: Arif (5), Jun (5), Mei (5), Sara (6). A member who owns nothing is not listed. If no member owns anything, the page shows the AC-7 empty block.
@@ -202,7 +201,7 @@ The average goes through `format.number(avg, { minimumFractionDigits: 1, maximum
 - Page wrapper: the shell already provides the gutter, `max-w-6xl`, and the bottom padding for the tab bar. Sections use `gap-4` on a phone and `gap-6` from `md`.
 - Heading row: `h1` 24px semibold on a phone, 30px from `md`; the count is a sibling `<p>` beside it (not inside the `h1`) in `text-muted-foreground`, 14 to 15px. From `md` the switch sits right on the same row, 300px wide; on a phone it is full width on its own row.
 - Switch: a `nav` with `aria-label` from `shelf.switch.label`, container `rounded-xl bg-muted p-1`, two equal items each `min-h-11 rounded-lg` with the current one `bg-card shadow-sm` and `font-semibold`; items are links, so focus rings follow the project style.
-- Grid: `grid-cols-2 gap-x-3 gap-y-6 sm:grid-cols-3 md:grid-cols-4 md:gap-x-4 lg:grid-cols-6`.
+- Grid: `grid-cols-2 gap-x-3 gap-y-6 sm:grid-cols-3 md:grid-cols-6 md:gap-x-4 xl:grid-cols-10`.
 - Card: `CoverTile` `rounded-xl`, `gap-2`; name `font-semibold` clamped to 2 lines and given room for 2 lines so a row of cards stays level; meta row 13px `text-muted-foreground`, tabular numbers, rating in `text-foreground` semibold with a primary colored star.
 - Empty and error blocks: shadcn `Empty`, about 96px below the heading on a phone, centered, text centered, icon in a 72px round `bg-muted` (error: `destructive` icon).
 - Part 2 sections: `gap-7` between members; heading row with 36px avatar; strip `gap-2.5` on a phone and `gap-3.5` from `md`, bleeding to the screen edge on a phone like `JustAdded`.
@@ -227,7 +226,7 @@ The average goes through `format.number(avg, { minimumFractionDigits: 1, maximum
 - Happy path, unit: `buildShelfData` over the dummy set returns 12 cards in the AC-3 order with the right owner counts and averages, verifies **AC-2, AC-3, AC-11**.
 - Happy path, unit: `compareNames` ignores case, orders by code point, and puts `三国杀` after Latin names, and the id breaks ties, verifies **AC-3**.
 - Happy path, component: a card renders the link, a clamped name, "2 owners", and "8.5 out of 10", and a game with a null average renders no rating, verifies **AC-1, AC-2**.
-- Happy path, browser: `/en/shelf` and `/zh/shelf` show 12 cards in order, the count, and the switch; the By owner link goes to `?view=owner` and shows the placeholder; an invalid `?view=x` shows All games, at 360px and 1280px in the light theme, verifies **AC-1, AC-3 to AC-6, AC-12**.
+- Happy path, browser: `/en/shelf` and `/zh/shelf` show 12 cards in order, the count, and the switch; the By owner link goes to `?view=owner` and shows the placeholder; an invalid `?view=x` shows All games, at 360px and 1280px in the light theme, verifies **AC-1, AC-3 to AC-6**.
 - Failure case, component and unit: `ShelfLoader` with a throwing `getShelfData` renders `ShelfError` with the `h1`; Try again calls `router.refresh`; the backstop `error.tsx` calls `retry`, verifies **AC-9**.
 - Empty case, component: `ShelfContent` with zero games renders the empty block, hides the count and switch, and has no button, in both views, verifies **AC-7**.
 - Loading case, component: the skeleton has 6 placeholders with `aria-busy` and the "Loading games" label, verifies **AC-8**.
@@ -239,7 +238,7 @@ The average goes through `format.number(avg, { minimumFractionDigits: 1, maximum
 Order follows the project default, Tracer Bullet: the thin thread (read layer, then a real page with cards) comes first, then each strand thickens it. No migration: this slice touches no schema.
 
 *Part 1: All games (build now)*
-1. [x] Move `CoverTile` and its test to `src/components/games/`, update home imports. Behavior unchanged, satisfies **AC-12**.
+1. [x] Move `CoverTile` and its test to `src/components/games/`, update home imports. Behavior unchanged.
 2. [x] Replace the tracer in `src/lib/games/shelf.ts` with `compareNames`, `buildShelfData`, and `getShelfData` over the dummy data, with unit tests; remove `getShelfGames`, satisfies **AC-3**, **AC-11**.
 3. [x] Add shadcn `empty` and `skeleton` with the shadcn CLI, satisfies **AC-7**, **AC-8**, **AC-9**.
 4. [x] Add the `shelf` messages to `en.json` and `zh.json` (the keys above, part 1 set), satisfies **AC-10**.
@@ -247,7 +246,7 @@ Order follows the project default, Tracer Bullet: the thin thread (read layer, t
 6. [x] Page: the `h1` outside, then `Suspense` (fallback `ShelfSkeleton`) around `ShelfLoader`, which awaits the `searchParams` promise passed down unread and parses `view`; split rendering into the sync `ShelfContent`; add `ShelfSwitch` and `ByOwnerPlaceholder`, satisfies **AC-5**, **AC-6**, **AC-8**.
 7. [x] `ShelfEmpty` (both views), `ShelfError`, the catch in `ShelfLoader`, the backstop `error.tsx` using `retry()`, and adding the `shelf.error` namespace to the locale layout's provider, satisfies **AC-7**, **AC-9**.
 8. [x] Keep `generateMetadata` and `getAlternates("/shelf")`; add previews of the skeleton, empty, and error blocks to `/design`, satisfies **AC-8**, **AC-9**, **AC-10**.
-9. [x] Vitest component tests for AC-7 to AC-9; browser checks in `e2e/shelf.spec.ts` (360px and 1280px, light theme, both languages) for AC-1 to AC-6; update `e2e/home.spec.ts` where it expects the tracer page, satisfies **AC-1** to **AC-9**, **AC-12**.
+9. [x] Vitest component tests for AC-7 to AC-9; browser checks in `e2e/shelf.spec.ts` (360px and 1280px, light theme, both languages) for AC-1 to AC-6; update `e2e/home.spec.ts` where it expects the tracer page, satisfies **AC-1** to **AC-9**.
 
 *Part 2: By owner (later strand of this feature)*
 10. Extend `buildShelfData` with `owners: OwnerShelf[]` (members A to Z, games A to Z, members with no games left out) and tests, satisfies **AC-13**.

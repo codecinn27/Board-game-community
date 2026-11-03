@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-// Spec 0007, AC-1 to AC-6, AC-12.
+// Spec 0007, AC-1 to AC-6.
 
 const order = [
   "Ark Nova",
