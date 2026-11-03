@@ -14,6 +14,12 @@ const { createMiddleware, handleIntl } = vi.hoisted(() => {
 });
 vi.mock("next-intl/middleware", () => ({ default: createMiddleware }));
 
+// Game ids 1 to 12 exist; the proxy asks the database one question per visit.
+const { gameExists } = vi.hoisted(() => ({
+  gameExists: vi.fn(async (id: string) => /^([1-9]|1[0-2])$/.test(id)),
+}));
+vi.mock("@/lib/games/detail", () => ({ gameExists }));
+
 const { default: proxy, config } = await import("./proxy");
 // Read now: Vitest clears mock calls before each test.
 const middlewareBuiltWith = createMiddleware.mock.calls.map((call) => call);

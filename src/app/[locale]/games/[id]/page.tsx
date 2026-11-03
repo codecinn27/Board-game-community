@@ -6,8 +6,8 @@ import { getGameDetail, getGameIds } from "@/lib/games/detail";
 
 const DESCRIPTION_LIMIT = 160;
 
-export function generateStaticParams() {
-  return getGameIds().map((id) => ({ id }));
+export async function generateStaticParams() {
+  return (await getGameIds()).map((id) => ({ id }));
 }
 
 export async function generateMetadata({

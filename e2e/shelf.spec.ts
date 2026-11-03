@@ -24,7 +24,7 @@ const copy = {
     owner: "By owner",
     soon: "By owner is coming soon",
     owners: "4 owners",
-    rating: "8.6 out of 10",
+    rating: "8.7 out of 10",
   },
   zh: {
     count: "12 款游戏",
@@ -32,7 +32,7 @@ const copy = {
     owner: "按主人",
     soon: "按主人查看即将上线",
     owners: "4 位主人",
-    rating: "8.6 分（满分 10）",
+    rating: "8.7 分（满分 10）",
   },
 } as const;
 

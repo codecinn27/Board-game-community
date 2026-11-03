@@ -34,6 +34,11 @@
     }
   },
   "home": {
+    "error": {
+      "title": "Could not load the home page",
+      "body": "Something went wrong on our side. Try again in a moment.",
+      "retry": "Try again"
+    },
     "meta": {
       "description": "See every board game our group owns, and who owns it, before you buy."
     },

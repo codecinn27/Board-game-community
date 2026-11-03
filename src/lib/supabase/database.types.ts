@@ -109,14 +109,14 @@ isOneToOne: false
                   ]
                 },"games": {
                   Row: {
-                    "added_by": string | null,"cover_path": string | null,"created_at": string,"description": string | null,"id": number,"name": string,"name_normalized": string | null,"play_time_max": number | null,"play_time_min": number | null,"players_max": number | null,"players_min": number | null,"source_id": string | null,"source_kind": Database["public"]['Enums']["game_source_kind"],"source_provider": string | null,"source_url": string | null,"updated_at": string
+                    "added_by": string | null,"cover_path": string | null,"cover_tint": string | null,"created_at": string,"description": string | null,"id": number,"name": string,"name_normalized": string | null,"play_time_max": number | null,"play_time_min": number | null,"players_max": number | null,"players_min": number | null,"source_id": string | null,"source_kind": Database["public"]['Enums']["game_source_kind"],"source_provider": string | null,"source_url": string | null,"updated_at": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "added_by"?: string | null,"cover_path"?: string | null,"created_at"?: string,"description"?: string | null,"id"?: never,"name": string,"name_normalized"?: never,"play_time_max"?: number | null,"play_time_min"?: number | null,"players_max"?: number | null,"players_min"?: number | null,"source_id"?: string | null,"source_kind"?: Database["public"]['Enums']["game_source_kind"],"source_provider"?: string | null,"source_url"?: string | null,"updated_at"?: string
+                    "added_by"?: string | null,"cover_path"?: string | null,"cover_tint"?: string | null,"created_at"?: string,"description"?: string | null,"id"?: never,"name": string,"name_normalized"?: never,"play_time_max"?: number | null,"play_time_min"?: number | null,"players_max"?: number | null,"players_min"?: number | null,"source_id"?: string | null,"source_kind"?: Database["public"]['Enums']["game_source_kind"],"source_provider"?: string | null,"source_url"?: string | null,"updated_at"?: string
                   }
                   Update: {
-                    "added_by"?: string | null,"cover_path"?: string | null,"created_at"?: string,"description"?: string | null,"id"?: never,"name"?: string,"name_normalized"?: never,"play_time_max"?: number | null,"play_time_min"?: number | null,"players_max"?: number | null,"players_min"?: number | null,"source_id"?: string | null,"source_kind"?: Database["public"]['Enums']["game_source_kind"],"source_provider"?: string | null,"source_url"?: string | null,"updated_at"?: string
+                    "added_by"?: string | null,"cover_path"?: string | null,"cover_tint"?: string | null,"created_at"?: string,"description"?: string | null,"id"?: never,"name"?: string,"name_normalized"?: never,"play_time_max"?: number | null,"play_time_min"?: number | null,"players_max"?: number | null,"players_min"?: number | null,"source_id"?: string | null,"source_kind"?: Database["public"]['Enums']["game_source_kind"],"source_provider"?: string | null,"source_url"?: string | null,"updated_at"?: string
                   }
                   Relationships: [
                     {
@@ -242,7 +242,7 @@ isOneToOne: false
           Views: {
             "game_stats": {
                   Row: {
-                    "added_by": string | null,"avg_entertainment": number | null,"avg_luck": number | null,"avg_recommendation": number | null,"avg_strategy": number | null,"avg_time_to_learn": number | null,"best_players_mode": number | null,"cover_path": string | null,"created_at": string | null,"description": string | null,"id": number | null,"name": string | null,"name_normalized": string | null,"owner_count": number | null,"play_time_max": number | null,"play_time_min": number | null,"players_max": number | null,"players_min": number | null,"rating_count": number | null,"source_id": string | null,"source_kind": Database["public"]['Enums']["game_source_kind"] | null,"source_provider": string | null,"source_url": string | null,"updated_at": string | null,"wishlist_count": number | null
+                    "added_by": string | null,"avg_entertainment": number | null,"avg_luck": number | null,"avg_recommendation": number | null,"avg_strategy": number | null,"avg_time_to_learn": number | null,"best_players_mode": number | null,"cover_path": string | null,"cover_tint": string | null,"created_at": string | null,"description": string | null,"id": number | null,"name": string | null,"name_normalized": string | null,"owner_count": number | null,"play_time_max": number | null,"play_time_min": number | null,"players_max": number | null,"players_min": number | null,"rating_count": number | null,"source_id": string | null,"source_kind": Database["public"]['Enums']["game_source_kind"] | null,"source_provider": string | null,"source_url": string | null,"updated_at": string | null,"wishlist_count": number | null
                   }
                   ComputedFields: never
                   Relationships: [

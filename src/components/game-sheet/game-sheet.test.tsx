@@ -7,7 +7,11 @@ import {
   type GameDetail,
   type GameOwner,
 } from "@/lib/games/detail";
-import { dummyGames, dummyOwners, dummyProfiles } from "@/lib/games/dummy-data";
+import {
+  fixtureGames,
+  fixtureOwners,
+  fixtureProfiles,
+} from "@/lib/games/fixtures";
 import { GameSheet } from "./game-sheet";
 
 vi.mock(
@@ -22,8 +26,13 @@ vi.mock(
 // Spec 0008, AC-4 to AC-11.
 
 function detail(id: number, over: Partial<GameDetail> = {}): GameDetail {
-  const game = buildGameDetail(id, dummyGames, dummyProfiles, dummyOwners);
-  if (game === null) throw new Error(`no dummy game ${id}`);
+  const game = buildGameDetail(
+    id,
+    fixtureGames,
+    fixtureProfiles,
+    fixtureOwners,
+  );
+  if (game === null) throw new Error(`no fixture game ${id}`);
   return { ...game, ...over };
 }
 

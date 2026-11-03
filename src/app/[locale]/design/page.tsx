@@ -13,7 +13,12 @@ import { ShelfError } from "@/components/shelf/shelf-error";
 import { ShelfSkeleton } from "@/components/shelf/shelf-skeleton";
 import { LocalTime } from "@/components/time/local-time";
 import { getAlternates } from "@/i18n/alternates";
-import { getGameDetail, type GameDetail } from "@/lib/games/detail";
+import { buildGameDetail, type GameDetail } from "@/lib/games/detail";
+import {
+  fixtureGames,
+  fixtureOwners,
+  fixtureProfiles,
+} from "@/lib/games/fixtures";
 import { navItems, type NavItem, type Viewer } from "@/lib/app-shell/nav";
 
 // A developer page (spec 0004): its own headings stay English, the shell
@@ -67,9 +72,9 @@ const radii = [
   ["full", "rounded-full", "raised Add"],
 ] as const;
 
-// The real sheet in the four states the dummy routes cannot all reach
+// The real sheet in the four states the live routes cannot all reach
 // (spec 0008, AC-20): complete, no tint, no description and no ratings, and no
-// owners. Built from the same dummy rows the live route reads.
+// owners. Built from the test fixtures, so this page makes no database call.
 const sheetStates: { name: string; id: number; over: Partial<GameDetail> }[] = [
   { name: "Complete", id: 1, over: {} },
   { name: "No tint", id: 7, over: { coverTint: null } },
@@ -302,7 +307,12 @@ async function SheetPreview({
   id: number;
   over: Partial<GameDetail>;
 }) {
-  const game = await getGameDetail(String(id));
+  const game = buildGameDetail(
+    id,
+    fixtureGames,
+    fixtureProfiles,
+    fixtureOwners,
+  );
   if (game === null) return null;
 
   return (

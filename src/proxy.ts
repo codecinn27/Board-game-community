@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import createMiddleware from "next-intl/middleware";
 import { routing } from "@/i18n/routing";
-import { getGameDetail } from "@/lib/games/detail";
+import { gameExists } from "@/lib/games/detail";
 
 const handleIntl = createMiddleware(routing);
 
@@ -15,7 +15,9 @@ export default async function proxy(request: NextRequest) {
   // on the first request for an id it has not seen (spec 0008, AC-1). The
   // rewrite lands on the catch all, which is the translated 404.
   const match = GAME_PATH.exec(request.nextUrl.pathname);
-  if (match !== null && (await getGameDetail(match[2] ?? "")) === null) {
+  // A cached read cannot run here, so this is a plain one-row check. If the
+  // database is down the request goes on and the page shows its error block.
+  if (match !== null && !(await gameExists(match[2] ?? ""))) {
     return NextResponse.rewrite(new URL(`/${match[1]}/_missing`, request.url));
   }
 

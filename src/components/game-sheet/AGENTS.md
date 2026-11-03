@@ -9,7 +9,7 @@ The game detail sheet (scope feature 9, [spec 0008](../../../docs/specs/0008-gam
 - `sheet-host.tsx` (client): the one Dialog (shadcn Dialog over Base UI), mounted once in `src/app/[locale]/layout.tsx`. It shows `sheet-preview.tsx` (from the card's own data) first, then the sheet.
 - `actions.tsx`: the Server Action `loadGameSheet(id, locale)`. It reads `getGameDetail` and returns plain data (`SheetData`, built by `sheet-data.ts`).
 - `sheet-view.tsx`: draws the sheet from `SheetData`. The modal and the page both render it, so they cannot differ. `game-sheet.tsx` is the server wrapper the page uses; `game-sheet-loader.tsx` reads the game for the page and handles the 404 and the error block.
-- `sheet-theme.ts`: the `--sheet-*` variables from `coverTheme()`. `NEUTRAL_SHEET_TINT` lives in `src/lib/games/neutral-tint.ts` so client code can import it without the dummy data.
+- `sheet-theme.ts`: the `--sheet-*` variables from `coverTheme()`. `NEUTRAL_SHEET_TINT` lives in `src/lib/games/neutral-tint.ts` so client code can import it without pulling in server code.
 
 ## Rules
 

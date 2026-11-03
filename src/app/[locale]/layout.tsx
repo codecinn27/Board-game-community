@@ -59,7 +59,7 @@ export default async function RootLayout({
     >
       <body className="flex min-h-full flex-col">
         {/* Locale and time zone flow through. `common.time` (for
-            LocalTime, used anywhere) and the shelf error backstop ship to the browser here; other client
+            LocalTime, used anywhere) and the shelf and home error backstops ship to the browser here; other client
             components pick their own namespace, never the whole file. */}
         <IntlClientProvider
           messages={{
@@ -68,6 +68,7 @@ export default async function RootLayout({
               heading: messages.shelf.heading,
               error: messages.shelf.error,
             },
+            home: { error: messages.home.error },
           }}
         >
           {/* "guest" until feature 6 (Member accounts) reads the session. */}

@@ -1,6 +1,14 @@
-import { dummyGames, dummyOwners, dummyProfiles } from "./dummy-data";
+import { cacheLife, cacheTag } from "next/cache";
+import { createPublicClient } from "@/lib/supabase/public";
+import { GAMES_TAG } from "./cache";
+import {
+  fetchGameExists,
+  fetchGameIds,
+  fetchGameOwners,
+  fetchGameRow,
+} from "./rows";
 import { compareNames } from "./shelf";
-import { type DummyGame, type DummyOwner, type DummyProfile } from "./types";
+import { type GameRow, type OwnerRow, type ProfileRow } from "./types";
 
 export { NEUTRAL_SHEET_TINT } from "./neutral-tint";
 
@@ -61,9 +69,9 @@ export function compareOwners(a: GameOwner, b: GameOwner): number {
 /** Pure: one game's sheet data, from the row sets. Null if the id is unknown. */
 export function buildGameDetail(
   id: number,
-  games: DummyGame[],
-  profiles: DummyProfile[],
-  owners: DummyOwner[],
+  games: GameRow[],
+  profiles: ProfileRow[],
+  owners: OwnerRow[],
 ): GameDetail | null {
   const game = games.find((g) => g.id === id);
   if (!game) return null;
@@ -94,14 +102,61 @@ export function buildGameDetail(
   };
 }
 
-/** Today: buildGameDetail over the dummy arrays. Feature 21 swaps this body for Supabase reads. */
+async function readGameDetail(id: number): Promise<GameDetail | null> {
+  "use cache";
+  cacheLife("games");
+  cacheTag(GAMES_TAG);
+
+  const client = createPublicClient();
+  const [game, links] = await Promise.all([
+    fetchGameRow(client, id),
+    fetchGameOwners(client, id),
+  ]);
+  if (game === null) return null;
+  return buildGameDetail(id, [game], links.profiles, links.owners);
+}
+
+/**
+ * One game's sheet data from the database, cached for 5 minutes under the
+ * `games` tag. An id that is not a positive whole number never reaches the
+ * cache or the database. A failed read throws and is not cached.
+ */
 export async function getGameDetail(id: string): Promise<GameDetail | null> {
   const gameId = parseGameId(id);
   if (gameId === null) return null;
-  return buildGameDetail(gameId, dummyGames, dummyProfiles, dummyOwners);
+  return readGameDetail(gameId);
 }
 
-/** Every id the build prerenders. Feature 21 reads them from `games`. */
-export function getGameIds(): string[] {
-  return dummyGames.map((g) => String(g.id));
+/**
+ * Whether a route param names a real game: a plain one-row read, not cached,
+ * for `src/proxy.ts`, where a cached function cannot run. A bad id never
+ * reaches the database. A failed read answers true: the page then shows its
+ * own error block instead of a false 404.
+ */
+export async function gameExists(id: string): Promise<boolean> {
+  const gameId = parseGameId(id);
+  if (gameId === null) return false;
+  try {
+    return await fetchGameExists(createPublicClient(), gameId);
+  } catch (error) {
+    console.error("gameExists failed", error);
+    return true;
+  }
+}
+
+/** A route param that is never a game, so the build always has one id to render. */
+export const NO_GAME_ID = "0";
+
+/**
+ * Every id the build prerenders. Cache Components fails the build on an empty
+ * list, so an empty database gives `NO_GAME_ID`, which the page answers with
+ * its 404.
+ */
+export async function getGameIds(): Promise<string[]> {
+  "use cache";
+  cacheLife("games");
+  cacheTag(GAMES_TAG);
+
+  const ids = await fetchGameIds(createPublicClient());
+  return ids.length === 0 ? [NO_GAME_ID] : ids.map(String);
 }

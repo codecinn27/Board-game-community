@@ -6,13 +6,11 @@ import {
   parseColor,
   textSurfaces,
 } from "@/lib/design/cover-tint";
-import { dummyGames, dummyOwners, dummyProfiles } from "./dummy-data";
+import { fixtureGames, fixtureOwners, fixtureProfiles } from "./fixtures";
 import {
   buildGameDetail,
   compareOwners,
   formatRange,
-  getGameDetail,
-  getGameIds,
   NEUTRAL_SHEET_TINT,
   parseGameId,
   type GameOwner,
@@ -100,13 +98,18 @@ describe("buildGameDetail", () => {
   // covers: AC-18
   it("returns null for an id that is not in the data", () => {
     expect(
-      buildGameDetail(99, dummyGames, dummyProfiles, dummyOwners),
+      buildGameDetail(99, fixtureGames, fixtureProfiles, fixtureOwners),
     ).toBeNull();
   });
 
   // covers: AC-9, AC-18
   it("derives the owner count from the owner rows and names every owner", () => {
-    const detail = buildGameDetail(1, dummyGames, dummyProfiles, dummyOwners);
+    const detail = buildGameDetail(
+      1,
+      fixtureGames,
+      fixtureProfiles,
+      fixtureOwners,
+    );
 
     expect(detail?.ownerCount).toBe(4);
     expect(detail?.owners.map((o) => o.displayName).sort()).toEqual([
@@ -122,28 +125,22 @@ describe("buildGameDetail", () => {
 
   // covers: AC-9
   it("gives a game with no owner rows an empty list", () => {
-    const detail = buildGameDetail(1, dummyGames, dummyProfiles, []);
+    const detail = buildGameDetail(1, fixtureGames, fixtureProfiles, []);
 
     expect(detail?.ownerCount).toBe(0);
     expect(detail?.owners).toEqual([]);
   });
 });
 
-describe("getGameDetail", () => {
-  // covers: AC-1
-  it("reads every dummy id and nothing else", async () => {
-    for (const id of getGameIds()) {
-      expect(await getGameDetail(id)).not.toBeNull();
-    }
-    expect(getGameIds()).toHaveLength(12);
-    for (const bad of ["999", "abc", "0", "1.5"]) {
-      expect(await getGameDetail(bad)).toBeNull();
-    }
-  });
-
+describe("the fixture games", () => {
   // covers: AC-18
-  it("leaves every detail column empty for Just One only", async () => {
-    const justOne = await getGameDetail("11");
+  it("leaves every detail column empty for Just One only", () => {
+    const justOne = buildGameDetail(
+      11,
+      fixtureGames,
+      fixtureProfiles,
+      fixtureOwners,
+    );
     expect(justOne).toMatchObject({
       description: null,
       playersMin: null,
@@ -154,7 +151,7 @@ describe("getGameDetail", () => {
       avgRecommendation: null,
     });
 
-    for (const game of dummyGames.filter((g) => g.id !== 11)) {
+    for (const game of fixtureGames.filter((g) => g.id !== 11)) {
       expect(game.description, game.name).not.toBeNull();
       expect(game.players_min, game.name).not.toBeNull();
       expect(game.play_time_max, game.name).not.toBeNull();
@@ -162,8 +159,13 @@ describe("getGameDetail", () => {
   });
 
   // covers: AC-18
-  it("gives 三国杀 a Chinese description", async () => {
-    const detail = await getGameDetail("12");
+  it("gives 三国杀 a Chinese description", () => {
+    const detail = buildGameDetail(
+      12,
+      fixtureGames,
+      fixtureProfiles,
+      fixtureOwners,
+    );
 
     expect(detail?.description).toMatch(/[一-鿿]/);
   });
@@ -171,7 +173,9 @@ describe("getGameDetail", () => {
 
 describe("sheet colors", () => {
   const tints = [
-    ...dummyGames.flatMap((g) => (g.cover_tint === null ? [] : [g.cover_tint])),
+    ...fixtureGames.flatMap((g) =>
+      g.cover_tint === null ? [] : [g.cover_tint],
+    ),
     NEUTRAL_SHEET_TINT,
   ];
 

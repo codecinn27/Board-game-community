@@ -1,12 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { dummyGames, dummyOwners, dummyProfiles } from "./dummy-data";
-import {
-  buildHomeData,
-  countMembers,
-  getHomeData,
-  pickNewest,
-  pickTopRated,
-} from "./home";
+import { fixtureGames, fixtureOwners, fixtureProfiles } from "./fixtures";
+import { buildHomeData, countMembers, pickNewest, pickTopRated } from "./home";
 import { type ShelfGame } from "./types";
 
 // Spec 0006, AC-1, AC-2, AC-3, AC-5.
@@ -24,8 +18,8 @@ function fixture(overrides: Partial<ShelfGame> & { id: number }): ShelfGame {
   };
 }
 
-describe("buildHomeData over the dummy data", () => {
-  const data = buildHomeData(dummyGames, dummyProfiles, dummyOwners);
+describe("buildHomeData over the fixture data", () => {
+  const data = buildHomeData(fixtureGames, fixtureProfiles, fixtureOwners);
 
   it("counts 12 games and 4 members", () => {
     expect(data.gameCount).toBe(12);
@@ -45,7 +39,7 @@ describe("buildHomeData over the dummy data", () => {
 
   it("names who added each game, and leaves it out when unknown", () => {
     expect(data.newest[0]?.addedByName).toBe("Mei");
-    const all = buildHomeData(dummyGames, dummyProfiles, dummyOwners);
+    const all = buildHomeData(fixtureGames, fixtureProfiles, fixtureOwners);
     expect(all.newest.every((g) => g.addedByName !== "")).toBe(true);
   });
 
@@ -71,10 +65,6 @@ describe("buildHomeData over the dummy data", () => {
       Wingspan: 4,
       "Magical Athlete": 2,
     });
-  });
-
-  it("is what getHomeData returns", async () => {
-    expect(await getHomeData()).toEqual(data);
   });
 });
 
@@ -148,7 +138,7 @@ describe("pickNewest", () => {
 
 describe("edge cases", () => {
   it("handles zero games", () => {
-    expect(buildHomeData([], dummyProfiles, [])).toEqual({
+    expect(buildHomeData([], fixtureProfiles, [])).toEqual({
       gameCount: 0,
       memberCount: 0,
       newest: [],
@@ -157,7 +147,7 @@ describe("edge cases", () => {
   });
 
   it("reports zero members when nobody owns a game", () => {
-    const data = buildHomeData([fixture({ id: 1 })], dummyProfiles, []);
+    const data = buildHomeData([fixture({ id: 1 })], fixtureProfiles, []);
     expect(data.gameCount).toBe(1);
     expect(data.memberCount).toBe(0);
   });
@@ -168,7 +158,7 @@ describe("edge cases", () => {
         fixture({ id: 1, added_by: null }),
         fixture({ id: 2, added_by: "00000000-0000-4000-8000-0000000000ff" }),
       ],
-      dummyProfiles,
+      fixtureProfiles,
       [],
     );
     expect(data.newest.map((g) => g.addedByName)).toEqual([null, null]);

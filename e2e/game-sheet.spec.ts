@@ -138,7 +138,7 @@ for (const locale of ["en", "zh"] as const) {
       const other = await opened;
 
       await expect(page.getByRole("dialog")).toHaveCount(0);
-      expect(other.url()).toContain(`/${locale}/games/1`);
+      await other.waitForURL(new RegExp(`/${locale}/games/1$`));
     });
 
     test("a direct visit renders the page version with no dialog", async ({

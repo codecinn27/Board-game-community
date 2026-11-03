@@ -27,7 +27,7 @@ const copy = {
     topRated: "Top rated",
     seeAll: "See all",
     owners: "1 owner",
-    rating: "8.6 out of 10",
+    rating: "8.7 out of 10",
   },
   zh: {
     h1: /12\s*款游戏在架上/,
@@ -37,7 +37,7 @@ const copy = {
     topRated: "最高评分",
     seeAll: "查看全部",
     owners: "1 位主人",
-    rating: "8.6 分（满分 10）",
+    rating: "8.7 分（满分 10）",
   },
 } as const;
 
@@ -100,7 +100,7 @@ for (const locale of ["en", "zh"] as const) {
         .first();
       await expect(first).toContainText(t.owners);
       await expect(first.getByRole("img", { name: t.rating })).toBeVisible();
-      await expect(first).toContainText("8.6");
+      await expect(first).toContainText("8.7");
     });
 
     test("every game is one whole link to its sheet", async ({ page }) => {

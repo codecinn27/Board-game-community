@@ -1,14 +1,15 @@
-import { type DummyGame, type DummyOwner, type DummyProfile } from "./types";
+import { type GameRow, type OwnerRow, type ProfileRow } from "./types";
 
-// Slice 1 dummy data, shaped like game_stats, profiles, and game_owners
-// (spec 0006). Feature 21 replaces the reads in home.ts and deletes this file.
+// Test fixtures, shaped like game_stats, profiles, and game_owners rows. They
+// feed the unit tests of the pure builders and the /design previews (spec 0009).
+// Local development data lives in supabase/seed.sql, not here.
 
 const MEI = "00000000-0000-4000-8000-000000000001";
 const SARA = "00000000-0000-4000-8000-000000000002";
 const JUN = "00000000-0000-4000-8000-000000000003";
 const ARIF = "00000000-0000-4000-8000-000000000004";
 
-export const dummyProfiles: DummyProfile[] = [
+export const fixtureProfiles: ProfileRow[] = [
   { id: MEI, display_name: "Mei" },
   { id: SARA, display_name: "Sara" },
   { id: JUN, display_name: "Jun" },
@@ -16,7 +17,7 @@ export const dummyProfiles: DummyProfile[] = [
 ];
 
 type GameDetails = Pick<
-  DummyGame,
+  GameRow,
   | "description"
   | "players_min"
   | "players_max"
@@ -47,7 +48,7 @@ function game(
   ratingCount: number,
   avg: number | null,
   details: GameDetails,
-): DummyGame {
+): GameRow {
   return {
     id,
     name,
@@ -61,7 +62,7 @@ function game(
   };
 }
 
-export const dummyGames: DummyGame[] = [
+export const fixtureGames: GameRow[] = [
   game(
     1,
     "Wingspan",
@@ -244,7 +245,7 @@ const ownersByGame: Record<number, string[]> = {
 };
 
 // Each link is dated like its game, as if the owners had it from the start.
-export const dummyOwners: DummyOwner[] = dummyGames.flatMap((g) =>
+export const fixtureOwners: OwnerRow[] = fixtureGames.flatMap((g) =>
   (ownersByGame[g.id] ?? []).map((memberId) => ({
     game_id: g.id,
     member_id: memberId,

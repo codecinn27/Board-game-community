@@ -1,5 +1,8 @@
-import { dummyGames, dummyOwners, dummyProfiles } from "./dummy-data";
-import { type DummyOwner, type DummyProfile, type ShelfGame } from "./types";
+import { cacheLife, cacheTag } from "next/cache";
+import { createPublicClient } from "@/lib/supabase/public";
+import { GAMES_TAG } from "./cache";
+import { fetchOwnerRows, fetchShelfGames } from "./rows";
+import { type OwnerRow, type ProfileRow, type ShelfGame } from "./types";
 
 export type ShelfCard = {
   id: number;
@@ -31,8 +34,8 @@ export function compareNames(a: string, b: string): number {
 /** Pure: everything the shelf shows, from the row sets. */
 export function buildShelfData(
   games: ShelfGame[],
-  _profiles: DummyProfile[],
-  owners: DummyOwner[],
+  _profiles: ProfileRow[],
+  owners: OwnerRow[],
 ): ShelfData {
   const ownerCounts = new Map<number, number>();
   for (const o of owners) {
@@ -52,9 +55,18 @@ export function buildShelfData(
   };
 }
 
-/** Today: buildShelfData over the dummy arrays. Feature 21 swaps this body for Supabase reads. */
+/** Everything the shelf shows, from the database, cached for 5 minutes under the `games` tag. */
 export async function getShelfData(): Promise<ShelfData> {
-  return buildShelfData(dummyGames, dummyProfiles, dummyOwners);
+  "use cache";
+  cacheLife("games");
+  cacheTag(GAMES_TAG);
+
+  const client = createPublicClient();
+  const [games, owners] = await Promise.all([
+    fetchShelfGames(client),
+    fetchOwnerRows(client),
+  ]);
+  return buildShelfData(games, [], owners);
 }
 
 export type ShelfView = "all" | "owner";
