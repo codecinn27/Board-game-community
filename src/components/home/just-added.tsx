@@ -53,6 +53,7 @@ export async function JustAdded({ games }: JustAddedProps) {
                   id: game.id,
                   name: game.name,
                   coverTint: game.coverTint,
+                  coverPath: game.coverPath,
                   ownerCount: null,
                   avgRecommendation: null,
                 }}
@@ -61,6 +62,7 @@ export async function JustAdded({ games }: JustAddedProps) {
                 <CoverTile
                   name={game.name}
                   tint={game.coverTint}
+                  path={game.coverPath}
                   className="w-full rounded-xl"
                 />
                 <span className="line-clamp-2 font-semibold">{game.name}</span>

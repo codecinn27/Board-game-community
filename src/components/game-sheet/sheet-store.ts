@@ -12,6 +12,7 @@ export type SheetCard = {
   id: number;
   name: string;
   coverTint: string | null;
+  coverPath: string | null;
   ownerCount: number | null;
   avgRecommendation: number | null;
 };

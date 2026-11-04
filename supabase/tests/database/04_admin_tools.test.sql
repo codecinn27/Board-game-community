@@ -6,7 +6,7 @@ begin;
 delete from public.games;
 delete from auth.users;
 
-select plan(57);
+select plan(58);
 
 create schema tests;
 grant usage on schema tests to public;
@@ -193,6 +193,9 @@ select throws_ok($$ select public.admin_set_member_status('00000000-0000-0000-00
 -- AC-5: storage buckets -------------------------------------------------------------------------------
 select tests.reset();
 select is((select public from storage.buckets where id = 'covers'), true, 'the covers bucket is public');
+-- Spec 0009: covers are at most 150 KB (153600 bytes), set in migration 20261105090000.
+select is((select file_size_limit from storage.buckets where id = 'covers'), 153600::bigint,
+  'the covers bucket limits each file to 150 KB');
 select is((select file_size_limit from storage.buckets where id = 'avatars'), 2097152::bigint,
   'the avatars bucket limits files to 2 MB');
 

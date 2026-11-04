@@ -19,6 +19,7 @@ function top(rank: number, over: Partial<TopGame> = {}): TopGame {
     id: rank,
     name: `Game ${rank}`,
     coverTint: null,
+    coverPath: null,
     ownerCount: 2,
     avgRecommendation: 8,
     rank,

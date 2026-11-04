@@ -29,6 +29,8 @@ export type GameDetail = {
   playTimeMax: number | null;
   /** `#rrggbb`, or null: the sheet then uses `NEUTRAL_SHEET_TINT`. */
   coverTint: string | null;
+  /** File name in the `covers` bucket, or null for the tint tile. */
+  coverPath: string | null;
   avgRecommendation: number | null;
   ratingCount: number;
   ownerCount: number;
@@ -95,6 +97,7 @@ export function buildGameDetail(
     playTimeMin: game.play_time_min,
     playTimeMax: game.play_time_max,
     coverTint: game.cover_tint,
+    coverPath: game.cover_path,
     avgRecommendation: game.avg_recommendation,
     ratingCount: game.rating_count,
     ownerCount: rows.length,

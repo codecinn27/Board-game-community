@@ -46,6 +46,7 @@ export async function TopRated({ games }: TopRatedProps) {
                       id: game.id,
                       name: game.name,
                       coverTint: game.coverTint,
+                      coverPath: game.coverPath,
                       ownerCount: game.ownerCount,
                       avgRecommendation: game.avgRecommendation,
                     }}
@@ -64,6 +65,7 @@ export async function TopRated({ games }: TopRatedProps) {
                     <CoverTile
                       name={game.name}
                       tint={game.coverTint}
+                      path={game.coverPath}
                       className="size-11 shrink-0 rounded-lg md:col-span-2 md:aspect-[4/3] md:size-auto md:w-full md:rounded-xl"
                     />
                     <span className="flex min-w-0 flex-1 flex-col md:contents">

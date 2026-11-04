@@ -29,6 +29,7 @@ export function ShelfCard({ game }: ShelfCardProps) {
         id: game.id,
         name: game.name,
         coverTint: game.coverTint,
+        coverPath: game.coverPath,
         ownerCount: game.ownerCount,
         avgRecommendation: game.avgRecommendation,
       }}
@@ -37,6 +38,7 @@ export function ShelfCard({ game }: ShelfCardProps) {
       <CoverTile
         name={game.name}
         tint={game.coverTint}
+        path={game.coverPath}
         className="w-full rounded-xl"
       />
       <span className="line-clamp-2 leading-6 font-semibold">{game.name}</span>

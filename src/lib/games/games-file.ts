@@ -10,6 +10,8 @@ export type GameInput = {
   playTimeMin: number | null;
   playTimeMax: number | null;
   coverTint: string | null;
+  /** File name in data/covers, saved as `games.cover_path`; null for no image. */
+  coverPath: string | null;
   /** ISO timestamp, or null to keep the load time. */
   addedAt: string | null;
 };
@@ -24,6 +26,7 @@ const FIELDS = [
   "playTimeMin",
   "playTimeMax",
   "coverTint",
+  "cover",
   "addedAt",
 ] as const;
 
@@ -31,6 +34,17 @@ const NAME_MAX = 200;
 const DESCRIPTION_MAX = 4000;
 const SMALLINT_MAX = 32767;
 const TINT = /^#[0-9a-f]{6}$/;
+const COVER_FILE = /^[a-z0-9][a-z0-9-]*\.(jpg|jpeg|png|webp)$/;
+
+/** The most a cover file may weigh: 150 KB. Matches the `covers` bucket's file_size_limit. */
+export const COVER_MAX_BYTES = 150 * 1024;
+
+/** A problem message when a cover file is too big, or null when it fits. */
+export function coverSizeProblem(file: string, bytes: number): string | null {
+  if (bytes <= COVER_MAX_BYTES) return null;
+  const kb = (bytes / 1024).toFixed(1);
+  return `cover file data/covers/${file} is ${kb} KB; covers must be at most ${COVER_MAX_BYTES / 1024} KB. Compress it and try again`;
+}
 
 function length(text: string): number {
   return Array.from(text).length;
@@ -133,6 +147,17 @@ function parseGame(
     }
   }
 
+  let coverPath: string | null = null;
+  if (!isBlank(row.cover)) {
+    if (typeof row.cover !== "string" || !COVER_FILE.test(row.cover)) {
+      mine.push(
+        `cover must be a file name in data/covers, lowercase letters, digits, and dashes, ending .jpg, .jpeg, .png, or .webp, got ${JSON.stringify(row.cover)}`,
+      );
+    } else {
+      coverPath = row.cover;
+    }
+  }
+
   let addedAt: string | null = null;
   if (!isBlank(row.addedAt)) {
     const time =
@@ -161,6 +186,7 @@ function parseGame(
     playTimeMin,
     playTimeMax,
     coverTint,
+    coverPath,
     addedAt,
   };
 }
@@ -220,12 +246,13 @@ function gameSql(game: GameInput, position: number): string {
     `    play_time_min = ${number(game.playTimeMin)},`,
     `    play_time_max = ${number(game.playTimeMax)},`,
     `    cover_tint = ${text(game.coverTint)},`,
+    `    cover_path = ${text(game.coverPath)},`,
     `    created_at = coalesce(${when}::timestamptz, created_at)`,
     `  where name_normalized = ${NORMALIZED(game.name)}`,
     `  returning id`,
     `)`,
-    `insert into public.games (name, description, players_min, players_max, play_time_min, play_time_max, cover_tint, created_at)`,
-    `select ${text(game.name)}, ${text(game.description)}, ${number(game.playersMin)}, ${number(game.playersMax)}, ${number(game.playTimeMin)}, ${number(game.playTimeMax)}, ${text(game.coverTint)}, coalesce(${when}::timestamptz, now())`,
+    `insert into public.games (name, description, players_min, players_max, play_time_min, play_time_max, cover_tint, cover_path, created_at)`,
+    `select ${text(game.name)}, ${text(game.description)}, ${number(game.playersMin)}, ${number(game.playersMax)}, ${number(game.playTimeMin)}, ${number(game.playTimeMax)}, ${text(game.coverTint)}, ${text(game.coverPath)}, coalesce(${when}::timestamptz, now())`,
     `where not exists (select 1 from updated);`,
   ].join("\n");
 }

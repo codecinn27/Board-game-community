@@ -13,6 +13,8 @@ export type SheetData = {
   name: string;
   /** `#rrggbb`, or null for the neutral tint. */
   tint: string | null;
+  /** File name in the `covers` bucket, or null for the tint tile. */
+  coverPath: string | null;
   /** Shown text and the spoken sentence; null with no ratings. */
   rating: { text: string; label: string } | null;
   ownerChip: { text: string; label: string };
@@ -71,6 +73,7 @@ export async function buildSheetData(
     id: game.id,
     name: game.name,
     tint: game.coverTint,
+    coverPath: game.coverPath,
     rating:
       rating === null
         ? null

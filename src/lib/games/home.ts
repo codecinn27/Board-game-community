@@ -8,6 +8,7 @@ export type HomeGame = {
   id: number;
   name: string;
   coverTint: string | null;
+  coverPath: string | null;
   addedAt: string;
   addedByName: string | null;
 };
@@ -16,6 +17,7 @@ export type TopGame = {
   id: number;
   name: string;
   coverTint: string | null;
+  coverPath: string | null;
   ownerCount: number;
   avgRecommendation: number;
   rank: number;
@@ -66,6 +68,7 @@ export function pickTopRated(
     id: game.id,
     name: game.name,
     coverTint: game.cover_tint,
+    coverPath: game.cover_path,
     ownerCount: ownerCounts.get(game.id) ?? 0,
     avgRecommendation: avg,
     rank: index + 1,
@@ -96,6 +99,7 @@ export function buildHomeData(
       id: g.id,
       name: g.name,
       coverTint: g.cover_tint,
+      coverPath: g.cover_path,
       addedAt: g.created_at,
       addedByName: (g.added_by !== null && names.get(g.added_by)) || null,
     })),

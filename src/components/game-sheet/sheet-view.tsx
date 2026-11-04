@@ -54,6 +54,7 @@ export function SheetView({
             <CoverTile
               name={data.name}
               tint={data.tint ?? NEUTRAL_SHEET_TINT}
+              path={data.coverPath}
               className="aspect-auto size-full rounded-none"
             />
           </div>

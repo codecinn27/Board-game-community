@@ -13,12 +13,13 @@ with updated as (
     play_time_min = 30,
     play_time_max = 30,
     cover_tint = '#2b4c7e',
+    cover_path = 'splendor.jpg',
     created_at = coalesce('2026-11-04T00:00:00.000Z'::timestamptz, created_at)
   where name_normalized = regexp_replace(lower('Splendor'), '[[:punct:][:space:]]', '', 'g')
   returning id
 )
-insert into public.games (name, description, players_min, players_max, play_time_min, play_time_max, cover_tint, created_at)
-select 'Splendor', 'Players act as wealthy Renaissance merchants acquiring mines, transportation methods, and artisans to covertly garner the most prestige points.', 2, 4, 30, 30, '#2b4c7e', coalesce('2026-11-04T00:00:00.000Z'::timestamptz, now())
+insert into public.games (name, description, players_min, players_max, play_time_min, play_time_max, cover_tint, cover_path, created_at)
+select 'Splendor', 'Players act as wealthy Renaissance merchants acquiring mines, transportation methods, and artisans to covertly garner the most prestige points.', 2, 4, 30, 30, '#2b4c7e', 'splendor.jpg', coalesce('2026-11-04T00:00:00.000Z'::timestamptz, now())
 where not exists (select 1 from updated);
 
 -- 2. Avalon
@@ -31,12 +32,13 @@ with updated as (
     play_time_min = 30,
     play_time_max = 45,
     cover_tint = '#4b2e83',
+    cover_path = 'avalon.jpg',
     created_at = coalesce('2026-11-04T00:00:00.000Z'::timestamptz, created_at)
   where name_normalized = regexp_replace(lower('Avalon'), '[[:punct:][:space:]]', '', 'g')
   returning id
 )
-insert into public.games (name, description, players_min, players_max, play_time_min, play_time_max, cover_tint, created_at)
-select 'Avalon', 'A social deduction game of hidden loyalties where loyal servants of Arthur battle against the minions of Mordred.', 5, 10, 30, 45, '#4b2e83', coalesce('2026-11-04T00:00:00.000Z'::timestamptz, now())
+insert into public.games (name, description, players_min, players_max, play_time_min, play_time_max, cover_tint, cover_path, created_at)
+select 'Avalon', 'A social deduction game of hidden loyalties where loyal servants of Arthur battle against the minions of Mordred.', 5, 10, 30, 45, '#4b2e83', 'avalon.jpg', coalesce('2026-11-04T00:00:00.000Z'::timestamptz, now())
 where not exists (select 1 from updated);
 
 -- 3. Dixit
@@ -49,12 +51,13 @@ with updated as (
     play_time_min = 30,
     play_time_max = 30,
     cover_tint = '#d4af37',
+    cover_path = 'dixit.webp',
     created_at = coalesce('2026-11-04T00:00:00.000Z'::timestamptz, created_at)
   where name_normalized = regexp_replace(lower('Dixit'), '[[:punct:][:space:]]', '', 'g')
   returning id
 )
-insert into public.games (name, description, players_min, players_max, play_time_min, play_time_max, cover_tint, created_at)
-select 'Dixit', 'A lightweight game of storytelling, guesswork, and imagination using beautifully illustrated surreal cards.', 3, 8, 30, 30, '#d4af37', coalesce('2026-11-04T00:00:00.000Z'::timestamptz, now())
+insert into public.games (name, description, players_min, players_max, play_time_min, play_time_max, cover_tint, cover_path, created_at)
+select 'Dixit', 'A lightweight game of storytelling, guesswork, and imagination using beautifully illustrated surreal cards.', 3, 8, 30, 30, '#d4af37', 'dixit.webp', coalesce('2026-11-04T00:00:00.000Z'::timestamptz, now())
 where not exists (select 1 from updated);
 
 -- 4. Piles
@@ -67,12 +70,13 @@ with updated as (
     play_time_min = 15,
     play_time_max = 20,
     cover_tint = '#c0392b',
+    cover_path = 'piles.webp',
     created_at = coalesce('2026-11-04T00:00:00.000Z'::timestamptz, created_at)
   where name_normalized = regexp_replace(lower('Piles'), '[[:punct:][:space:]]', '', 'g')
   returning id
 )
-insert into public.games (name, description, players_min, players_max, play_time_min, play_time_max, cover_tint, created_at)
-select 'Piles', 'A fast-moving card game focused on stacking and organizing assets efficiently under pressure.', 2, 5, 15, 20, '#c0392b', coalesce('2026-11-04T00:00:00.000Z'::timestamptz, now())
+insert into public.games (name, description, players_min, players_max, play_time_min, play_time_max, cover_tint, cover_path, created_at)
+select 'Piles', 'A fast-moving card game focused on stacking and organizing assets efficiently under pressure.', 2, 5, 15, 20, '#c0392b', 'piles.webp', coalesce('2026-11-04T00:00:00.000Z'::timestamptz, now())
 where not exists (select 1 from updated);
 
 -- 5. 7 Wonders
@@ -85,12 +89,13 @@ with updated as (
     play_time_min = 30,
     play_time_max = 30,
     cover_tint = '#8e44ad',
+    cover_path = '7-wonders.webp',
     created_at = coalesce('2026-11-04T00:00:00.000Z'::timestamptz, created_at)
   where name_normalized = regexp_replace(lower('7 Wonders'), '[[:punct:][:space:]]', '', 'g')
   returning id
 )
-insert into public.games (name, description, players_min, players_max, play_time_min, play_time_max, cover_tint, created_at)
-select '7 Wonders', 'A fast-paced card drafting game where players develop one of the ancient world''s great city-states across three ages.', 3, 7, 30, 30, '#8e44ad', coalesce('2026-11-04T00:00:00.000Z'::timestamptz, now())
+insert into public.games (name, description, players_min, players_max, play_time_min, play_time_max, cover_tint, cover_path, created_at)
+select '7 Wonders', 'A fast-paced card drafting game where players develop one of the ancient world''s great city-states across three ages.', 3, 7, 30, 30, '#8e44ad', '7-wonders.webp', coalesce('2026-11-04T00:00:00.000Z'::timestamptz, now())
 where not exists (select 1 from updated);
 
 -- 6. Saboteur
@@ -103,12 +108,13 @@ with updated as (
     play_time_min = 30,
     play_time_max = 30,
     cover_tint = '#795548',
+    cover_path = 'saboteur.webp',
     created_at = coalesce('2026-11-04T00:00:00.000Z'::timestamptz, created_at)
   where name_normalized = regexp_replace(lower('Saboteur'), '[[:punct:][:space:]]', '', 'g')
   returning id
 )
-insert into public.games (name, description, players_min, players_max, play_time_min, play_time_max, cover_tint, created_at)
-select 'Saboteur', 'A semi-cooperative tunneling card game where gold-seeking dwarves try to sniff out paths while secret saboteurs attempt to derail them.', 3, 10, 30, 30, '#795548', coalesce('2026-11-04T00:00:00.000Z'::timestamptz, now())
+insert into public.games (name, description, players_min, players_max, play_time_min, play_time_max, cover_tint, cover_path, created_at)
+select 'Saboteur', 'A semi-cooperative tunneling card game where gold-seeking dwarves try to sniff out paths while secret saboteurs attempt to derail them.', 3, 10, 30, 30, '#795548', 'saboteur.webp', coalesce('2026-11-04T00:00:00.000Z'::timestamptz, now())
 where not exists (select 1 from updated);
 
 -- 7. 1 Night Ultimate Werewolf
@@ -121,12 +127,13 @@ with updated as (
     play_time_min = 10,
     play_time_max = 15,
     cover_tint = '#111111',
+    cover_path = 'one-night-ultimate-warewolf.jpg',
     created_at = coalesce('2026-11-04T00:00:00.000Z'::timestamptz, created_at)
   where name_normalized = regexp_replace(lower('1 Night Ultimate Werewolf'), '[[:punct:][:space:]]', '', 'g')
   returning id
 )
-insert into public.games (name, description, players_min, players_max, play_time_min, play_time_max, cover_tint, created_at)
-select '1 Night Ultimate Werewolf', 'A fast-paced deduction game for up to ten players where someone is a werewolf, but roles shift throughout a single thrilling night.', 3, 10, 10, 15, '#111111', coalesce('2026-11-04T00:00:00.000Z'::timestamptz, now())
+insert into public.games (name, description, players_min, players_max, play_time_min, play_time_max, cover_tint, cover_path, created_at)
+select '1 Night Ultimate Werewolf', 'A fast-paced deduction game for up to ten players where someone is a werewolf, but roles shift throughout a single thrilling night.', 3, 10, 10, 15, '#111111', 'one-night-ultimate-warewolf.jpg', coalesce('2026-11-04T00:00:00.000Z'::timestamptz, now())
 where not exists (select 1 from updated);
 
 -- 8. Monopoly Deal
@@ -139,12 +146,13 @@ with updated as (
     play_time_min = 15,
     play_time_max = 15,
     cover_tint = '#27ae60',
+    cover_path = 'monopoly-deal.webp',
     created_at = coalesce('2026-11-04T00:00:00.000Z'::timestamptz, created_at)
   where name_normalized = regexp_replace(lower('Monopoly Deal'), '[[:punct:][:space:]]', '', 'g')
   returning id
 )
-insert into public.games (name, description, players_min, players_max, play_time_min, play_time_max, cover_tint, created_at)
-select 'Monopoly Deal', 'A fast-playing, portable card game version of Monopoly where players race to collect three complete property sets.', 2, 5, 15, 15, '#27ae60', coalesce('2026-11-04T00:00:00.000Z'::timestamptz, now())
+insert into public.games (name, description, players_min, players_max, play_time_min, play_time_max, cover_tint, cover_path, created_at)
+select 'Monopoly Deal', 'A fast-playing, portable card game version of Monopoly where players race to collect three complete property sets.', 2, 5, 15, 15, '#27ae60', 'monopoly-deal.webp', coalesce('2026-11-04T00:00:00.000Z'::timestamptz, now())
 where not exists (select 1 from updated);
 
 -- 9. Uno No Mercy
@@ -157,12 +165,13 @@ with updated as (
     play_time_min = 15,
     play_time_max = 30,
     cover_tint = '#e74c3c',
+    cover_path = 'uno-no-mercy.webp',
     created_at = coalesce('2026-11-04T00:00:00.000Z'::timestamptz, created_at)
   where name_normalized = regexp_replace(lower('Uno No Mercy'), '[[:punct:][:space:]]', '', 'g')
   returning id
 )
-insert into public.games (name, description, players_min, players_max, play_time_min, play_time_max, cover_tint, created_at)
-select 'Uno No Mercy', 'A much harsher version of classic UNO packed with brutal stackable penalties, hand-limit limits, and elimination rules.', 2, 6, 15, 30, '#e74c3c', coalesce('2026-11-04T00:00:00.000Z'::timestamptz, now())
+insert into public.games (name, description, players_min, players_max, play_time_min, play_time_max, cover_tint, cover_path, created_at)
+select 'Uno No Mercy', 'A much harsher version of classic UNO packed with brutal stackable penalties, hand-limit limits, and elimination rules.', 2, 6, 15, 30, '#e74c3c', 'uno-no-mercy.webp', coalesce('2026-11-04T00:00:00.000Z'::timestamptz, now())
 where not exists (select 1 from updated);
 
 -- 10. Love Letter
@@ -175,12 +184,13 @@ with updated as (
     play_time_min = 20,
     play_time_max = 20,
     cover_tint = '#e91e63',
+    cover_path = 'love-letter.webp',
     created_at = coalesce('2026-11-04T00:00:00.000Z'::timestamptz, created_at)
   where name_normalized = regexp_replace(lower('Love Letter'), '[[:punct:][:space:]]', '', 'g')
   returning id
 )
-insert into public.games (name, description, players_min, players_max, play_time_min, play_time_max, cover_tint, created_at)
-select 'Love Letter', 'A micro-game of risk, deduction, and luck where players try to deliver their romantic letter to the Princess.', 2, 6, 20, 20, '#e91e63', coalesce('2026-11-04T00:00:00.000Z'::timestamptz, now())
+insert into public.games (name, description, players_min, players_max, play_time_min, play_time_max, cover_tint, cover_path, created_at)
+select 'Love Letter', 'A micro-game of risk, deduction, and luck where players try to deliver their romantic letter to the Princess.', 2, 6, 20, 20, '#e91e63', 'love-letter.webp', coalesce('2026-11-04T00:00:00.000Z'::timestamptz, now())
 where not exists (select 1 from updated);
 
 -- 11. Shallow Regrets
@@ -193,12 +203,13 @@ with updated as (
     play_time_min = 15,
     play_time_max = 15,
     cover_tint = '#16a085',
+    cover_path = 'shallow-regrets.jpg',
     created_at = coalesce('2026-11-04T00:00:00.000Z'::timestamptz, created_at)
   where name_normalized = regexp_replace(lower('Shallow Regrets'), '[[:punct:][:space:]]', '', 'g')
   returning id
 )
-insert into public.games (name, description, players_min, players_max, play_time_min, play_time_max, cover_tint, created_at)
-select 'Shallow Regrets', 'An unsettling, compact eldritch fishing card game where players reel in bizarre deep-sea horrors for a quick payout.', 2, 3, 15, 15, '#16a085', coalesce('2026-11-04T00:00:00.000Z'::timestamptz, now())
+insert into public.games (name, description, players_min, players_max, play_time_min, play_time_max, cover_tint, cover_path, created_at)
+select 'Shallow Regrets', 'An unsettling, compact eldritch fishing card game where players reel in bizarre deep-sea horrors for a quick payout.', 2, 3, 15, 15, '#16a085', 'shallow-regrets.jpg', coalesce('2026-11-04T00:00:00.000Z'::timestamptz, now())
 where not exists (select 1 from updated);
 
 -- 12. Catan
@@ -211,12 +222,13 @@ with updated as (
     play_time_min = 60,
     play_time_max = 90,
     cover_tint = '#d35400',
+    cover_path = 'catan.webp',
     created_at = coalesce('2026-11-04T00:00:00.000Z'::timestamptz, created_at)
   where name_normalized = regexp_replace(lower('Catan'), '[[:punct:][:space:]]', '', 'g')
   returning id
 )
-insert into public.games (name, description, players_min, players_max, play_time_min, play_time_max, cover_tint, created_at)
-select 'Catan', 'The classic strategy board game where settlers trade, build, and develop holdings across a modular hexagonal island.', 3, 4, 60, 90, '#d35400', coalesce('2026-11-04T00:00:00.000Z'::timestamptz, now())
+insert into public.games (name, description, players_min, players_max, play_time_min, play_time_max, cover_tint, cover_path, created_at)
+select 'Catan', 'The classic strategy board game where settlers trade, build, and develop holdings across a modular hexagonal island.', 3, 4, 60, 90, '#d35400', 'catan.webp', coalesce('2026-11-04T00:00:00.000Z'::timestamptz, now())
 where not exists (select 1 from updated);
 
 commit;

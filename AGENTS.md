@@ -48,7 +48,7 @@ Stored in `docs/specs/`. Format: `docs/specs/NNNN-title.md`. Feature scope lives
 ## Rules
 
 - Env vars are listed in `.env.example`; real values go in `.env.local` (git ignored). Never commit secrets.
-- The Supabase secret key is used only in `src/lib/supabase/admin.ts`.
+- The Supabase secret key is used only in `src/lib/supabase/admin.ts`, and in `scripts/seed-games.mjs` to upload cover images (it is a Node script, so it cannot import the `server-only` admin client).
 - Row level security on every table; public read, member write.
 - Tests sit next to the code (`*.test.ts`, Vitest).
 - Browser checks live in `e2e/` (Playwright, `playwright.config.ts`); results go to the git ignored `test-results/`.

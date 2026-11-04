@@ -8,6 +8,7 @@ export type ShelfCard = {
   id: number;
   name: string;
   coverTint: string | null;
+  coverPath: string | null;
   ownerCount: number;
   avgRecommendation: number | null;
 };
@@ -49,6 +50,7 @@ export function buildShelfData(
         id: g.id,
         name: g.name,
         coverTint: g.cover_tint,
+        coverPath: g.cover_path,
         ownerCount: ownerCounts.get(g.id) ?? 0,
         avgRecommendation: g.avg_recommendation,
       })),

@@ -132,6 +132,7 @@ describe("getShelfData", () => {
       id: 1,
       name: "Wingspan",
       coverTint: "#f3ead2",
+      coverPath: null,
       ownerCount: 4,
       avgRecommendation: 8,
     });

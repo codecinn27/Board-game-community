@@ -19,6 +19,7 @@ function game(id: number, over: Partial<HomeGame> = {}): HomeGame {
     id,
     name: `Game ${id}`,
     coverTint: null,
+    coverPath: null,
     addedAt: "2026-10-31T17:00:00Z",
     addedByName: "Mei",
     ...over,

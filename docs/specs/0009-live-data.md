@@ -148,9 +148,19 @@ The pure builders (`buildGameDetail`, `buildShelfData`, `buildHomeData`, `pickNe
 | `playersMin`, `playersMax` | no | whole numbers above 0; min not above max; an empty end shows as `?` |
 | `playTimeMin`, `playTimeMax` | no | minutes, same rules |
 | `coverTint` | no | lowercase `#rrggbb`; empty gives the neutral tint |
+| `cover` | no | a file name in `data/covers/`, lowercase letters, digits, and dashes, ending `.jpg`, `.jpeg`, `.png`, or `.webp`; the file must be at most 150 KB (153600 bytes); uploaded to the `covers` bucket and saved as `games.cover_path` (text only) |
 | `addedAt` | no | an ISO date, for the "Just added" order; defaults to the time you load |
 
-Cover images are out of scope: every game still shows the placeholder cover. Real games load without owners, ratings, or an "added by".
+Real games load without owners, ratings, or an "added by".
+
+**Cover images** (added after the first version of this spec): image files never go into the database. Each image lives in `data/covers/` on your machine, and `pnpm seed:games` uploads it through the Storage REST API to the public `covers` bucket (`POST /storage/v1/object/covers/{file}`, upsert, so a rerun replaces the file). Storage bytes count toward File storage, and the database holds only the `storage.objects` row (a few hundred bytes) plus `games.cover_path`, the bare file name.
+
+**Cover size limit (150 KB)**: each cover is at most 150 KB (`COVER_MAX_BYTES` = 153600 bytes in `src/lib/games/games-file.ts`). Three limits enforce it, and they must agree:
+- The `covers` bucket's `file_size_limit` is 153600. It was set in the Supabase dashboard; migration `20261105090000_cover_size_limit.sql` records the same value so a fresh `supabase db reset` matches, and `04_admin_tools.test.sql` checks it.
+- `pnpm seed:games` checks each file's size with `coverSizeProblem` before any upload, lists every oversized file, and writes nothing if one is too big.
+- Storage rejects an oversized upload anyway, so a bypassed check still fails.
+
+Images are compressed before they go in `data/covers/` (WebP or JPEG, about 800 px on the long side). On 2026-11-05 the three covers over the limit were re-encoded at the same file names: love-letter.webp (1091 KB to 66 KB), one-night-ultimate-warewolf.jpg (175 KB to 37 KB), and splendor.jpg (149 KB to 71 KB). The SQL file writes `cover_path` as text and never contains image data. Pages show a cover with `coverUrl(path)` in `src/lib/games/cover-url.ts`, which builds the public URL `…/storage/v1/object/public/covers/{file}`; a null path keeps the tint tile. Only `seed:games` holds the secret key for this upload, which `CLAUDE.md` allows; no member or page can write the bucket (the storage policies grant no write access).
 
 **State transitions**: none.
 
@@ -186,11 +196,12 @@ Cover images are out of scope: every game still shows the placeholder cover. Rea
 - `cover_tint` is null or lowercase `#rrggbb`, enforced by the database; the sheet's colors still come only from `coverTheme()`.
 - The pure builders keep their signatures, so their tests stay valid.
 - The generated SQL never creates owners, ratings, or members, and never uses the secret key.
+- Image bytes are stored only in the `covers` storage bucket. The database holds only `games.cover_path` text, and no SQL or table column stores image data.
 - `docs/scope` and `docs/design.md` are updated in the same change; the dummy file does not survive it.
 
 **Security model**: public read, no writes. All three screens read with the anonymous publishable key under the existing row level security: `games`, `game_owners`, `ratings` are public, and `profiles` exposes only `id`, `display_name`, `avatar_path`, `created_at` to anonymous readers, so no email or role leaks. `game_stats` is `security_invoker`, so it enforces the caller's policies. The new column is writable only by SQL (postgres, the dashboard) or an admin tool, never by `authenticated` in this feature. The data file has no personal data. No compliance scope.
 
-**Configuration required**: none new. The reads use the existing `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`. Vercel must have them at build time (it already needs them), because `generateStaticParams` now reads the database. Migration 5 must be pushed to the real project (`supabase db push`) before the new code is deployed there.
+**Configuration required**: `pnpm seed:games` needs `NEXT_PUBLIC_SUPABASE_URL` and `SUPABASE_SECRET_KEY` in `.env.local` to upload covers (skip with `--skip-upload`). The reads use the existing `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`. Vercel must have them at build time (it already needs them), because `generateStaticParams` now reads the database. Migration 5 must be pushed to the real project (`supabase db push`) before the new code is deployed there.
 
 **Critical test scenarios** (each maps to an acceptance criterion):
 - Happy path: local `db reset`, then open Wingspan from the shelf; the modal shows the DB tint, 4 owners, `8.0`, verifies **AC-4, AC-5, AC-7**
@@ -233,7 +244,7 @@ Order follows the project's Tracer Bullet approach, and you said to start with t
 - The proxy now reads the database for each game visit (cached, but a new dependency); the build now needs the Supabase environment variables.
 
 **Neutral**:
-- Covers stay as placeholders; real cover images and `cover_path` are a later feature.
+- Cover images live in the `covers` storage bucket, never in a table. The 12 sample covers total about 1.7 MB of File storage; the database size is unchanged by them.
 - `memberCount` on home still means "members who own a game" and is cheap to change when profiles can be counted.
 
 ## Follow-up

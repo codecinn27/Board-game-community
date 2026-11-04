@@ -20,7 +20,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 8 | Community shelf | Slice 1 (frontend, dummy data) | in-progress |
 | 9 | Game detail sheet | Slice 1 (frontend, dummy data) | in-progress |
 | 22 | Shelf: By owner view | Next (frontend, dummy data) | planned |
-| 21 | Live data for home, shelf, and game sheet | Slice 2 | done |
+| 21 | Live data for home, shelf, and game sheet | Slice 2 | in-progress |
 | 6 | Member accounts | Slice 2 | planned |
 | 7 | Add a game I own | Slice 2 | planned |
 | 10 | Online game lookup | Slice 3 | planned |
@@ -161,9 +161,9 @@ Spec [0007](../specs/0007-community-shelf.md) (part 2) · code in `src/component
 
 Starts once you are happy with the Slice 1 design.
 
-### 21. Live data for home, shelf, and game sheet · done
+### 21. Live data for home, shelf, and game sheet · in-progress
 Replace the dummy data with real reads from Supabase (public read, no sign in needed). The dummy games move into `supabase/seed.sql` as local sample data so development looks the same as before, and your real games go in through `data/games.json`, which `pnpm seed:games` turns into SQL for the real project.
-**Done when:** home, shelf, and the game sheet show real database rows with no visual change, the dummy data file is deleted, and the cover tint comes from `games.cover_tint`.
+**Done when:** home, shelf, and the game sheet show real database rows with no visual change, the dummy data file is deleted, and the cover tint comes from `games.cover_tint`. Games with a cover image show it everywhere a cover appears.
 - [x] Design it (spec): `/architect live data for home, shelf, and game sheet`
 - [x] Build it: `/develop live data for home, shelf, and game sheet`
   - [x] Database: migration 5 (`cover_tint`, `game_stats` rebuild), regenerated types, local sample seed (AC-1 to 3, 12)
@@ -171,6 +171,7 @@ Replace the dummy data with real reads from Supabase (public read, no sign in ne
   - [x] Shelf and home live, empty and error cases (AC-7 to 9, 11)
   - [x] Your data file: `data/games.json`, checks, `pnpm seed:games` and the SQL it writes (AC-13, 14)
   - [x] Delete the dummy file, fixtures, tests, browser checks, docs (AC-15, 16)
+  - [ ] Cover images (built: `cover` field, upload in `pnpm seed:games`, `CoverTile` image with tint fallback, covers capped at 150 KB by the bucket limit and the seed check; left: run the seed and check it in the browser): put each game's picture in the Supabase `covers` bucket, save its path in `games.cover_path`, and show it on home, shelf, and the game sheet (the tint tile stays as the fallback when a game has no image)
 Spec [0009](../specs/0009-live-data.md) · code in `src/lib/games/`, `src/lib/supabase/`, `src/components/game-sheet/`, `supabase/`, `data/`
 
 ### 6. Member accounts · needs a decision

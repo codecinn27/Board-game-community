@@ -50,6 +50,7 @@ export function SheetPreview({
         <CoverTile
           name={card.name}
           tint={card.coverTint ?? NEUTRAL_SHEET_TINT}
+          path={card.coverPath}
           className="aspect-auto size-full rounded-none"
         />
         <div

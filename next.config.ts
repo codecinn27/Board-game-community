@@ -1,7 +1,21 @@
 import { type NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
 
+// Cover images come from the public `covers` bucket of the Supabase project.
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+
 const nextConfig: NextConfig = {
+  images: {
+    remotePatterns: supabaseUrl
+      ? [
+          {
+            protocol: "https",
+            hostname: new URL(supabaseUrl).hostname,
+            pathname: "/storage/v1/object/public/covers/**",
+          },
+        ]
+      : [],
+  },
   cacheComponents: true,
   partialPrefetching: true,
   cacheLife: {

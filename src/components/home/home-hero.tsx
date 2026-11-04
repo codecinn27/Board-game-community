@@ -75,6 +75,7 @@ export async function HomeHero({
                   key={game.id}
                   name={game.name}
                   tint={game.coverTint}
+                  path={game.coverPath}
                   className="rounded-xl shadow-sm"
                 />
               ))}

@@ -1,7 +1,29 @@
 import { describe, expect, it } from "vitest";
-import { parseGamesFile, toGamesSql } from "./games-file";
+import {
+  COVER_MAX_BYTES,
+  coverSizeProblem,
+  parseGamesFile,
+  toGamesSql,
+} from "./games-file";
 
 // Spec 0009, AC-13 and AC-14.
+
+describe("coverSizeProblem", () => {
+  // covers: the 150 KB cover limit (matches the covers bucket)
+  it("accepts a cover of exactly 150 KB and rejects one byte more", () => {
+    expect(COVER_MAX_BYTES).toBe(153600);
+    expect(coverSizeProblem("splendor.jpg", 153600)).toBeNull();
+    expect(coverSizeProblem("splendor.jpg", 153601)).toMatch(
+      /splendor\.jpg is 150\.0 KB; covers must be at most 150 KB/,
+    );
+  });
+
+  it("reports the size in KB for the 1 MB original that prompted the limit", () => {
+    expect(coverSizeProblem("love-letter.webp", 1091002)).toMatch(
+      /love-letter\.webp is 1065\.4 KB/,
+    );
+  });
+});
 
 const good = {
   name: "  Wingspan ",
@@ -11,6 +33,7 @@ const good = {
   playTimeMin: 40,
   playTimeMax: 70,
   coverTint: "#f3ead2",
+  cover: "wingspan.webp",
   addedAt: "2026-11-04",
 };
 
@@ -29,6 +52,7 @@ describe("parseGamesFile", () => {
         playTimeMin: 40,
         playTimeMax: 70,
         coverTint: "#f3ead2",
+        coverPath: "wingspan.webp",
         addedAt: "2026-11-04T00:00:00.000Z",
       },
     ]);
@@ -38,7 +62,13 @@ describe("parseGamesFile", () => {
   it("needs only a name; everything else may be missing, empty, or null", () => {
     const { games, problems } = parseGamesFile([
       { name: "Just One" },
-      { name: "Dixit", description: "", coverTint: "", playersMin: null },
+      {
+        name: "Dixit",
+        description: "",
+        coverTint: "",
+        cover: "",
+        playersMin: null,
+      },
     ]);
 
     expect(problems).toEqual([]);
@@ -46,10 +76,29 @@ describe("parseGamesFile", () => {
       description: null,
       playersMin: null,
       coverTint: null,
+      coverPath: null,
       addedAt: null,
     });
     expect(games[1]).toMatchObject({ description: null, coverTint: null });
   });
+
+  // covers: AC-13
+  it.each(["Splendor.jpg", "a/b.jpg", "../x.png", "cover.gif", "cover", 7])(
+    "rejects the cover %j",
+    (cover) => {
+      expect(parseGamesFile([{ name: "X", cover }]).problems).toHaveLength(1);
+    },
+  );
+
+  // covers: AC-13
+  it.each(["a.jpg", "7-wonders.webp", "x1.jpeg", "y.png"])(
+    "accepts the cover %j",
+    (cover) => {
+      expect(parseGamesFile([{ name: "X", cover }]).games[0]?.coverPath).toBe(
+        cover,
+      );
+    },
+  );
 
   // covers: AC-13
   it("accepts an empty list and Chinese text", () => {
@@ -88,7 +137,7 @@ describe("parseGamesFile", () => {
       'Game 5 ("Zero"): playersMin must be a whole number from 1 to 32767, got 0',
       'Game 6 ("Fraction"): playTimeMax must be a whole number from 1 to 32767, got 1.5',
       'Game 7 ("Date"): addedAt must be a real date such as 2026-11-04, got "last week"',
-      'Game 8 ("Typo"): unknown field "descripton" (fields are name, description, playersMin, playersMax, playTimeMin, playTimeMax, coverTint, addedAt)',
+      'Game 8 ("Typo"): unknown field "descripton" (fields are name, description, playersMin, playersMax, playTimeMin, playTimeMax, coverTint, cover, addedAt)',
       "Game 9: must be an object",
     ]);
   });
@@ -141,6 +190,13 @@ describe("toGamesSql", () => {
   const sql = toGamesSql(
     parseGamesFile([good, { name: "O'Brien's 三国杀" }]).games,
   );
+
+  // covers: AC-14
+  it("saves the cover file name as cover_path, or null", () => {
+    expect(sql).toContain("cover_path = 'wingspan.webp',");
+    expect(sql).toContain("cover_path = null,");
+    expect(sql).toContain("cover_tint, cover_path, created_at)");
+  });
 
   // covers: AC-14
   it("runs in one transaction", () => {
