@@ -8,6 +8,7 @@ import {
   Plus,
   type LucideIcon,
 } from "lucide-react";
+import { Suspense } from "react";
 import { Link, usePathname } from "@/i18n/navigation";
 import { buttonVariants } from "@/components/ui/button";
 import { isActiveTab, type NavIcon } from "@/lib/app-shell/nav";
@@ -42,15 +43,40 @@ type NavLinkProps = {
 const focusRing =
   "outline-none focus-visible:ring-3 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background";
 
-export function NavLink({
+/**
+ * The path is runtime data on routes with a `[param]` (the game sheet), so the
+ * live link streams in; until then the same link shows as not active.
+ */
+export function NavLink(props: NavLinkProps) {
+  if (props.pathname !== undefined) {
+    return (
+      <NavLinkView
+        {...props}
+        active={isActiveTab(props.pathname, props.href)}
+      />
+    );
+  }
+  return (
+    <Suspense fallback={<NavLinkView {...props} active={false} />}>
+      <LiveNavLink {...props} />
+    </Suspense>
+  );
+}
+
+function LiveNavLink(props: NavLinkProps) {
+  const currentPath = usePathname();
+  return (
+    <NavLinkView {...props} active={isActiveTab(currentPath, props.href)} />
+  );
+}
+
+function NavLinkView({
   href,
   icon,
   label,
   variant,
-  pathname,
-}: NavLinkProps) {
-  const currentPath = usePathname();
-  const active = isActiveTab(pathname ?? currentPath, href);
+  active,
+}: NavLinkProps & { active: boolean }) {
   const Icon = icons[icon];
 
   if (variant === "raised") {

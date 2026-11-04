@@ -34,6 +34,11 @@
     }
   },
   "home": {
+    "error": {
+      "title": "Could not load the home page",
+      "body": "Something went wrong on our side. Try again in a moment.",
+      "retry": "Try again"
+    },
     "meta": {
       "description": "See every board game our group owns, and who owns it, before you buy."
     },
@@ -85,6 +90,46 @@
         "title": "By owner is coming soon",
         "body": "Soon you will see each member's games here."
       }
+    }
+  },
+  "game": {
+    "meta": {
+      "description": "Details, ratings, and owners for a board game on the shelf."
+    },
+    "close": "Close",
+    "share": {
+      "label": "Share",
+      "copied": "Link copied",
+      "copyFailed": "Could not copy, use the address bar"
+    },
+    "chips": {
+      "rating": "{rating} out of 10, from {count, plural, one {# rating} other {# ratings}}",
+      "owners": "{count, plural, one {# owner} other {# owners}}"
+    },
+    "stats": {
+      "players": "Players",
+      "minutes": "Minutes",
+      "owners": "Owners",
+      "unknown": "?"
+    },
+    "description": {
+      "more": "More",
+      "less": "Less"
+    },
+    "owners": {
+      "heading": "Owners ({count})",
+      "since": "Since {date}",
+      "none": "Nobody owns this yet"
+    },
+    "dock": {
+      "own": "I own this",
+      "soon": "Coming soon"
+    },
+    "loading": "Loading game",
+    "error": {
+      "title": "Could not load this game",
+      "body": "Something went wrong on our side. Try again in a moment.",
+      "retry": "Try again"
     }
   }
 }

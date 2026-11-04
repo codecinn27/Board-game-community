@@ -4,6 +4,7 @@ import { locale as rootLocale } from "next/root-params";
 import { notFound } from "next/navigation";
 import { getMessages, getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/app-shell/app-shell";
+import { SheetHost } from "@/components/game-sheet/sheet-host";
 import { IntlClientProvider } from "@/i18n/intl-client-provider";
 import { hasLocale, htmlLang, routing } from "@/i18n/routing";
 import { themeColors } from "@/lib/design/theme-color";
@@ -58,7 +59,7 @@ export default async function RootLayout({
     >
       <body className="flex min-h-full flex-col">
         {/* Locale and time zone flow through. `common.time` (for
-            LocalTime, used anywhere) and the shelf error backstop ship to the browser here; other client
+            LocalTime, used anywhere) and the shelf and home error backstops ship to the browser here; other client
             components pick their own namespace, never the whole file. */}
         <IntlClientProvider
           messages={{
@@ -67,10 +68,24 @@ export default async function RootLayout({
               heading: messages.shelf.heading,
               error: messages.shelf.error,
             },
+            home: { error: messages.home.error },
           }}
         >
           {/* "guest" until feature 6 (Member accounts) reads the session. */}
           <AppShell viewer="guest">{children}</AppShell>
+          {/* The game sheet (spec 0008): one client dialog, outside <main>,
+              above the shell. Cards open it; no navigation happens. */}
+          <SheetHost
+            labels={{
+              close: messages.game.close,
+              loading: messages.game.loading,
+              errorTitle: messages.game.error.title,
+              errorBody: messages.game.error.body,
+              errorRetry: messages.game.error.retry,
+              notFoundTitle: messages.common.notFound.title,
+              notFoundBody: messages.common.notFound.body,
+            }}
+          />
         </IntlClientProvider>
       </body>
     </html>

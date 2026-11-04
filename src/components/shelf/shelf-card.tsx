@@ -1,7 +1,7 @@
 import { Star, Users } from "lucide-react";
 import { useFormatter, useTranslations } from "next-intl";
 import { CoverTile } from "@/components/games/cover-tile";
-import { Link } from "@/i18n/navigation";
+import { SheetLink } from "@/components/game-sheet/sheet-link";
 import { type ShelfCard as ShelfCardData } from "@/lib/games/shelf";
 import { cn } from "@/lib/utils";
 
@@ -24,13 +24,21 @@ export function ShelfCard({ game }: ShelfCardProps) {
         });
 
   return (
-    <Link
-      href={`/games/${game.id}`}
+    <SheetLink
+      card={{
+        id: game.id,
+        name: game.name,
+        coverTint: game.coverTint,
+        coverPath: game.coverPath,
+        ownerCount: game.ownerCount,
+        avgRecommendation: game.avgRecommendation,
+      }}
       className={cn("flex flex-col gap-2 rounded-xl", focusRing)}
     >
       <CoverTile
         name={game.name}
         tint={game.coverTint}
+        path={game.coverPath}
         className="w-full rounded-xl"
       />
       <span className="line-clamp-2 leading-6 font-semibold">{game.name}</span>
@@ -50,6 +58,6 @@ export function ShelfCard({ game }: ShelfCardProps) {
           </span>
         </span>
       </span>
-    </Link>
+    </SheetLink>
   );
 }

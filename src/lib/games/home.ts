@@ -1,10 +1,14 @@
-import { dummyGames, dummyOwners, dummyProfiles } from "./dummy-data";
-import { type DummyOwner, type DummyProfile, type ShelfGame } from "./types";
+import { cacheLife, cacheTag } from "next/cache";
+import { createPublicClient } from "@/lib/supabase/public";
+import { GAMES_TAG } from "./cache";
+import { fetchOwnerRows, fetchProfileRows, fetchShelfGames } from "./rows";
+import { type OwnerRow, type ProfileRow, type ShelfGame } from "./types";
 
 export type HomeGame = {
   id: number;
   name: string;
   coverTint: string | null;
+  coverPath: string | null;
   addedAt: string;
   addedByName: string | null;
 };
@@ -13,6 +17,7 @@ export type TopGame = {
   id: number;
   name: string;
   coverTint: string | null;
+  coverPath: string | null;
   ownerCount: number;
   avgRecommendation: number;
   rank: number;
@@ -63,6 +68,7 @@ export function pickTopRated(
     id: game.id,
     name: game.name,
     coverTint: game.cover_tint,
+    coverPath: game.cover_path,
     ownerCount: ownerCounts.get(game.id) ?? 0,
     avgRecommendation: avg,
     rank: index + 1,
@@ -77,8 +83,8 @@ export function countMembers(owners: { member_id: string }[]): number {
 /** Pure: everything the page shows, from the three row sets. */
 export function buildHomeData(
   games: ShelfGame[],
-  profiles: DummyProfile[],
-  owners: DummyOwner[],
+  profiles: ProfileRow[],
+  owners: OwnerRow[],
 ): HomeData {
   const names = new Map(profiles.map((p) => [p.id, p.display_name]));
   const ownerCounts = new Map<number, number>();
@@ -93,6 +99,7 @@ export function buildHomeData(
       id: g.id,
       name: g.name,
       coverTint: g.cover_tint,
+      coverPath: g.cover_path,
       addedAt: g.created_at,
       addedByName: (g.added_by !== null && names.get(g.added_by)) || null,
     })),
@@ -105,7 +112,17 @@ export function buildHomeData(
   };
 }
 
-/** Today: buildHomeData over the dummy arrays. Feature 21 swaps this body for Supabase reads. */
+/** Everything home shows, from the database, cached for 5 minutes under the `games` tag. */
 export async function getHomeData(): Promise<HomeData> {
-  return buildHomeData(dummyGames, dummyProfiles, dummyOwners);
+  "use cache";
+  cacheLife("games");
+  cacheTag(GAMES_TAG);
+
+  const client = createPublicClient();
+  const [games, profiles, owners] = await Promise.all([
+    fetchShelfGames(client),
+    fetchProfileRows(client),
+    fetchOwnerRows(client),
+  ]);
+  return buildHomeData(games, profiles, owners);
 }

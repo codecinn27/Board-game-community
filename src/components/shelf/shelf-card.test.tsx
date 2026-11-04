@@ -16,6 +16,7 @@ function card(over: Partial<ShelfCardData> = {}): ShelfCardData {
     id: 5,
     name: "SETI",
     coverTint: null,
+    coverPath: null,
     ownerCount: 2,
     avgRecommendation: 8.5,
     ...over,

@@ -1,11 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { dummyGames, dummyOwners, dummyProfiles } from "./dummy-data";
-import {
-  buildShelfData,
-  compareNames,
-  getShelfData,
-  parseShelfView,
-} from "./shelf";
+import { fixtureGames, fixtureOwners, fixtureProfiles } from "./fixtures";
+import { buildShelfData, compareNames, parseShelfView } from "./shelf";
 import { type ShelfGame } from "./types";
 
 // Spec 0007, AC-2, AC-3, AC-11.
@@ -48,8 +43,12 @@ describe("compareNames", () => {
   });
 });
 
-describe("buildShelfData over the dummy data", () => {
-  const { games } = buildShelfData(dummyGames, dummyProfiles, dummyOwners);
+describe("buildShelfData over the fixture data", () => {
+  const { games } = buildShelfData(
+    fixtureGames,
+    fixtureProfiles,
+    fixtureOwners,
+  );
 
   // covers: AC-3, AC-11
   it("lists all 12 games A to Z", () => {
@@ -75,7 +74,7 @@ describe("buildShelfData over the dummy data", () => {
     expect(byName.get("Wingspan")?.ownerCount).toBe(4);
     expect(byName.get("SETI")?.ownerCount).toBe(1);
     const total = games.reduce((sum, g) => sum + g.ownerCount, 0);
-    expect(total).toBe(dummyOwners.length);
+    expect(total).toBe(fixtureOwners.length);
   });
 
   // covers: AC-2
@@ -107,13 +106,6 @@ describe("buildShelfData ties", () => {
   it("gives a game with no owner links a count of 0", () => {
     const { games } = buildShelfData([fixture(1, "Solo")], [], []);
     expect(games[0]?.ownerCount).toBe(0);
-  });
-});
-
-describe("getShelfData", () => {
-  // covers: AC-11
-  it("reads the dummy data", async () => {
-    expect((await getShelfData()).games).toHaveLength(dummyGames.length);
   });
 });
 

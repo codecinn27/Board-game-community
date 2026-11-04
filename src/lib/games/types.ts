@@ -5,15 +5,26 @@ type Present<K extends keyof GameStatsRow> = {
   [P in K]: NonNullable<GameStatsRow[P]>;
 };
 
-/** A game as the dummy data and feature 21 provide it. */
+/** A game as the shelf and home read it from `game_stats`. */
 export type ShelfGame = Present<"id" | "name" | "created_at" | "rating_count"> &
-  Pick<GameStatsRow, "added_by" | "cover_path" | "avg_recommendation"> & {
-    /** Feature 21 adds `games.cover_tint` (`#rrggbb`). */
-    cover_tint: string | null;
-  };
+  Pick<
+    GameStatsRow,
+    "added_by" | "cover_path" | "cover_tint" | "avg_recommendation"
+  >;
 
-export type DummyProfile = Pick<Tables<"profiles">, "id" | "display_name">;
-export type DummyOwner = Pick<
+/** A shelf game plus the detail columns of `games` (spec 0008). */
+export type GameRow = ShelfGame &
+  Pick<
+    Tables<"games">,
+    | "description"
+    | "players_min"
+    | "players_max"
+    | "play_time_min"
+    | "play_time_max"
+  >;
+
+export type ProfileRow = Pick<Tables<"profiles">, "id" | "display_name">;
+export type OwnerRow = Pick<
   Tables<"game_owners">,
   "game_id" | "member_id" | "created_at"
 >;

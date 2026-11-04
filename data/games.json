@@ -1,0 +1,134 @@
+[
+  {
+    "name": "Splendor",
+    "description": "Players act as wealthy Renaissance merchants acquiring mines, transportation methods, and artisans to covertly garner the most prestige points.",
+    "playersMin": 2,
+    "playersMax": 4,
+    "playTimeMin": 30,
+    "playTimeMax": 30,
+    "coverTint": "#2b4c7e",
+    "cover": "splendor.jpg",
+    "addedAt": "2026-11-04"
+  },
+  {
+    "name": "Avalon",
+    "description": "A social deduction game of hidden loyalties where loyal servants of Arthur battle against the minions of Mordred.",
+    "playersMin": 5,
+    "playersMax": 10,
+    "playTimeMin": 30,
+    "playTimeMax": 45,
+    "coverTint": "#4b2e83",
+    "cover": "avalon.jpg",
+    "addedAt": "2026-11-04"
+  },
+  {
+    "name": "Dixit",
+    "description": "A lightweight game of storytelling, guesswork, and imagination using beautifully illustrated surreal cards.",
+    "playersMin": 3,
+    "playersMax": 8,
+    "playTimeMin": 30,
+    "playTimeMax": 30,
+    "coverTint": "#d4af37",
+    "cover": "dixit.webp",
+    "addedAt": "2026-11-04"
+  },
+  {
+    "name": "Piles",
+    "description": "A fast-moving card game focused on stacking and organizing assets efficiently under pressure.",
+    "playersMin": 2,
+    "playersMax": 5,
+    "playTimeMin": 15,
+    "playTimeMax": 20,
+    "coverTint": "#c0392b",
+    "cover": "piles.webp",
+    "addedAt": "2026-11-04"
+  },
+  {
+    "name": "7 Wonders",
+    "description": "A fast-paced card drafting game where players develop one of the ancient world's great city-states across three ages.",
+    "playersMin": 3,
+    "playersMax": 7,
+    "playTimeMin": 30,
+    "playTimeMax": 30,
+    "coverTint": "#8e44ad",
+    "cover": "7-wonders.webp",
+    "addedAt": "2026-11-04"
+  },
+  {
+    "name": "Saboteur",
+    "description": "A semi-cooperative tunneling card game where gold-seeking dwarves try to sniff out paths while secret saboteurs attempt to derail them.",
+    "playersMin": 3,
+    "playersMax": 10,
+    "playTimeMin": 30,
+    "playTimeMax": 30,
+    "coverTint": "#795548",
+    "cover": "saboteur.webp",
+    "addedAt": "2026-11-04"
+  },
+  {
+    "name": "1 Night Ultimate Werewolf",
+    "description": "A fast-paced deduction game for up to ten players where someone is a werewolf, but roles shift throughout a single thrilling night.",
+    "playersMin": 3,
+    "playersMax": 10,
+    "playTimeMin": 10,
+    "playTimeMax": 15,
+    "coverTint": "#111111",
+    "cover": "one-night-ultimate-warewolf.jpg",
+    "addedAt": "2026-11-04"
+  },
+  {
+    "name": "Monopoly Deal",
+    "description": "A fast-playing, portable card game version of Monopoly where players race to collect three complete property sets.",
+    "playersMin": 2,
+    "playersMax": 5,
+    "playTimeMin": 15,
+    "playTimeMax": 15,
+    "coverTint": "#27ae60",
+    "cover": "monopoly-deal.webp",
+    "addedAt": "2026-11-04"
+  },
+  {
+    "name": "Uno No Mercy",
+    "description": "A much harsher version of classic UNO packed with brutal stackable penalties, hand-limit limits, and elimination rules.",
+    "playersMin": 2,
+    "playersMax": 6,
+    "playTimeMin": 15,
+    "playTimeMax": 30,
+    "coverTint": "#e74c3c",
+    "cover": "uno-no-mercy.webp",
+    "addedAt": "2026-11-04"
+  },
+  {
+    "name": "Love Letter",
+    "description": "A micro-game of risk, deduction, and luck where players try to deliver their romantic letter to the Princess.",
+    "playersMin": 2,
+    "playersMax": 6,
+    "playTimeMin": 20,
+    "playTimeMax": 20,
+    "coverTint": "#e91e63",
+    "cover": "love-letter.webp",
+    "addedAt": "2026-11-04"
+  },
+  {
+    "name": "Shallow Regrets",
+    "description": "An unsettling, compact eldritch fishing card game where players reel in bizarre deep-sea horrors for a quick payout.",
+    "playersMin": 2,
+    "playersMax": 3,
+    "playTimeMin": 15,
+    "playTimeMax": 15,
+    "coverTint": "#16a085",
+    "cover": "shallow-regrets.jpg",
+    "addedAt": "2026-11-04"
+  },
+  {
+    "name": "Catan",
+    "description": "The classic strategy board game where settlers trade, build, and develop holdings across a modular hexagonal island.",
+    "playersMin": 3,
+    "playersMax": 4,
+    "playTimeMin": 60,
+    "playTimeMax": 90,
+    "coverTint": "#d35400",
+    "cover": "catan.webp",
+    "addedAt": "2026-11-04"
+  }
+]

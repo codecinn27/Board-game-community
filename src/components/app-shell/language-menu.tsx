@@ -9,8 +9,8 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { usePathname, useRouter } from "@/i18n/navigation";
-import { hasLocale, localeCode, type Locale } from "@/i18n/routing";
+import { useRouter } from "@/i18n/navigation";
+import { hasLocale, localeCode, routing, type Locale } from "@/i18n/routing";
 import { cn } from "@/lib/utils";
 
 export type LanguageOption = {
@@ -32,17 +32,22 @@ const focusRing =
   "outline-none focus-visible:ring-3 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background";
 
 export function LanguageMenu({ current, label, options }: LanguageMenuProps) {
-  const pathname = usePathname();
   const router = useRouter();
   const [, startTransition] = useTransition();
   const currentLang = options.find((o) => o.locale === current)?.lang;
 
   function choose(value: unknown) {
     if (!hasLocale(value) || value === current) return;
-    // Read the query at choose time, so no useSearchParams (and no Suspense)
-    // is needed. Items are not links: nothing is prefetched, and the cookie
+    // Read the path and query at choose time, so no usePathname or
+    // useSearchParams (and no Suspense) is needed. Items are not links: nothing is prefetched, and the cookie
     // only changes when the proxy sees the new prefixed path (spec 0005, AC-4).
-    const href = `${pathname}${window.location.search}`;
+    const { pathname, search } = window.location;
+    const prefix = routing.locales.find(
+      (l) => pathname === `/${l}` || pathname.startsWith(`/${l}/`),
+    );
+    const path =
+      prefix === undefined ? pathname : pathname.slice(prefix.length + 1);
+    const href = `${path === "" ? "/" : path}${search}`;
     startTransition(() => router.replace(href, { locale: value }));
   }
 

@@ -36,6 +36,7 @@ pnpm test        # vitest run
 pnpm test:e2e    # Playwright at 360px and 1280px, light and dark (starts pnpm dev, needs .env.local)
 supabase test db # pgTAP database tests (needs Docker Desktop running)
 supabase db push # apply migrations to the linked real project
+pnpm seed:games # check data/games.json and write supabase/games-data.sql (idempotent SQL for the real project, run it in the SQL editor)
 ```
 
 Docker Desktop's CLI is in `C:\Users\kobe9\AppData\Local\Programs\DockerDesktop\resources\bin`. Git Bash gets it from `~/.bash_profile`; if `docker` is not found, add that folder to `PATH` (details in [supabase/AGENTS.md](supabase/AGENTS.md)).
@@ -47,7 +48,7 @@ Stored in `docs/specs/`. Format: `docs/specs/NNNN-title.md`. Feature scope lives
 ## Rules
 
 - Env vars are listed in `.env.example`; real values go in `.env.local` (git ignored). Never commit secrets.
-- The Supabase secret key is used only in `src/lib/supabase/admin.ts`.
+- The Supabase secret key is used only in `src/lib/supabase/admin.ts`, and in `scripts/seed-games.mjs` to upload cover images (it is a Node script, so it cannot import the `server-only` admin client).
 - Row level security on every table; public read, member write.
 - Tests sit next to the code (`*.test.ts`, Vitest).
 - Browser checks live in `e2e/` (Playwright, `playwright.config.ts`); results go to the git ignored `test-results/`.
@@ -62,11 +63,16 @@ Stored in `docs/specs/`. Format: `docs/specs/NNNN-title.md`. Feature scope lives
 - Import `Link`, `redirect`, `usePathname`, and `useRouter` from `@/i18n/navigation`, never `next/link` or `next/navigation`; send messages to the browser only through `IntlClientProvider` with picked namespaces. Raw text in JSX under `src/app/` and `src/components/` fails lint (the `/design` page, `src/components/ui/`, and tests are exempt).
 - Show timestamps with `LocalTime` (`src/components/time/local-time.tsx`), never format dates by hand.
 - next-intl's middleware does not load under Vitest, so proxy redirects and the language cookie are tested in `e2e/two-languages.spec.ts`.
-- Home reads dummy data through `src/lib/games/home.ts` (`buildHomeData`) from `src/lib/games/dummy-data.ts`, typed like the real rows; live data (scope feature 21) swaps those read functions, not the components.
-- Shelf reads the same dummy data through `src/lib/games/shelf.ts` (`getShelfData`, `compareNames`); `?view=owner` is read only inside `ShelfLoader` under `Suspense` (Cache Components), never in the page. Shelf pieces live in `src/components/shelf/`; `CoverTile` is in `src/components/games/`.
+- Home, shelf, and the game sheet read live rows from Supabase (spec 0009). Components never query: only the `get*` functions in `src/lib/games/` do (`getHomeData`, `getShelfData`, `getGameDetail`, `getGameIds`), each a `"use cache"` read through `createPublicClient()` tagged `GAMES_TAG` (`src/lib/games/cache.ts`, 5 minute `games` profile in `next.config.ts`). Call `revalidateGames()` after any write that changes a game, owner, or rating. Pure builders (`buildHomeData` and friends) are tested on `src/lib/games/fixtures.ts`.
+- Shelf reads through `src/lib/games/shelf.ts` (`getShelfData`, `compareNames`); `?view=owner` is read only inside `ShelfLoader` under `Suspense` (Cache Components), never in the page. Shelf pieces live in `src/components/shelf/`; `CoverTile` is in `src/components/games/`.
+- The game sheet reads through `getGameDetail` in `src/lib/games/detail.ts`. Every game card is a `SheetLink` that opens the sheet as a modal on the same page (no navigation); `/games/[id]` is the plain page for direct visits and shared links. File map and rules: [src/components/game-sheet/AGENTS.md](src/components/game-sheet/AGENTS.md).
+- `src/proxy.ts` also rewrites an unknown or invalid `/{locale}/games/{id}` to the catch all, so it answers a real 404 status (a prerendered dynamic route would serve its shell with 200 on a first unseen id); its matcher has a second entry for game paths because the first skips paths with a dot.
+- A client component that reads the path with `usePathname` must sit inside `Suspense` (see `NavLink`) or read `window.location` when the event happens (see `LanguageMenu`), because dynamic routes such as `/games/[id]` reject it outside `Suspense`.
+- A Server Action has no route, so `next/root-params` fails there: pass the locale in as an argument. Return plain data from it, not rendered UI that uses client components.
 - Page side padding for the header and `<main>` is the `--page-gutter` variable in `src/app/globals.css` (24, 52, 60, 80px by breakpoint); use it for anything that must line up with the page edge.
 - The shadcn CLI can write `import { cn } from "cn"` and add a stray `cn` npm package; change the import to `@/lib/utils` and drop the package.
 - Shell tabs come only from `src/lib/app-shell/nav.ts` (`enabled` plus `audience`); the bottom tab bar shows only at 2 or more visible tabs.
+- Comments that start with `// YC:` are the engineer's own notes. Never remove or rewrite them, even when editing or refactoring the code around them; leave them in place.
 
 ## Tooling
 
@@ -102,5 +108,6 @@ Stored in `docs/specs/`. Format: `docs/specs/NNNN-title.md`. Feature scope lives
 - Design system: build all UI to [docs/design.md](docs/design.md) (art direction and the build mandate); token values live in `src/app/globals.css`, and `/design` previews them.
 - [src/lib/supabase/AGENTS.md](src/lib/supabase/AGENTS.md) (which Supabase client to use, and the secret key rule)
 - [supabase/AGENTS.md](supabase/AGENTS.md) (migrations, pgTAP tests, seed, and running Docker for the local stack)
+- [src/components/game-sheet/AGENTS.md](src/components/game-sheet/AGENTS.md) (the game detail sheet: modal, page, store, and animation rules)
 
 _Drafted by /audit from the repo, worth a quick human pass. Edit freely: once a line stops matching this draft, later runs treat it as curated and will flag rather than overwrite it._

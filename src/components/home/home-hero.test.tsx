@@ -18,6 +18,7 @@ const mosaic: HomeGame[] = Array.from({ length: 6 }, (_, i) => ({
   id: i + 1,
   name: `Game ${i + 1}`,
   coverTint: null,
+  coverPath: null,
   addedAt: "2026-10-01T00:00:00Z",
   addedByName: null,
 }));

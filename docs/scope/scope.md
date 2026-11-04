@@ -3,7 +3,7 @@
 A shared, public board game shelf for your local community: it shows every game the group owns and who owns it, so nobody buys a duplicate. Members register to add their games, fill in a standard rating form, comment, keep a top 5, and grow a wishlist of games still to conquer. Mobile first, desktop second, in English and Chinese.
 
 **Build approach:** Tracer Bullet (prove one real thread through every layer first, then thicken it one strand at a time). After the foundations, the front end comes first: home, shelf, and game sheet are built on hardcoded dummy data until the design is right (Slice 1), and only then wired to the database (Slice 2 onward).
-**Workflow:** Beta (after `/develop`: `/check verify`, then `/test`). The project default level of rigor. `/architect` is the recommended first stop for a feature with a real decision, but skippable when you already know the build. Any feature can carry its own tag (e.g. `· GA`) to do more or less.
+**Workflow:** Prototype (after `/develop`: nothing more, the engineer does the self check). The project default level of rigor. `/architect` is the recommended first stop for a feature with a real decision, but skippable when you already know the build. Any feature can carry its own tag (e.g. `· GA`) to do more or less.
 
 _These are recommendations to keep your build orderly, not requirements. Skip anything that does not fit: if you already know how to build a feature, use `/develop` and skip `/architect`. You decide when a feature is `done`._
 
@@ -18,8 +18,9 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 5 | Two languages (English + Chinese) | Foundation | done |
 | 15 | Home page | Slice 1 (frontend, dummy data) | done |
 | 8 | Community shelf | Slice 1 (frontend, dummy data) | in-progress |
-| 9 | Game detail sheet | Slice 1 (frontend, dummy data) | planned |
-| 21 | Live data for home, shelf, and game sheet | Slice 2 | planned |
+| 9 | Game detail sheet | Slice 1 (frontend, dummy data) | in-progress |
+| 22 | Shelf: By owner view | Next (frontend, dummy data) | planned |
+| 21 | Live data for home, shelf, and game sheet | Slice 2 | in-progress |
 | 6 | Member accounts | Slice 2 | planned |
 | 7 | Add a game I own | Slice 2 | planned |
 | 10 | Online game lookup | Slice 3 | planned |
@@ -118,31 +119,60 @@ Spec [0006](../specs/0006-home-page.md) · code in `src/app/[locale]/`, `src/lib
 
 ### 8. Community shelf · in-progress
 The "all board games" section at `/shelf`: every game the community owns, as a mobile friendly grid of covers, with a switch between all games and games grouped by owner.
-**Done when:** a visitor sees every dummy game with cover, name, owner count, and average recommendation, can switch to the by owner view, and the empty and loading states render.
+**Done when:** a visitor sees every dummy game with cover, name, owner count, and average recommendation, can switch to the By owner tab (it shows a "coming soon" note; the real view moved to feature 22), and the empty and loading states render.
 - [x] Mock it on the canvas (phone and desktop) and get your OK
 - [x] Design it (spec): `/architect community shelf`
-- [ ] Build it: `/develop community shelf`
+- [x] Build it: `/develop community shelf`
   - [x] Part 1, thin thread: `CoverTile` moved to `src/components/games/`, read layer and `compareNames` replace the tracer, cards in the grid at `/shelf` (AC-1 to 4, 11)
   - [x] Part 1, the rest: view switch from `?view=`, loading skeleton, empty and error states, By owner placeholder, messages in both languages (AC-5 to 10)
-  - [x] Part 1, checks: component tests for the states, `/design` previews, browser checks, updated home checks (AC-7 to 9, 12)
-  - [ ] Part 2, By owner: owner rows in the read layer, member sections with game strips, browser checks (AC-13 to 15)
-- [ ] Verify it: `/check verify community shelf`
+  - [x] Part 1, checks: component tests for the states, `/design` previews, browser checks, updated home checks (AC-7 to 9)
+- [x] Verify it: `/check verify community shelf`
 - [x] Test it: `/test community shelf`
 Spec [0007](../specs/0007-community-shelf.md) · code in `src/app/[locale]/shelf/`, `src/lib/games/`, `src/components/shelf/`, `src/components/games/`, `messages/`
 
-### 9. Game detail sheet · needs a decision
+### 9. Game detail sheet · in-progress
 Tap a game on the shelf or home page to open its sheet, built to Design 5 (Cover Tint): the cover on top fading into its own color, name, rating and owner chips, a stats card, the description, the list of owners, and the "I own this" dock. Already designed on the canvas (phone and desktop dialog); the color rules are built in `src/lib/design/cover-tint.ts`.
 **Done when:** every dummy game opens its own tinted sheet at `/games/[id]` over the shelf (Back closes it, a direct visit shows it as a page), it shows the details and every owner, and "I own this" is visible but not wired up yet.
-- [ ] Design it (spec): `/architect game detail sheet`
+- [x] Design it (spec): `/architect game detail sheet`
+- [x] Build it: `/develop game detail sheet`
+  - [x] Thin thread: dummy data with details, `getGameDetail`, bare `/games/[id]` page, 404 and static ids (AC-1, 18, 19)
+  - [x] The sheet: tinted anatomy, chips, stats, owners, disabled dock, messages in both languages (AC-4 to 7, 9, 10, 16)
+  - [x] Islands and frame: description "More", Share, shadcn Dialog frames, focus and motion, loading, error, metadata (AC-8, 11 to 15, 17)
+  - [x] Tests, `/design` previews, `docs/design.md` update, browser checks (AC-20)
+- [ ] Verify it: `/check verify game detail sheet`
+- [x] Test it: `/test game detail sheet`
+Spec [0008](../specs/0008-game-detail-sheet.md) · code in `src/app/[locale]/games/`, `src/app/[locale]/@modal/`, `src/components/game-sheet/`, `src/lib/games/`, `messages/`
+
+## Next: Shelf by owner (frontend, dummy data)
+
+Moved out of feature 8 (Community shelf) so the shelf could be finished. It is still dummy data and still front end only, so do it before Slice 2.
+
+### 22. Shelf: By owner view · planned
+The "By owner" view at `/shelf?view=owner`: one section per member who owns at least one game, members A to Z, each with a row of their games that scrolls sideways inside itself. It replaces the "coming soon" note the shelf shows today.
+**Done when:** a visitor switches to By owner and sees every member with their games as a sideways strip of covers, with no sideways scroll of the page at 360px, and the loading and error states match All games.
+- [x] Design it (spec): already written as part 2 of [spec 0007](../specs/0007-community-shelf.md) (AC-13 to 15, build plan tasks 10 to 12); `/architect shelf by owner view` can split it into its own spec
+- [ ] Build it: `/develop shelf by owner view`
+  - [ ] Read layer: owner rows in `buildShelfData` (members A to Z, games A to Z, members with no games left out) and tests (AC-13)
+  - [ ] `OwnerShelves`: member sections with avatar and game strips; delete the placeholder and its two messages (AC-13 to 15)
+  - [ ] Browser checks for By owner at both widths and both languages (AC-13, 14)
+Spec [0007](../specs/0007-community-shelf.md) (part 2) · code in `src/components/shelf/`, `src/lib/games/shelf.ts`, `messages/`
 
 ## Slice 2: Real data behind the screens
 
 Starts once you are happy with the Slice 1 design.
 
-### 21. Live data for home, shelf, and game sheet · needs a decision
-Replace the dummy data with real reads from Supabase (public read, no sign in needed), and move the dummy games into `supabase/seed.sql` so local development looks the same as before.
-**Done when:** home, shelf, and the game sheet show real database rows with no visual change, the dummy data file is deleted, and the cover tint comes from `games.cover_tint`.
-- [ ] Design it (spec): `/architect live data for home, shelf, and game sheet`
+### 21. Live data for home, shelf, and game sheet · in-progress
+Replace the dummy data with real reads from Supabase (public read, no sign in needed). The dummy games move into `supabase/seed.sql` as local sample data so development looks the same as before, and your real games go in through `data/games.json`, which `pnpm seed:games` turns into SQL for the real project.
+**Done when:** home, shelf, and the game sheet show real database rows with no visual change, the dummy data file is deleted, and the cover tint comes from `games.cover_tint`. Games with a cover image show it everywhere a cover appears.
+- [x] Design it (spec): `/architect live data for home, shelf, and game sheet`
+- [x] Build it: `/develop live data for home, shelf, and game sheet`
+  - [x] Database: migration 5 (`cover_tint`, `game_stats` rebuild), regenerated types, local sample seed (AC-1 to 3, 12)
+  - [x] Game sheet live first: cached reads, proxy 404, static ids, `pnpm build` with and without data (AC-4 to 6, 10)
+  - [x] Shelf and home live, empty and error cases (AC-7 to 9, 11)
+  - [x] Your data file: `data/games.json`, checks, `pnpm seed:games` and the SQL it writes (AC-13, 14)
+  - [x] Delete the dummy file, fixtures, tests, browser checks, docs (AC-15, 16)
+  - [ ] Cover images (built: `cover` field, upload in `pnpm seed:games`, `CoverTile` image with tint fallback, covers capped at 150 KB by the bucket limit and the seed check; left: run the seed and check it in the browser): put each game's picture in the Supabase `covers` bucket, save its path in `games.cover_path`, and show it on home, shelf, and the game sheet (the tint tile stays as the fallback when a game has no image)
+Spec [0009](../specs/0009-live-data.md) · code in `src/lib/games/`, `src/lib/supabase/`, `src/components/game-sheet/`, `supabase/`, `data/`
 
 ### 6. Member accounts · needs a decision
 Register, sign in, sign out. Anyone can browse without an account; only members can add games, rate, and comment.
