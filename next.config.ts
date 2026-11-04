@@ -1,10 +1,20 @@
+import { networkInterfaces } from "node:os";
 import { type NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
 
 // Cover images come from the public `covers` bucket of the Supabase project.
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 
+// YC: need this cause Nextjs1 prevent the javascript chunks to be render in dev, therefore configure this in order to run the js, when mobile access to this ip that run this program in the same network
+// Dev only: allow this machine's LAN IPv4 addresses (for phone testing on Wi-Fi).
+// Read when the dev server starts, so a new IP is picked up after a restart.
+const lanAddresses = Object.values(networkInterfaces())
+  .flatMap((infos) => infos ?? [])
+  .filter((info) => info.family === "IPv4" && !info.internal)
+  .map((info) => info.address);
+
 const nextConfig: NextConfig = {
+  allowedDevOrigins: lanAddresses,
   images: {
     remotePatterns: supabaseUrl
       ? [

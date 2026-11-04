@@ -72,6 +72,7 @@ Stored in `docs/specs/`. Format: `docs/specs/NNNN-title.md`. Feature scope lives
 - Page side padding for the header and `<main>` is the `--page-gutter` variable in `src/app/globals.css` (24, 52, 60, 80px by breakpoint); use it for anything that must line up with the page edge.
 - The shadcn CLI can write `import { cn } from "cn"` and add a stray `cn` npm package; change the import to `@/lib/utils` and drop the package.
 - Shell tabs come only from `src/lib/app-shell/nav.ts` (`enabled` plus `audience`); the bottom tab bar shows only at 2 or more visible tabs.
+- Comments that start with `// YC:` are the engineer's own notes. Never remove or rewrite them, even when editing or refactoring the code around them; leave them in place.
 
 ## Tooling
 
