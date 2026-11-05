@@ -14,7 +14,7 @@ export function SheetSkeleton({ label }: SheetSkeletonProps) {
       role="status"
       className="flex flex-col bg-background"
     >
-      <Skeleton className="h-[52dvh] max-h-[30rem] shrink-0 rounded-none" />
+      <Skeleton className="aspect-square w-full shrink-0 rounded-none" />
       <div className="flex flex-col gap-6 px-5 pt-4 pb-6">
         <div className="flex flex-col items-center gap-3">
           <Skeleton className="h-9 w-3/4" />

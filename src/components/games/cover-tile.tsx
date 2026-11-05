@@ -51,7 +51,7 @@ export function CoverTile({ name, tint, path, className }: CoverTileProps) {
           alt=""
           fill
           sizes="(min-width: 768px) 480px, 100vw"
-          className="object-cover"
+          className="object-cover object-top"
         />
       )}
     </div>

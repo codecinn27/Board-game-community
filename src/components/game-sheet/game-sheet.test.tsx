@@ -55,7 +55,7 @@ describe("GameSheet", () => {
 
     expect(html).toMatch(/<h1[^>]*>Wingspan<\/h1>/);
     expect(html).toContain("line-clamp-2");
-    expect(html).toContain("h-[52dvh] max-h-[30rem]");
+    expect(html).toContain("aspect-square w-full");
     expect(textOf(html)).toContain("Attract birds");
     expect(textOf(html)).toContain("Owners (4)");
     expect(html).toContain("I own this");
