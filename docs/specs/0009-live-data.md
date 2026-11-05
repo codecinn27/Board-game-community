@@ -1,7 +1,7 @@
 # 0009. Live data for home, shelf, and game sheet
 
 **Date**: 2026-11-04
-**Status**: Accepted
+**Status**: In Progress
 
 ## Summary
 

@@ -46,7 +46,7 @@ export function SheetPreview({
       style={sheetStyle(card.coverTint)}
       className="flex flex-col bg-linear-to-b from-(--sheet-tint) from-55% to-(--sheet-deep) text-(--sheet-ink)"
     >
-      <div className="relative h-[52dvh] max-h-[30rem] shrink-0 overflow-hidden">
+      <div className="relative aspect-square w-full shrink-0 overflow-hidden">
         <CoverTile
           name={card.name}
           tint={card.coverTint ?? NEUTRAL_SHEET_TINT}
@@ -55,7 +55,7 @@ export function SheetPreview({
         />
         <div
           aria-hidden
-          className="absolute inset-x-0 bottom-0 h-2/5 bg-linear-to-b from-transparent to-(--sheet-tint)"
+          className="absolute inset-x-0 bottom-0 h-1/6 bg-linear-to-b from-transparent to-(--sheet-tint)"
         />
         <div className="absolute top-4 left-4">
           <CloseButton label={closeLabel} />

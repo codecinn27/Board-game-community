@@ -171,6 +171,7 @@ Replace the dummy data with real reads from Supabase (public read, no sign in ne
   - [x] Shelf and home live, empty and error cases (AC-7 to 9, 11)
   - [x] Your data file: `data/games.json`, checks, `pnpm seed:games` and the SQL it writes (AC-13, 14)
   - [x] Delete the dummy file, fixtures, tests, browser checks, docs (AC-15, 16)
+  - [x] Cover image anchor: a cover fills its frame and is anchored to the top (`object-cover object-top` in `CoverTile`), so the top of the picture, such as a title, is never cropped on the game sheet, home, or shelf. Phone keeps the same rule.
   - [ ] Cover images (built: `cover` field, upload in `pnpm seed:games`, `CoverTile` image with tint fallback, covers capped at 150 KB by the bucket limit and the seed check; left: run the seed and check it in the browser): put each game's picture in the Supabase `covers` bucket, save its path in `games.cover_path`, and show it on home, shelf, and the game sheet (the tint tile stays as the fallback when a game has no image)
 Spec [0009](../specs/0009-live-data.md) · code in `src/lib/games/`, `src/lib/supabase/`, `src/components/game-sheet/`, `supabase/`, `data/`
 

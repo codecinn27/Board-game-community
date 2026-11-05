@@ -16,7 +16,7 @@ describe("SheetSkeleton", () => {
 
     expect(html).toContain('aria-busy="true"');
     expect(html).toContain('aria-label="Loading game"');
-    expect(html).toContain("h-[52dvh] max-h-[30rem]");
+    expect(html).toContain("aspect-square w-full");
   });
 });
 

@@ -49,7 +49,7 @@ export function SheetView({
             "mx-auto w-full max-w-lg overflow-clip rounded-[28px]",
         )}
       >
-        <div className="relative h-[52dvh] max-h-[30rem] shrink-0 overflow-hidden">
+        <div className="relative aspect-square w-full shrink-0 overflow-hidden">
           <div className="size-full origin-center in-data-starting-style:scale-105 motion-safe:transition-transform motion-safe:duration-280 motion-safe:ease-out">
             <CoverTile
               name={data.name}
@@ -60,7 +60,7 @@ export function SheetView({
           </div>
           <div
             aria-hidden
-            className="absolute inset-x-0 bottom-0 h-2/5 bg-linear-to-b from-transparent to-(--sheet-tint)"
+            className="absolute inset-x-0 bottom-0 h-1/6 bg-linear-to-b from-transparent to-(--sheet-tint)"
           />
           <div className="absolute top-4 left-4">{closeControl}</div>
           <div className="absolute top-4 right-4">
