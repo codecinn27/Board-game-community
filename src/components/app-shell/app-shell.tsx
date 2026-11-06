@@ -1,22 +1,26 @@
-import { type ReactNode } from "react";
-import { type Viewer } from "@/lib/app-shell/nav";
+import { Suspense, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { BottomTabBar } from "./bottom-tab-bar";
+import { ShellBottomBar, ShellHeader } from "./shell-nav";
 import { getShellTabs } from "./shell-tabs";
 import { SiteHeader } from "./site-header";
 
 type AppShellProps = {
-  viewer: Viewer;
   children: ReactNode;
 };
 
-export async function AppShell({ viewer, children }: AppShellProps) {
-  const tabs = await getShellTabs(viewer);
-  const hasBottomBar = tabs.length > 0;
+// Only the two nav pieces read the session, each under Suspense with the guest
+// tabs as the fallback; `<main>` and the page stay outside it (spec 0010). The
+// guest and member sets both have 3 tabs, so the bottom padding never shifts.
+export async function AppShell({ children }: AppShellProps) {
+  const guestTabs = await getShellTabs("guest");
+  const hasBottomBar = guestTabs.length > 0;
 
   return (
     <>
-      <SiteHeader tabs={tabs} />
+      <Suspense fallback={<SiteHeader tabs={guestTabs} />}>
+        <ShellHeader />
+      </Suspense>
       <main
         id="main"
         className={cn(
@@ -29,7 +33,9 @@ export async function AppShell({ viewer, children }: AppShellProps) {
         {children}
       </main>
       {/* After <main>, so keyboard order is header, main, bar. */}
-      <BottomTabBar tabs={tabs} />
+      <Suspense fallback={<BottomTabBar tabs={guestTabs} />}>
+        <ShellBottomBar />
+      </Suspense>
     </>
   );
 }

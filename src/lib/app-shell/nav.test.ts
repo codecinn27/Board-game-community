@@ -4,12 +4,24 @@ import { isActiveTab, navItems, visibleTabs } from "./nav";
 const allOn = navItems.map((item) => ({ ...item, enabled: true }));
 
 describe("visibleTabs", () => {
-  it("gives a guest home and shelf today", () => {
-    expect(visibleTabs("guest").map((i) => i.key)).toEqual(["home", "shelf"]);
+  it("gives a guest home, shelf, and sign in today", () => {
+    expect(visibleTabs("guest").map((i) => i.key)).toEqual([
+      "home",
+      "shelf",
+      "signIn",
+    ]);
   });
 
-  it("gives a member home and shelf today", () => {
-    expect(visibleTabs("member").map((i) => i.key)).toEqual(["home", "shelf"]);
+  it("gives a member home, shelf, and me today (Add waits for feature 7)", () => {
+    expect(visibleTabs("member").map((i) => i.key)).toEqual([
+      "home",
+      "shelf",
+      "me",
+    ]);
+  });
+
+  it("gives both viewers three tabs, so the bar height never shifts", () => {
+    expect(visibleTabs("guest")).toHaveLength(visibleTabs("member").length);
   });
 
   it("orders the guest set home, shelf, sign in", () => {

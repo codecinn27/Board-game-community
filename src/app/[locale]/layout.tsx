@@ -71,8 +71,7 @@ export default async function RootLayout({
             home: { error: messages.home.error },
           }}
         >
-          {/* "guest" until feature 6 (Member accounts) reads the session. */}
-          <AppShell viewer="guest">{children}</AppShell>
+          <AppShell>{children}</AppShell>
           {/* The game sheet (spec 0008): one client dialog, outside <main>,
               above the shell. Cards open it; no navigation happens. */}
           <SheetHost

@@ -1,6 +1,8 @@
 import { NextResponse, type NextRequest } from "next/server";
 import createMiddleware from "next-intl/middleware";
 import { routing } from "@/i18n/routing";
+import { authRedirect } from "@/lib/auth/guards";
+import { updateSession } from "@/lib/auth/session";
 import { gameExists } from "@/lib/games/detail";
 
 const handleIntl = createMiddleware(routing);
@@ -8,6 +10,8 @@ const handleIntl = createMiddleware(routing);
 const GAME_PATH = new RegExp(
   `^/(${routing.locales.join("|")})/games/([^/]+)/?$`,
 );
+
+const LOCALE_PATH = new RegExp(`^/(${routing.locales.join("|")})(/.*)?$`);
 
 export default async function proxy(request: NextRequest) {
   // An unknown game id answers 404 here, before any page streams: a route
@@ -22,9 +26,29 @@ export default async function proxy(request: NextRequest) {
   }
 
   const response = handleIntl(request);
-  // Feature 6 (Member accounts) chains the @supabase/ssr session refresh here,
-  // on this response (spec 0001).
-  return response;
+  // An unprefixed path is only being sent to its language; nothing else to do.
+  if (response.headers.has("location")) return response;
+
+  // The session refresh runs on this response (spec 0001, spec 0010). It reads
+  // the cookie only when one exists, so a visitor costs nothing.
+  const session = await updateSession(request, response);
+  const parts = LOCALE_PATH.exec(request.nextUrl.pathname);
+  const target =
+    parts === null
+      ? null
+      : authRedirect(parts[2] ?? "/", request.nextUrl.searchParams, session);
+  if (parts === null || target === null) return response;
+
+  const [targetPath = "/", query] = target.split("?");
+  const url = new URL(
+    `/${parts[1]}${targetPath === "/" ? "" : targetPath}`,
+    request.url,
+  );
+  url.search = query ? `?${query}` : "";
+  const redirect = NextResponse.redirect(url);
+  // Keeps the refreshed session and the language cookie on the redirect.
+  response.cookies.getAll().forEach((cookie) => redirect.cookies.set(cookie));
+  return redirect;
 }
 
 export const config = {
