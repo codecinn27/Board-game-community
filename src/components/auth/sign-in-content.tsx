@@ -1,11 +1,9 @@
 import { getMessages, getTranslations } from "next-intl/server";
 import { IntlClientProvider } from "@/i18n/intl-client-provider";
-import { Link } from "@/i18n/navigation";
 import { hasInvitePass } from "@/lib/auth/invite-cookie";
 import { safeNext } from "@/lib/auth/safe-next";
 import { requireEnv } from "@/lib/supabase/env";
-import { cn } from "@/lib/utils";
-import { AuthHeading } from "./auth-layout";
+import { AuthCard, AuthFooter } from "./auth-scene";
 import { Notice } from "./form-parts";
 import { InviteForm } from "./invite-form";
 import { RegisterForm } from "./register-form";
@@ -47,61 +45,45 @@ export async function SignInContent({
   // to a browser that has not entered the code.
   const hasPass = register && (await hasInvitePass());
 
+  // The footer switch keeps the return page (AC-17).
   const query = (mode?: "register") => ({
     ...(mode ? { mode } : {}),
     ...(next === "/" ? {} : { next }),
   });
-  const tab = (active: boolean) =>
-    cn(
-      "flex min-h-11 flex-1 items-center justify-center rounded-md px-3 text-sm font-medium text-muted-foreground focus-visible:ring-3 focus-visible:ring-ring focus-visible:outline-none",
-      active && "bg-card text-foreground shadow-sm",
-    );
 
-  const heading = !register
-    ? t("signIn.heading")
+  const copy = !register
+    ? { title: t("signIn.heading"), subtitle: t("signIn.subheading") }
     : hasPass
-      ? t("register.heading")
-      : t("invite.heading");
+      ? { title: t("register.heading"), subtitle: t("register.subheading") }
+      : { title: t("invite.heading"), subtitle: t("invite.body") };
 
   return (
-    <IntlClientProvider messages={{ auth: messages.auth }}>
-      <nav
-        aria-label={t("tabs.label")}
-        className="flex gap-1 rounded-lg bg-secondary p-1"
-      >
-        <Link
+    <AuthCard title={copy.title} subtitle={copy.subtitle}>
+      <IntlClientProvider messages={{ auth: messages.auth }}>
+        <div className="flex flex-col gap-5">
+          {noticeKey ? <Notice message={t(`errors.${noticeKey}`)} /> : null}
+          {!register ? (
+            <SignInForm siteKey={siteKey} next={next} />
+          ) : hasPass ? (
+            <RegisterForm siteKey={siteKey} next={next} />
+          ) : (
+            <InviteForm siteKey={siteKey} next={next} />
+          )}
+        </div>
+      </IntlClientProvider>
+      {register ? (
+        <AuthFooter
+          prompt={t("switch.toSignInPrompt")}
+          label={t("switch.toSignIn")}
           href={{ pathname: "/sign-in", query: query() }}
-          aria-current={register ? undefined : "page"}
-          className={tab(!register)}
-        >
-          {t("tabs.signIn")}
-        </Link>
-        <Link
-          href={{ pathname: "/sign-in", query: query("register") }}
-          aria-current={register ? "page" : undefined}
-          className={tab(register)}
-        >
-          {t("tabs.register")}
-        </Link>
-      </nav>
-
-      <AuthHeading
-        title={heading}
-        {...(register && !hasPass ? { body: t("invite.body") } : {})}
-      />
-      {noticeKey ? <Notice message={t(`errors.${noticeKey}`)} /> : null}
-
-      {!register ? (
-        <>
-          <SignInForm siteKey={siteKey} next={next} />
-        </>
-      ) : hasPass ? (
-        <>
-          <RegisterForm siteKey={siteKey} next={next} />
-        </>
+        />
       ) : (
-        <InviteForm siteKey={siteKey} next={next} />
+        <AuthFooter
+          prompt={t("switch.toRegisterPrompt")}
+          label={t("switch.toRegister")}
+          href={{ pathname: "/sign-in", query: query("register") }}
+        />
       )}
-    </IntlClientProvider>
+    </AuthCard>
   );
 }

@@ -20,7 +20,7 @@ export function DisplayNameForm({ current }: { current: string }) {
     <form action={formAction} noValidate>
       <FieldGroup>
         <HiddenContext />
-        <FormError error={state.error} />
+        <FormError error={state.error} look="plain" />
         {state.ok ? (
           <p role="status" className="text-sm text-primary">
             {t("saved")}
@@ -34,11 +34,13 @@ export function DisplayNameForm({ current }: { current: string }) {
           maxLength={DISPLAY_NAME_MAX}
           defaultValue={state.values?.displayName ?? current}
           error={state.fields?.displayName}
+          look="plain"
         />
         <SubmitButton
           label={t("save")}
           pendingLabel={t("saving")}
           pending={pending}
+          look="plain"
         />
       </FieldGroup>
     </form>

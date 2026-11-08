@@ -75,6 +75,57 @@ describe("token contrast (WCAG 2.2 AA)", () => {
   });
 });
 
+// Spec 0010, AC-20: the auth Dice Galaxy scene's own tokens, on `.auth-scene`.
+function authTokens(): Map<string, string> {
+  const match = /^\.auth-scene\s*\{([^}]*)\}/m.exec(css);
+  if (!match?.[1]) throw new Error("No .auth-scene block in globals.css");
+  return declarations(match[1]);
+}
+
+// The sky is a gradient, so text on it is checked on every stop.
+const SKY = ["--auth-sky", "--auth-sky-mid", "--auth-sky-deep"];
+
+const authPairs: [string, string[], number][] = [
+  ["--auth-on-sky", SKY, 4.5],
+  ["--auth-on-sky-muted", SKY, 4.5],
+  ["--auth-ink", ["--auth-card", "--auth-field", "--auth-danger-bg"], 4.5],
+  ["--auth-ink-muted", ["--auth-card", "--auth-field"], 4.5],
+  ["--auth-link", ["--auth-card", "--auth-field"], 4.5],
+  ["--auth-on-button", ["--auth-button-from", "--auth-button-to"], 4.5],
+  ["--auth-danger", ["--auth-card", "--auth-danger-bg"], 4.5],
+  ["--auth-field-line", ["--auth-card", "--auth-field"], 3],
+  ["--auth-ring", ["--auth-card", "--auth-field"], 3],
+  ["--auth-icon", ["--auth-field"], 3],
+];
+
+describe("auth Dice Galaxy scene contrast (WCAG 2.2 AA)", () => {
+  const tokens = authTokens();
+  const cases = authPairs.flatMap(([text, surfaces, min]) =>
+    surfaces.map((name) => [text, name, min] as const),
+  );
+
+  it.each(cases)("%s on %s reaches %s:1", (text, name, min) => {
+    expect(
+      contrastRatio(resolve(tokens, text), resolve(tokens, name)),
+    ).toBeGreaterThanOrEqual(min);
+  });
+
+  it("keeps the art colors out of text (fills only)", () => {
+    const textTokens = authPairs.map(([text]) => text);
+    for (const art of [
+      "--auth-clay",
+      "--auth-rose",
+      "--auth-gold",
+      "--auth-haze",
+      "--auth-glow",
+      "--auth-spark",
+      "--auth-flame",
+    ]) {
+      expect(textTokens).not.toContain(art);
+    }
+  });
+});
+
 describe("themeColor hex mirrors --background", () => {
   it("matches the light background", () => {
     const token = resolve(lightTokens(), "--background");

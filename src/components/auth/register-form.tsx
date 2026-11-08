@@ -56,12 +56,12 @@ export function RegisterForm({ siteKey, next }: RegisterFormProps) {
           pending={pending}
           disabled={token === ""}
         />
-        <p className="text-center text-sm text-muted-foreground">
+        <p className="px-2 text-center text-sm text-auth-ink-muted">
           {t.rich("register.privacy", {
             link: (chunks) => (
               <Link
                 href="/privacy"
-                className="font-medium text-primary underline underline-offset-4"
+                className="font-medium text-auth-link underline underline-offset-4 focus-visible:ring-3 focus-visible:ring-auth-ring focus-visible:outline-none"
               >
                 {chunks}
               </Link>

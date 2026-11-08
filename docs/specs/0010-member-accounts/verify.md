@@ -1,4 +1,4 @@
-# Verify: Member accounts · spec 0010 · updated 2026-11-06
+# Verify: Member accounts · spec 0010 · updated 2026-11-07
 
 _Steps derived from spec 0010 acceptance criteria. `/check verify` runs these; `/test` locks the durable ones._
 
@@ -25,6 +25,21 @@ Setup: `supabase start` (Docker Desktop on), `.env.local` has the four new varia
 - [ ] Open the sign in, register, forgot, reset, `/me`, and privacy pages at 360px and 1280px, in English and Chinese → no sideways scroll → AC-14
 - [ ] Have a Chinese reader check `messages/zh.json` (`auth`, `privacy`) and the Chinese half of the reset mail → AC-14
 
+### Dice Galaxy scene (revised 2026-11-08, replaces the clay scene)
+
+- [ ] Open `/en/sign-in`, `?mode=register` (before and after the invite code), `/en/forgot-password`, and a reset link's `/en/reset-password` → each shows the night sky with stars, a rocket, the ringed planet, the dice, and the heading on the sky above a white card resting on the cloud bank; the header and tab bar stay cream → AC-16
+- [ ] Compare `/en/sign-in` at 390px and 1280px with design D on the [Sign-in Page Options canvas](https://claude.ai/artifact/DZFyiGJt9u5mP3sL34Rfnk) → same layout, no social buttons, field reads "Email" → AC-16
+- [ ] Sign in mode reads "Welcome back" / "Sign in to continue your journey"; the footer "Don't have an account? Sign up" goes to create account and keeps `?next=/shelf`; create account shows "Already a member? Sign in" → AC-17
+- [ ] Each field is a rounded rectangle with its icon inside; a screen reader (or the accessibility tree) names each input; submit an empty form and the errors show under the fields → AC-18
+- [ ] Press the eye on the password field → text shows and the button is pressed; press again → hidden, typed value and caret kept → AC-18
+- [ ] Network tab: the scene loads no images (the art is inline SVG); one Baloo 2 font file loads on the auth pages and not on `/en/shelf` → AC-19, AC-20
+- [ ] `/zh/forgot-password` → Chinese text uses the device font, Latin text uses Baloo 2 → AC-20
+- [ ] `/en/me` and `/en/privacy` still use the warm site look → AC-16
+- [ ] At 360px no sideways scroll; below `lg` the small rocket flies above the heading; at 1280px the card is centered about 440px wide with the big rocket on its left, its trail landing in the clouds; at 1920px the sky reaches both window edges and the card still rests on the clouds → AC-21
+- [ ] Watch both rockets (390px and 1280px) → rocket and trail bob together with no gap, a gold and orange flame flickers at the nozzle, puffs leave the flame's tip and fade down the trail, a soft light slides along the trail; no dots sit still on the trail → AC-21
+- [ ] Turn on reduced motion in the OS → the planet, dice, rockets, and stars stand still, and no puffs or trail light show → AC-21
+- [ ] Tab through the form → every control shows a ring and is at least 44px → AC-21
+
 ## Commands
 
 - [ ] `pnpm test` → all green, including `src/lib/auth/*.test.ts` and the `actions`, `callback`, and `confirm` tests → AC-3, 4, 5, 6, 12, 13
@@ -33,6 +48,8 @@ Setup: `supabase start` (Docker Desktop on), `.env.local` has the four new varia
 - [ ] `pnpm exec playwright test e2e/member-accounts.spec.ts` (set `E2E_MAILBOX=1` for the mail run) → green at 360 and 1280 → AC-1, 2, 8, 11, 12, 14
 - [ ] `supabase test db` → existing pgTAP files stay green; `git diff --stat supabase/migrations` shows no change → AC-15
 - [ ] `grep -rn "getSession\|user_metadata" src` → no hit that reads a role or status → AC-15
+- [ ] `pnpm test src/lib/design/contrast.test.ts` → every `--auth-*` text pair passes AA → AC-20
+- [ ] `grep -rnE "#[0-9a-fA-F]{6}|oklch\(" src/components/auth` → no hit (colors only from tokens) → AC-20
 
 ## Value sourcing (one step per row of the spec table)
 
@@ -47,4 +64,4 @@ Setup: `supabase start` (Docker Desktop on), `.env.local` has the four new varia
 
 ## Acceptance-criteria coverage
 
-- AC-1 … covered by steps 1, build · AC-2 … 2 to 4, e2e · AC-3 … 5 to 7 · AC-4 … 8, 9, callback tests · AC-5 … 10, 11 · AC-6 … 6, 12 · AC-7 … 13 · AC-8 … 14, build · AC-9 … 15 to 17 · AC-10 … 18, 19 · AC-11 … 20 · AC-12 … 21, 22 · AC-13 … 7, pass cookie tests · AC-14 … 23, 24 · AC-15 … pgTAP and grep commands
+- AC-1 … covered by steps 1, build · AC-2 … 2 to 4, e2e · AC-3 … 5 to 7 · AC-4 … 8, 9, callback tests · AC-5 … 10, 11 · AC-6 … 6, 12 · AC-7 … 13 · AC-8 … 14, build · AC-9 … 15 to 17 · AC-10 … 18, 19 · AC-11 … 20 · AC-12 … 21, 22 · AC-13 … 7, pass cookie tests · AC-14 … 23, 24 · AC-15 … pgTAP and grep commands · AC-16 to AC-21 … Clay scene steps, contrast test, and the colour grep

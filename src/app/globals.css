@@ -45,6 +45,142 @@
   --cover-6: oklch(0.88 0.04 75);
 }
 
+/*
+ * Auth Dice Galaxy scene (spec 0010, AC-20): the second scoped theme after
+ * Cover Tint. These tokens live only on `.auth-scene` (sign in, forgot,
+ * reset), so the rest of the site keeps its terracotta look. Text uses the
+ * on-sky, ink, link, button, and danger tokens, which pass 4.5:1 in
+ * contrast.test.ts; the art colors (clay, rose, gold, haze, glow, flame) are
+ * fills.
+ */
+.auth-scene {
+  /* Night sky, top glow to bottom */
+  --auth-sky: oklch(0.416 0.171 298.6);
+  --auth-sky-mid: oklch(0.271 0.116 296.2);
+  --auth-sky-deep: oklch(0.207 0.087 294.8);
+  --auth-glow: oklch(0.508 0.171 343.4);
+  --auth-haze: oklch(0.754 0.105 299.8);
+  --auth-on-sky: oklch(1 0 0);
+  --auth-on-sky-muted: oklch(0.878 0.056 300.1);
+  /* Form card */
+  --auth-card: oklch(1 0 0);
+  --auth-field: oklch(0.964 0.015 302.6);
+  /* Field outline: 3:1 on the card and the field, so its edge is visible. */
+  --auth-field-line: oklch(0.618 0.103 296.8);
+  --auth-icon: oklch(0.521 0.195 288.5);
+  --auth-ink: oklch(0.3 0.074 290);
+  --auth-ink-muted: oklch(0.474 0.071 294);
+  --auth-link: oklch(0.485 0.211 293.3);
+  --auth-ring: oklch(0.485 0.211 293.3);
+  --auth-danger: oklch(0.5 0.19 20);
+  --auth-danger-bg: oklch(0.955 0.03 15);
+  --auth-shadow: oklch(0.15 0.08 300 / 65%);
+  /* Submit button: white text passes on both ends */
+  --auth-button-from: oklch(0.553 0.193 353);
+  --auth-button-to: oklch(0.485 0.211 293.3);
+  --auth-on-button: oklch(1 0 0);
+  --auth-button-glow: oklch(0.508 0.171 343.4 / 70%);
+  /* Art: clay dice, rocket, planet, sparkles */
+  --auth-clay: oklch(1 0 0);
+  --auth-clay-shade: oklch(0.923 0.032 301.6);
+  --auth-clay-deep: oklch(0.846 0.062 299.6);
+  --auth-pip: oklch(0.53 0.205 288.1);
+  --auth-rose-light: oklch(0.939 0.034 354.9);
+  --auth-rose: oklch(0.837 0.084 356.1);
+  --auth-rose-deep: oklch(0.761 0.108 355.5);
+  --auth-magenta: oklch(0.606 0.203 353.1);
+  --auth-window: oklch(0.399 0.148 304.4);
+  --auth-gold: oklch(0.876 0.113 87.4);
+  --auth-spark: oklch(0.834 0.158 89);
+  /* The middle layer of the rocket's flame (gold outside, white core). */
+  --auth-flame: oklch(0.776 0.147 69.1);
+}
+
+@keyframes auth-float {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -8px, 0);
+  }
+}
+
+@keyframes auth-twinkle {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+
+/* The rocket, its trail, and its puffs bob as one, so the trail stays on. */
+@keyframes auth-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+/* The nozzle flame, scaled from its top edge (`origin-top`). */
+@keyframes auth-flicker {
+  0%,
+  100% {
+    transform: scale(1, 1);
+  }
+  25% {
+    transform: scale(0.9, 1.18);
+  }
+  50% {
+    transform: scale(1.06, 0.86);
+  }
+  75% {
+    transform: scale(0.94, 1.1);
+  }
+}
+
+/* An exhaust puff leaves the flame tip, drifts down the trail, grows, and
+   fades. Each rocket sets the path on the puff: `--auth-mid-*` halfway,
+   `--auth-end-*` at the end, in its own SVG units. */
+@keyframes auth-puff {
+  0% {
+    transform: translate(0, 0) scale(0.3);
+    opacity: 0;
+  }
+  12% {
+    opacity: 0.95;
+  }
+  50% {
+    transform: translate(var(--auth-mid-x), var(--auth-mid-y)) scale(1.3);
+    opacity: 0.75;
+  }
+  100% {
+    transform: translate(var(--auth-end-x), var(--auth-end-y)) scale(2.2);
+    opacity: 0;
+  }
+}
+
+/* A soft light slides from the nozzle along the trail, then rests. */
+@keyframes auth-shimmer {
+  0% {
+    transform: translate(0, 0);
+    opacity: 0;
+  }
+  12% {
+    opacity: 1;
+  }
+  70%,
+  100% {
+    transform: translate(var(--auth-end-x), var(--auth-end-y));
+    opacity: 0;
+  }
+}
+
 /* Left and right page padding, shared by the header and <main>. Edit these
    four values to try a different ratio; nothing else needs to change. */
 :root {
@@ -73,6 +209,11 @@
     "Microsoft YaHei", "Noto Sans CJK SC", "Noto Sans SC", system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
   --font-heading: var(--font-sans);
+  /* Auth scene only: Baloo 2 for Latin (its variable is set by AuthScene),
+     then the same device fonts for Chinese. */
+  --font-auth:
+    var(--font-baloo), "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei",
+    "Noto Sans CJK SC", "Noto Sans SC", system-ui, sans-serif;
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -99,6 +240,48 @@
   --color-cover-5: var(--cover-5);
   --color-cover-6: var(--cover-6);
 
+  /* Auth Dice Galaxy scene: resolve only inside `.auth-scene`. */
+  --color-auth-sky: var(--auth-sky);
+  --color-auth-sky-mid: var(--auth-sky-mid);
+  --color-auth-sky-deep: var(--auth-sky-deep);
+  --color-auth-glow: var(--auth-glow);
+  --color-auth-haze: var(--auth-haze);
+  --color-auth-on-sky: var(--auth-on-sky);
+  --color-auth-on-sky-muted: var(--auth-on-sky-muted);
+  --color-auth-card: var(--auth-card);
+  --color-auth-field: var(--auth-field);
+  --color-auth-field-line: var(--auth-field-line);
+  --color-auth-icon: var(--auth-icon);
+  --color-auth-ink: var(--auth-ink);
+  --color-auth-ink-muted: var(--auth-ink-muted);
+  --color-auth-link: var(--auth-link);
+  --color-auth-ring: var(--auth-ring);
+  --color-auth-danger: var(--auth-danger);
+  --color-auth-danger-bg: var(--auth-danger-bg);
+  --color-auth-shadow: var(--auth-shadow);
+  --color-auth-button-from: var(--auth-button-from);
+  --color-auth-button-to: var(--auth-button-to);
+  --color-auth-on-button: var(--auth-on-button);
+  --color-auth-button-glow: var(--auth-button-glow);
+  --color-auth-clay: var(--auth-clay);
+  --color-auth-clay-shade: var(--auth-clay-shade);
+  --color-auth-clay-deep: var(--auth-clay-deep);
+  --color-auth-pip: var(--auth-pip);
+  --color-auth-rose-light: var(--auth-rose-light);
+  --color-auth-rose: var(--auth-rose);
+  --color-auth-rose-deep: var(--auth-rose-deep);
+  --color-auth-magenta: var(--auth-magenta);
+  --color-auth-window: var(--auth-window);
+  --color-auth-gold: var(--auth-gold);
+  --color-auth-spark: var(--auth-spark);
+  --color-auth-flame: var(--auth-flame);
+  --animate-auth-float: auth-float 7s ease-in-out infinite;
+  --animate-auth-twinkle: auth-twinkle 3.5s ease-in-out infinite;
+  --animate-auth-bob: auth-bob 6s ease-in-out infinite;
+  --animate-auth-flicker: auth-flicker 1.2s ease-in-out infinite;
+  --animate-auth-puff: auth-puff 3s linear infinite;
+  --animate-auth-shimmer: auth-shimmer 3.2s ease-in-out infinite;
+
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -116,7 +299,10 @@
     @apply font-sans;
   }
   body {
-    @apply bg-background text-base/[1.6] text-foreground;
+    /* `overflow-x: clip` lets a full width band (the auth night sky) reach
+       both window edges without a sideways scrollbar; unlike `hidden`, it
+       keeps the sticky header working. */
+    @apply overflow-x-clip bg-background text-base/[1.6] text-foreground;
   }
   h1,
   h2,

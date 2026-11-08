@@ -1,6 +1,6 @@
 import { type Metadata } from "next";
 import { getMessages, getTranslations } from "next-intl/server";
-import { AuthColumn, AuthHeading } from "@/components/auth/auth-layout";
+import { AuthCard, AuthScene } from "@/components/auth/auth-scene";
 import { PasswordForm } from "@/components/auth/password-form";
 import { IntlClientProvider } from "@/i18n/intl-client-provider";
 import { resetPassword } from "./actions";
@@ -22,11 +22,12 @@ export default async function ResetPasswordPage() {
     getMessages(),
   ]);
   return (
-    <AuthColumn>
-      <AuthHeading title={t("heading")} />
-      <IntlClientProvider messages={{ auth: messages.auth }}>
-        <PasswordForm action={resetPassword} variant="reset" />
-      </IntlClientProvider>
-    </AuthColumn>
+    <AuthScene>
+      <AuthCard title={t("heading")} subtitle={t("subheading")}>
+        <IntlClientProvider messages={{ auth: messages.auth }}>
+          <PasswordForm action={resetPassword} variant="reset" />
+        </IntlClientProvider>
+      </AuthCard>
+    </AuthScene>
   );
 }

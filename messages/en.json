@@ -151,11 +151,6 @@
         "description": "Your account."
       }
     },
-    "tabs": {
-      "label": "Sign in or create an account",
-      "signIn": "Sign in",
-      "register": "Create account"
-    },
     "fields": {
       "email": "Email",
       "password": "Password",
@@ -196,7 +191,8 @@
       "heading": "Welcome back",
       "submit": "Sign in",
       "pending": "Signing in",
-      "forgot": "Forgot password?"
+      "forgot": "Forgot password?",
+      "subheading": "Sign in to continue your journey"
     },
     "invite": {
       "heading": "Join the community",
@@ -208,7 +204,8 @@
       "heading": "Create your account",
       "submit": "Create account",
       "pending": "Creating account",
-      "privacy": "By creating an account you agree to the <link>privacy note</link>."
+      "privacy": "By creating an account you agree to the <link>privacy note</link>.",
+      "subheading": "Pick the name other members will see."
     },
     "checkEmail": {
       "title": "Check your email",
@@ -219,12 +216,15 @@
       "heading": "Forgot your password?",
       "body": "Enter your email and we will send you a link to set a new one.",
       "submit": "Send reset link",
-      "pending": "Sending"
+      "pending": "Sending",
+      "rememberedPrompt": "Remembered it?",
+      "remembered": "Sign in"
     },
     "reset": {
       "heading": "Choose a new password",
       "submit": "Save new password",
-      "pending": "Saving"
+      "pending": "Saving",
+      "subheading": "Pick one you will remember."
     },
     "me": {
       "heading": "Me",
@@ -238,6 +238,16 @@
       "signOut": "Sign out",
       "privacy": "Read the privacy note",
       "disabled": "Your account is read only. You can browse, but you cannot add or change anything. Ask the group admin if this looks wrong."
+    },
+    "switch": {
+      "toRegisterPrompt": "Don't have an account?",
+      "toRegister": "Sign up",
+      "toSignInPrompt": "Already a member?",
+      "toSignIn": "Sign in"
+    },
+    "password": {
+      "show": "Show password",
+      "hide": "Hide password"
     }
   },
   "privacy": {

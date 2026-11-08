@@ -24,10 +24,12 @@ export async function AppShell({ children }: AppShellProps) {
       <main
         id="main"
         className={cn(
-          "mx-auto flex w-full max-w-screen-2xl flex-1 flex-col px-(--page-gutter) pt-6 pb-10",
+          // The paddings are variables so a full bleed block (the auth clay
+          // scene) can cancel them exactly.
+          "mx-auto flex w-full max-w-screen-2xl flex-1 flex-col px-(--page-gutter) pt-(--main-pt) pb-(--main-pb) [--main-pb:2.5rem] [--main-pt:1.5rem]",
           // Clears the 64px bar, the raised Add, and the iPhone home indicator.
           hasBottomBar &&
-            "pb-[calc(5.5rem+env(safe-area-inset-bottom))] md:pb-10",
+            "[--main-pb:calc(5.5rem+env(safe-area-inset-bottom))] md:[--main-pb:2.5rem]",
         )}
       >
         {children}

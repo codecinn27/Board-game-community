@@ -63,5 +63,17 @@ The engineer wanted the code before registration for everyone, so the Google cal
 
 Reading the session in the root layout would make every page dynamic and lose the cache that protects the Vercel quota. Splitting the shell so only the nav reads the session, inside Suspense (React's loading boundary) with the guest tabs as the fallback, keeps content static.
 
+## Revision 2026-11-07: the clay scene
+
+The engineer supplied a reference image and an art brief (soft pastel purple, 3D clay characters, glass and clay surfaces) for the sign in page. Choices made while folding it into the spec:
+
+- **Scoped theme, not a site restyle.** `docs/design.md` sets a warm terracotta tabletop for the whole site. Changing every token would restyle home, shelf, and the sheet, which the brief did not ask for. The game sheet already sets the pattern of a scoped theme (Cover Tint), so the auth pages get their own `--auth-*` tokens under one wrapper class.
+- **Which pages.** Sign in, create account (with the invite step), forgot, and reset are one flow and share one scene. `/me` and `/privacy` are site pages a member returns to, so they keep the site look.
+- **Illustration as an image.** 3D clay characters cannot be drawn well in CSS or SVG, so the group, plant, and flower are generated images with size caps; everything simple (clouds, shapes, heart) is CSS to keep the page light.
+- **Left out of the reference.** Social buttons (the spec dropped Google, and there is no Apple or Facebook), "Email or Username" (no usernames), and the "Login" wording (the site says "Sign in" everywhere).
+- **Contrast.** White text on `#A78BFA` is about 2.7:1, below AA. The brief's colors stay for fills and the gradient's light end; text and the button's dark end use a deeper violet so the contrast test still passes.
+- **Labels.** The reference shows placeholders only. Placeholders vanish while typing and are not labels, so each input keeps a real label (visually hidden) and the icon badge carries the meaning on screen.
+- **Tabs to footer.** The reference switches mode with a "Sign Up" footer link, which also frees space at the top for the heading and the group. The footer keeps `next`.
+
 The engineer's choices, taken as fixed: invite code, shared and changeable (an env var); open to Google and email; one `/sign-in` page with a mode switch; return to the page the member came from; Turnstile with a long random code and no attempt counter; display names need not be unique; a `/privacy` page; own Turnstile component; design from screenshots the engineer will supply.
 

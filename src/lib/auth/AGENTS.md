@@ -31,6 +31,7 @@ Pages: `src/app/[locale]/{sign-in,forgot-password,reset-password,me,privacy}/`. 
 - A Turnstile token works once. When Supabase also checks it (sign in, sign up, reset), do not call `verifyTurnstile` too; `verifyInvite` has no Supabase call, so it does. Forms remount the widget after each answer (`useAuthForm`).
 - Role and status are never read from user editable metadata.
 - `/sign-in`, `/forgot-password`, and `/reset-password` render inside `AuthScene` (`src/components/auth/auth-scene.tsx`); `/me` and `/privacy` keep `AuthColumn` (`auth-layout.tsx`). Scene colors are `--auth-*` tokens that exist only inside `.auth-scene` (`src/app/globals.css`), so scene components write no literal colors.
+- The scene's look and motion rules (art, rockets in flight, tokens, `authSceneClass` as a plain string) live in the "Auth Dice Galaxy scene" section of [docs/design.md](../../../docs/design.md); change them there along with the code.
 
 ## Gotchas
 

@@ -59,7 +59,7 @@ test.describe("guest", () => {
       page.getByRole("heading", { name: "Welcome back" }),
     ).toBeVisible();
     await expect(page.getByLabel("Email")).toBeVisible();
-    await expect(page.getByLabel("Password")).toBeVisible();
+    await expect(page.getByLabel("Password", { exact: true })).toBeVisible();
     await noSidewaysScroll(page);
   });
 
@@ -98,7 +98,7 @@ test.describe("guest", () => {
   }) => {
     await page.goto("/en/sign-in");
     await page.getByLabel("Email").fill("nobody@example.com");
-    await page.getByLabel("Password").fill("wrong-password-1");
+    await page.getByLabel("Password", { exact: true }).fill("wrong-password-1");
     await waitForSecurityCheck(page);
     await page
       .getByRole("button", { name: "Sign in", exact: true })
@@ -144,7 +144,7 @@ test.describe("email registration", () => {
 
     await page.getByLabel("Display name").fill("Mei E2E");
     await page.getByLabel("Email").fill(email);
-    await page.getByLabel("Password").fill("e2e-password-1");
+    await page.getByLabel("Password", { exact: true }).fill("e2e-password-1");
     await waitForSecurityCheck(page);
     await page.getByRole("button", { name: "Create account" }).last().click();
 
@@ -156,5 +156,108 @@ test.describe("email registration", () => {
     await expect(
       page.getByRole("link", { name: "Sign in", exact: true }).first(),
     ).toBeVisible();
+  });
+});
+
+// Spec 0010, AC-16 to AC-21: the Dice Galaxy scene. Runs at 360 and 1280
+// through the Playwright projects. Each page also saves a screenshot for the
+// engineer.
+const scenePages = [
+  ["sign in", "/en/sign-in", "Welcome back"],
+  ["invite step", "/en/sign-in?mode=register", "Join the community"],
+  ["forgot password", "/en/forgot-password", "Forgot your password?"],
+  ["forgot password in Chinese", "/zh/forgot-password", "忘记密码了吗？"],
+] as const;
+
+test.describe("Dice Galaxy scene", () => {
+  for (const [name, path, heading] of scenePages) {
+    test(`${name} renders inside the scene (AC-16, AC-19, AC-21)`, async ({
+      page,
+    }, testInfo) => {
+      await page.goto(path);
+      const scene = page.locator(".auth-scene");
+      await expect(scene).toBeVisible();
+      await expect(
+        scene.getByRole("heading", { level: 1, name: heading }),
+      ).toBeVisible();
+      await noSidewaysScroll(page);
+
+      // The art is drawn in code: no image files in the scene (AC-19).
+      await expect(scene.locator("img")).toHaveCount(0);
+      // The sky reaches both window edges (AC-21).
+      const sky = await scene.evaluate((el) => {
+        const layer = el.querySelector<HTMLElement>(
+          ':scope > [aria-hidden="true"]',
+        );
+        const box = layer?.getBoundingClientRect();
+        return box ? [box.left, box.right] : [1, 0];
+      });
+      const width = await page.evaluate(
+        () => document.documentElement.clientWidth,
+      );
+      expect(sky[0]).toBeLessThanOrEqual(0);
+      expect(sky[1]).toBeGreaterThanOrEqual(width);
+
+      await page.screenshot({
+        path: testInfo.outputPath(`${name.replace(/\W+/g, "-")}.png`),
+        fullPage: true,
+      });
+    });
+  }
+
+  test("the password toggle shows and hides without losing the value (AC-18)", async ({
+    page,
+  }) => {
+    await page.goto("/en/sign-in");
+    const password = page.getByLabel("Password", { exact: true });
+    const toggle = page.getByRole("button", { name: "Show password" });
+
+    await password.fill("secret-pass-1");
+    await expect(toggle).toHaveAttribute("aria-pressed", "false");
+    await toggle.click();
+    await expect(password).toHaveAttribute("type", "text");
+    await expect(toggle).toHaveAttribute("aria-pressed", "true");
+    await expect(password).toHaveValue("secret-pass-1");
+
+    await toggle.click();
+    await expect(password).toHaveAttribute("type", "password");
+    await expect(password).toHaveValue("secret-pass-1");
+  });
+
+  test("the footer switch keeps the return page (AC-17)", async ({ page }) => {
+    await page.goto("/en/sign-in?next=%2Fshelf");
+    await expect(
+      page.getByRole("link", { name: "Forgot password?" }),
+    ).toBeVisible();
+    await page.getByRole("link", { name: "Sign up" }).click();
+    await expect(page).toHaveURL(/\/en\/sign-in\?mode=register&next=%2Fshelf$/);
+    await expect(page.getByLabel("Invite code")).toBeVisible();
+
+    await page
+      .locator(".auth-scene")
+      .getByRole("link", { name: "Sign in", exact: true })
+      .click();
+    await expect(page).toHaveURL(/\/en\/sign-in\?next=%2Fshelf$/);
+  });
+
+  test("nothing floats or twinkles with reduced motion (AC-21)", async ({
+    page,
+  }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/en/sign-in");
+    const moving = await page
+      .locator(".auth-scene *")
+      .evaluateAll(
+        (elements) =>
+          elements.filter((el) =>
+            getComputedStyle(el).animationName.startsWith("auth-"),
+          ).length,
+      );
+    expect(moving).toBe(0);
+  });
+
+  test("the scene stays on the auth pages only (AC-16)", async ({ page }) => {
+    await page.goto("/en/privacy");
+    await expect(page.locator(".auth-scene")).toHaveCount(0);
   });
 });

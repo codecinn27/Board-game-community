@@ -184,7 +184,10 @@ Register, sign in, sign out. Anyone can browse without an account; only members 
   - [x] Sign in thread: email sign in, Turnstile, `/me` with sign out, redirect guards (AC-5, 7, 12, 13)
   - [x] Invite gate and email registration, signed in at once with no confirmation mail (AC-2, 3, 13)
   - [x] Password reset, `/me` display name and password, `/privacy`, messages in both languages, tests, docs (AC-9 to 11, 14, 15)
-Spec [0010](../specs/0010-member-accounts/index.md) · code in `src/lib/auth/`, `src/components/auth/`, `src/app/[locale]/sign-in/`, `src/app/auth/`, `src/proxy.ts`, `messages/`
+  - [x] Dice Galaxy art in code: sky, stars, rockets, planet, dice, cloud bank; the clay pictures, flags, and brief removed (AC-19)
+  - [x] Dice Galaxy look: `--auth-*` tokens and contrast pairs, Baloo 2, `AuthScene` on sign in, forgot, and reset, heading on the sky, rounded fields with icons, password show or hide, gradient button (AC-16 to 18, 20, 21)
+  - [x] Dice Galaxy checks: browser checks at 360 and 1280, `/design` block, "Auth Dice Galaxy scene" section in `docs/design.md` (AC-16 to 21)
+Spec [0010](../specs/0010-member-accounts/index.md) · design [design D, Dice Galaxy](https://claude.ai/artifact/DZFyiGJt9u5mP3sL34Rfnk) · code in `src/lib/auth/`, `src/components/auth/`, `src/app/[locale]/sign-in/`, `src/app/auth/`, `src/proxy.ts`, `messages/`
 
 ### 7. Add a game I own · needs a decision
 A member searches your own database first; if the game is there they mark "I own this", if not they enter it manually. Seeing who already owns a game helps avoid duplicate buys, but it is information only, never a block. This also wires up the "I own this" button on the game sheet.

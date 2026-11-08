@@ -151,11 +151,6 @@
         "description": "你的账号。"
       }
     },
-    "tabs": {
-      "label": "登录或创建账号",
-      "signIn": "登录",
-      "register": "创建账号"
-    },
     "fields": {
       "email": "邮箱",
       "password": "密码",
@@ -196,7 +191,8 @@
       "heading": "欢迎回来",
       "submit": "登录",
       "pending": "正在登录",
-      "forgot": "忘记密码？"
+      "forgot": "忘记密码？",
+      "subheading": "登录，继续你的旅程"
     },
     "invite": {
       "heading": "加入社区",
@@ -208,7 +204,8 @@
       "heading": "创建你的账号",
       "submit": "创建账号",
       "pending": "正在创建账号",
-      "privacy": "创建账号即表示你同意<link>隐私说明</link>。"
+      "privacy": "创建账号即表示你同意<link>隐私说明</link>。",
+      "subheading": "取一个其他成员会看到的名称。"
     },
     "checkEmail": {
       "title": "请查收邮件",
@@ -219,12 +216,15 @@
       "heading": "忘记密码了吗？",
       "body": "输入你的邮箱，我们会发送设置新密码的链接。",
       "submit": "发送重置链接",
-      "pending": "正在发送"
+      "pending": "正在发送",
+      "rememberedPrompt": "想起来了？",
+      "remembered": "登录"
     },
     "reset": {
       "heading": "设置新密码",
       "submit": "保存新密码",
-      "pending": "正在保存"
+      "pending": "正在保存",
+      "subheading": "选一个你记得住的密码。"
     },
     "me": {
       "heading": "我的",
@@ -238,6 +238,16 @@
       "signOut": "退出登录",
       "privacy": "查看隐私说明",
       "disabled": "你的账号目前为只读。你可以浏览，但不能添加或修改内容。如有疑问，请联系群管理员。"
+    },
+    "switch": {
+      "toRegisterPrompt": "还没有账号？",
+      "toRegister": "注册",
+      "toSignInPrompt": "已经是成员？",
+      "toSignIn": "登录"
+    },
+    "password": {
+      "show": "显示密码",
+      "hide": "隐藏密码"
     }
   },
   "privacy": {

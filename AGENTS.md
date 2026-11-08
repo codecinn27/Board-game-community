@@ -71,8 +71,10 @@ Stored in `docs/specs/`. Format: `docs/specs/NNNN-title.md`. Feature scope lives
 - A client component that reads the path with `usePathname` must sit inside `Suspense` (see `NavLink`) or read `window.location` when the event happens (see `LanguageMenu`), because dynamic routes such as `/games/[id]` reject it outside `Suspense`.
 - A Server Action has no route, so `next/root-params` fails there: pass the locale in as an argument. Return plain data from it, not rendered UI that uses client components.
 - Page side padding for the header and `<main>` is the `--page-gutter` variable in `src/app/globals.css` (24, 52, 60, 80px by breakpoint); use it for anything that must line up with the page edge.
+- The top and bottom padding of `<main>` are the `--main-pt` and `--main-pb` variables (set in `src/components/app-shell/app-shell.tsx`); a full bleed block cancels them with negative margins, as `AuthScene` does.
 - The shadcn CLI can write `import { cn } from "cn"` and add a stray `cn` npm package; change the import to `@/lib/utils` and drop the package.
 - Shell tabs come only from `src/lib/app-shell/nav.ts` (`enabled` plus `audience`); the bottom tab bar shows only at 2 or more visible tabs.
+- The app ships no service worker. In dev only, `src/app/sw.js/route.ts` answers `/sw.js` with a cleanup worker that deletes Cache Storage and unregisters itself, so a worker another app left on `localhost:3000` cannot serve stale chunks (Turbopack's "module factory is not available"); outside dev it answers 404. Replace this route if the app ever gets a real service worker.
 - Comments that start with `// YC:` are the engineer's own notes. Never remove or rewrite them, even when editing or refactoring the code around them; leave them in place.
 
 ## Tooling
@@ -110,5 +112,6 @@ Stored in `docs/specs/`. Format: `docs/specs/NNNN-title.md`. Feature scope lives
 - [src/lib/supabase/AGENTS.md](src/lib/supabase/AGENTS.md) (which Supabase client to use, and the secret key rule)
 - [supabase/AGENTS.md](supabase/AGENTS.md) (migrations, pgTAP tests, seed, and running Docker for the local stack)
 - [src/components/game-sheet/AGENTS.md](src/components/game-sheet/AGENTS.md) (the game detail sheet: modal, page, store, and animation rules)
+- [src/lib/auth/AGENTS.md](src/lib/auth/AGENTS.md) (member accounts: session checks, the invite gate, auth redirects, and the auth pages)
 
 _Drafted by /audit from the repo, worth a quick human pass. Edit freely: once a line stops matching this draft, later runs treat it as curated and will flag rather than overwrite it._

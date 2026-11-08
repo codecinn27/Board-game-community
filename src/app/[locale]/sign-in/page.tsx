@@ -1,7 +1,7 @@
 import { type Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { Suspense } from "react";
-import { AuthColumn, AuthSkeleton } from "@/components/auth/auth-layout";
+import { AuthScene, AuthSkeleton } from "@/components/auth/auth-scene";
 import { SignInContent } from "@/components/auth/sign-in-content";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -24,10 +24,10 @@ export default function SignInPage({
   searchParams,
 }: PageProps<"/[locale]/sign-in">) {
   return (
-    <AuthColumn>
+    <AuthScene>
       <Suspense fallback={<Fallback />}>
         <SignInContent searchParams={searchParams} />
       </Suspense>
-    </AuthColumn>
+    </AuthScene>
   );
 }
