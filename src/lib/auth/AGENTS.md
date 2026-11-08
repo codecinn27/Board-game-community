@@ -30,12 +30,14 @@ Pages: `src/app/[locale]/{sign-in,forgot-password,reset-password,me,privacy}/`. 
 - `next` has no language prefix and goes through `safeNext()` at every use, not only where it is read.
 - A Turnstile token works once. When Supabase also checks it (sign in, sign up, reset), do not call `verifyTurnstile` too; `verifyInvite` has no Supabase call, so it does. Forms remount the widget after each answer (`useAuthForm`).
 - Role and status are never read from user editable metadata.
+- `/sign-in`, `/forgot-password`, and `/reset-password` render inside `AuthScene` (`src/components/auth/auth-scene.tsx`); `/me` and `/privacy` keep `AuthColumn` (`auth-layout.tsx`). Scene colors are `--auth-*` tokens that exist only inside `.auth-scene` (`src/app/globals.css`), so scene components write no literal colors.
 
 ## Gotchas
 
 - The reset mail uses `{{ .RedirectTo }}&token_hash={{ .TokenHash }}&type=recovery` (`supabase/templates/recovery.html`). The hosted project needs the same template, the redirect allowlist, and email confirmation turned off.
 - `proxy.ts` does the guest and signed in redirects (AC-12); the `/me` page keeps its own backstop redirect.
 - A reset link session is told apart by an `otp` entry in the token's `amr` claim.
+- `getViewer()` awaits `connection()` before `getClaims()`. `getClaims()` reads the clock to check the token's expiry, and with Partial Prefetching the clock is off limits during the runtime prefetch (cookies are not).
 - Local Supabase reads the Turnstile secret from `supabase/.env` (git ignored); `.env.example` lists the four new app variables.
 
 ## Related specs

@@ -19,12 +19,14 @@ export function PasswordForm({ action, variant }: PasswordFormProps) {
   const [state, formAction, pending] = useActionState(action, initialState);
   const submit = variant === "reset" ? "reset.submit" : "me.save";
   const wait = variant === "reset" ? "reset.pending" : "me.saving";
+  // The reset page sits in the auth scene; `/me` keeps the site look.
+  const look = variant === "reset" ? "scene" : "plain";
 
   return (
     <form action={formAction} noValidate>
       <FieldGroup>
         <HiddenContext />
-        <FormError error={state.error} />
+        <FormError error={state.error} look={look} />
         {state.ok && variant === "me" ? (
           <p role="status" className="text-sm text-primary">
             {t("me.passwordSaved")}
@@ -39,6 +41,7 @@ export function PasswordForm({ action, variant }: PasswordFormProps) {
           type="password"
           autoComplete="new-password"
           error={state.fields?.password}
+          look={look}
         />
         <AuthField
           key={state.ok ? "saved-confirm" : "editing-confirm"}
@@ -47,11 +50,13 @@ export function PasswordForm({ action, variant }: PasswordFormProps) {
           type="password"
           autoComplete="new-password"
           error={state.fields?.confirm}
+          look={look}
         />
         <SubmitButton
           label={t(submit)}
           pendingLabel={t(wait)}
           pending={pending}
+          look={look}
         />
       </FieldGroup>
     </form>
