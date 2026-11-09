@@ -62,7 +62,7 @@ test.describe("guest", () => {
     await expect(
       page.getByRole("heading", { name: "Welcome back" }),
     ).toBeVisible();
-    await expect(page.getByLabel("Email")).toBeVisible();
+    await expect(page.getByLabel("Username or email")).toBeVisible();
     await expect(page.getByLabel("Password", { exact: true })).toBeVisible();
     await noSidewaysScroll(page);
   });
@@ -90,7 +90,9 @@ test.describe("guest", () => {
     await waitForSecurityCheck(page);
     await page.getByRole("button", { name: "Continue" }).click();
     await expect(page.getByLabel("Display name")).toBeVisible();
+    await expect(page.getByLabel("Username", { exact: true })).toBeVisible();
     await expect(page.getByLabel("Email")).toBeVisible();
+    await expect(page.getByLabel("Confirm password")).toBeVisible();
     await expect(
       page.getByRole("link", { name: "privacy note" }),
     ).toBeVisible();
@@ -101,7 +103,7 @@ test.describe("guest", () => {
     page,
   }) => {
     await page.goto("/en/sign-in");
-    await page.getByLabel("Email").fill("nobody@example.com");
+    await page.getByLabel("Username or email").fill("nobody_here");
     await page.getByLabel("Password", { exact: true }).fill("wrong-password-1");
     await waitForSecurityCheck(page);
     await page
@@ -109,7 +111,7 @@ test.describe("guest", () => {
       .last()
       .click();
     await expect(page.locator("main").getByRole("alert")).toContainText(
-      "The email or password is wrong.",
+      "The username, email or password is wrong.",
     );
   });
 });
@@ -158,6 +160,7 @@ test.describe("email registration", () => {
       const email = `e2e${Date.now()}${locale}${letters}@example.com`;
       registered.push(email);
       const name = "Mei E2E";
+      const username = `mei${Date.now() % 1_000_000_000}`;
 
       await page.goto(`/${locale}/sign-in?mode=register&next=%2Fshelf`);
       await page.getByLabel(t.auth.fields.inviteCode).fill(inviteCode);
@@ -165,9 +168,13 @@ test.describe("email registration", () => {
       await page.getByRole("button", { name: t.auth.invite.submit }).click();
 
       await page.getByLabel(t.auth.fields.displayName).fill(name);
+      await page.getByLabel(t.auth.fields.username).fill(username);
       await page.getByLabel(t.auth.fields.email).fill(email);
       await page
         .getByLabel(t.auth.fields.password, { exact: true })
+        .fill("e2e-password-1");
+      await page
+        .getByLabel(t.auth.fields.confirmRegister)
         .fill("e2e-password-1");
       await waitForSecurityCheck(page);
       await page

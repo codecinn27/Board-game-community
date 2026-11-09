@@ -52,7 +52,8 @@ export function buildWelcomeEmail({
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f1ec;">
 <tr><td align="center" style="padding:24px 12px;">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#ffffff;border-radius:12px;font-family:${FONT};color:#1f2430;">
-<tr><td style="padding:32px 28px 8px 28px;">
+<tr><td style="padding:28px 28px 0 28px;"><img src="${escapeHtml(siteUrl)}/email-logo.png" width="48" height="48" alt="${escapeHtml(t("siteName"))}" style="display:block;border:0;border-radius:24px;"></td></tr>
+<tr><td style="padding:20px 28px 8px 28px;">
 <h1 style="margin:0 0 12px 0;font-size:24px;line-height:1.3;">${escapeHtml(greeting)}</h1>
 <p style="margin:0 0 16px 0;font-size:16px;line-height:1.5;">${escapeHtml(t("ready"))}</p>
 <p style="margin:0 0 8px 0;font-size:16px;font-weight:600;">${escapeHtml(t("canDoHeading"))}</p>

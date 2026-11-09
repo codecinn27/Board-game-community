@@ -5,6 +5,7 @@ import { IntlClientProvider } from "@/i18n/intl-client-provider";
 import { Link, redirect } from "@/i18n/navigation";
 import { getViewer } from "@/lib/auth/viewer";
 import { createClient } from "@/lib/supabase/server";
+import { getUsername } from "@/lib/supabase/usernames";
 import { AuthHeading } from "./auth-layout";
 import { DisplayNameForm } from "./display-name-form";
 import { PasswordForm } from "./password-form";
@@ -23,7 +24,7 @@ export async function MeContent() {
   }
 
   const supabase = await createClient();
-  const [t, messages, { data: profile }, { data: userData }] =
+  const [t, messages, { data: profile }, { data: userData }, username] =
     await Promise.all([
       getTranslations("auth.me"),
       getMessages(),
@@ -33,6 +34,7 @@ export async function MeContent() {
         .eq("id", viewer.id)
         .maybeSingle(),
       supabase.auth.getUser(),
+      getUsername(viewer.id),
     ]);
 
   const displayName = profile?.display_name ?? "";
@@ -57,6 +59,14 @@ export async function MeContent() {
       <dl className="flex flex-col gap-1">
         <dt className="text-sm text-muted-foreground">{t("email")}</dt>
         <dd className="break-all">{viewer.email ?? ""}</dd>
+      </dl>
+
+      <dl className="flex flex-col gap-1">
+        <dt className="text-sm text-muted-foreground">{t("username")}</dt>
+        <dd className="break-all">{username}</dd>
+        <dd className="text-sm text-muted-foreground">
+          {t("displayNameNote")}
+        </dd>
       </dl>
 
       {disabled ? (

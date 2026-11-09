@@ -157,22 +157,28 @@
       "newPassword": "New password",
       "confirmPassword": "Confirm new password",
       "displayName": "Display name",
-      "inviteCode": "Invite code"
+      "inviteCode": "Invite code",
+      "username": "Username",
+      "identifier": "Username or email",
+      "confirmRegister": "Confirm password"
     },
     "hints": {
       "displayName": "1 to 40 characters. Other members see this name.",
       "password": "At least 8 characters.",
-      "inviteCode": "Ask a member of the group for the code."
+      "inviteCode": "Ask a member of the group for the code.",
+      "username": "3 to 20 letters, numbers, _ or -. You sign in with it. Other members cannot see it."
     },
     "fieldErrors": {
       "required": "This field is needed.",
       "nameLength": "Use 1 to 40 characters.",
       "emailInvalid": "Enter a valid email address.",
       "passwordShort": "Use at least 8 characters.",
-      "passwordMismatch": "The two passwords do not match."
+      "passwordMismatch": "The two passwords do not match.",
+      "usernameInvalid": "Use 3 to 20 letters, numbers, _ or -. No spaces or @.",
+      "usernameTaken": "That username is taken. Try another."
     },
     "errors": {
-      "credentials": "The email or password is wrong.",
+      "credentials": "The username, email or password is wrong.",
       "unconfirmed": "Confirm your email first. We sent you a link when you registered.",
       "captcha": "The security check did not pass. Please try again.",
       "weakPassword": "That password is too weak. Use at least 8 characters.",
@@ -205,7 +211,7 @@
       "submit": "Create account",
       "pending": "Creating account",
       "privacy": "By creating an account you agree to the <link>privacy note</link>.",
-      "subheading": "Pick the name other members will see."
+      "subheading": "Enter a display name for other members to see and a username to sign in with."
     },
     "checkEmail": {
       "title": "Check your email",
@@ -237,7 +243,9 @@
       "googleNote": "You sign in with Google, so there is no password to change here.",
       "signOut": "Sign out",
       "privacy": "Read the privacy note",
-      "disabled": "Your account is read only. You can browse, but you cannot add or change anything. Ask the group admin if this looks wrong."
+      "disabled": "Your account is read only. You can browse, but you cannot add or change anything. Ask the group admin if this looks wrong.",
+      "username": "Username",
+      "displayNameNote": "Other members see your display name, not your username."
     },
     "switch": {
       "toRegisterPrompt": "Don't have an account?",

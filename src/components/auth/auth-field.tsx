@@ -21,6 +21,9 @@ type FieldLabelKey =
   | "newPassword"
   | "confirmPassword"
   | "displayName"
+  | "username"
+  | "identifier"
+  | "confirmRegister"
   | "inviteCode";
 
 /** The icon inside each scene field, on the left (spec 0010, AC-18). */
@@ -30,6 +33,9 @@ const ICONS: Record<FieldLabelKey, LucideIcon> = {
   newPassword: Lock,
   confirmPassword: Lock,
   displayName: User,
+  username: User,
+  identifier: User,
+  confirmRegister: Lock,
   inviteCode: KeyRound,
 };
 
@@ -38,7 +44,7 @@ type AuthFieldProps = {
   /** Key under `auth.fields`. */
   label: FieldLabelKey;
   /** Key under `auth.hints`, shown under the field. */
-  hint?: "displayName" | "password" | "inviteCode";
+  hint?: "displayName" | "username" | "password" | "inviteCode";
   error?: FieldCode | undefined;
   type?: ComponentProps<"input">["type"];
   autoComplete?: string;

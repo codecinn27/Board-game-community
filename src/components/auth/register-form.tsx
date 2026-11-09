@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl";
 import { signUpWithEmail } from "@/app/[locale]/sign-in/actions";
 import { FieldGroup } from "@/components/ui/field";
 import { Link } from "@/i18n/navigation";
-import { DISPLAY_NAME_MAX } from "@/lib/auth/validation";
+import { DISPLAY_NAME_MAX, USERNAME_MAX } from "@/lib/auth/validation";
 import { AuthField } from "./auth-field";
 import { FormError, HiddenContext, SubmitButton } from "./form-parts";
 import { Turnstile } from "./turnstile";
@@ -34,6 +34,15 @@ export function RegisterForm({ siteKey, next }: RegisterFormProps) {
           error={state.fields?.displayName}
         />
         <AuthField
+          name="username"
+          label="username"
+          hint="username"
+          autoComplete="username"
+          maxLength={USERNAME_MAX}
+          defaultValue={state.values?.username}
+          error={state.fields?.username}
+        />
+        <AuthField
           name="email"
           label="email"
           type="email"
@@ -48,6 +57,13 @@ export function RegisterForm({ siteKey, next }: RegisterFormProps) {
           type="password"
           autoComplete="new-password"
           error={state.fields?.password}
+        />
+        <AuthField
+          name="confirm"
+          label="confirmRegister"
+          type="password"
+          autoComplete="new-password"
+          error={state.fields?.confirm}
         />
         <Turnstile key={attempt} siteKey={siteKey} onToken={setToken} />
         <SubmitButton

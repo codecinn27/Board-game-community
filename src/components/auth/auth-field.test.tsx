@@ -92,7 +92,7 @@ describe("form parts in the auth scene", () => {
     const html = render(<FormError error="credentials" />);
     expect(html).toContain('role="alert"');
     expect(html).toContain("text-auth-danger");
-    expect(html).toContain("The email or password is wrong.");
+    expect(html).toContain("The username, email or password is wrong.");
   });
 
   it("puts white text on the pink to violet gradient", () => {
