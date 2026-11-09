@@ -21,7 +21,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 9 | Game detail sheet | Slice 1 (frontend, dummy data) | in-progress |
 | 22 | Shelf: By owner view | Next (frontend, dummy data) | planned |
 | 21 | Live data for home, shelf, and game sheet | Slice 2 | in-progress |
-| 6 | Member accounts | Slice 2 | planned |
+| 6 | Member accounts | Slice 2 | in-progress |
 | 7 | Add a game I own | Slice 2 | planned |
 | 10 | Online game lookup | Slice 3 | planned |
 | 11 | Paste a link to auto fill | Slice 3 | planned |
@@ -175,10 +175,19 @@ Replace the dummy data with real reads from Supabase (public read, no sign in ne
   - [ ] Cover images (built: `cover` field, upload in `pnpm seed:games`, `CoverTile` image with tint fallback, covers capped at 150 KB by the bucket limit and the seed check; left: run the seed and check it in the browser): put each game's picture in the Supabase `covers` bucket, save its path in `games.cover_path`, and show it on home, shelf, and the game sheet (the tint tile stays as the fallback when a game has no image)
 Spec [0009](../specs/0009-live-data.md) · code in `src/lib/games/`, `src/lib/supabase/`, `src/components/game-sheet/`, `supabase/`, `data/`
 
-### 6. Member accounts · needs a decision
-Register, sign in, sign out. Anyone can browse without an account; only members can add games, rate, and comment.
+### 6. Member accounts · in-progress
+Register, sign in, sign out. Anyone can browse without an account; only members can add games, rate, and comment. A person enters the community's shared invite code first, then registers with email and password and is signed in at once.
 **Done when:** a visitor can register and sign in, signed out visitors can only view, and a simple privacy note explains what personal data is stored.
-- [ ] Design it (spec): `/architect member accounts`
+- [x] Design it (spec): `/architect member accounts`
+- [x] Build it: `/develop member accounts`
+  - [x] Config and session plumbing: env, `proxy.ts` session refresh, `getViewer`, `safeNext`, nav split under Suspense, tabs switched on (AC-1, 6, 8, 15)
+  - [x] Sign in thread: email sign in, Turnstile, `/me` with sign out, redirect guards (AC-5, 7, 12, 13)
+  - [x] Invite gate and email registration, signed in at once with no confirmation mail (AC-2, 3, 13)
+  - [x] Password reset, `/me` display name and password, `/privacy`, messages in both languages, tests, docs (AC-9 to 11, 14, 15)
+  - [x] Dice Galaxy art in code: sky, stars, rockets, planet, dice, cloud bank; the clay pictures, flags, and brief removed (AC-19)
+  - [x] Dice Galaxy look: `--auth-*` tokens and contrast pairs, Baloo 2, `AuthScene` on sign in, forgot, and reset, heading on the sky, rounded fields with icons, password show or hide, gradient button (AC-16 to 18, 20, 21)
+  - [x] Dice Galaxy checks: browser checks at 360 and 1280, `/design` block, "Auth Dice Galaxy scene" section in `docs/design.md` (AC-16 to 21)
+Spec [0010](../specs/0010-member-accounts/index.md) · design [design D, Dice Galaxy](https://claude.ai/artifact/DZFyiGJt9u5mP3sL34Rfnk) · code in `src/lib/auth/`, `src/components/auth/`, `src/app/[locale]/sign-in/`, `src/app/auth/`, `src/proxy.ts`, `messages/`
 
 ### 7. Add a game I own · needs a decision
 A member searches your own database first; if the game is there they mark "I own this", if not they enter it manually. Seeing who already owns a game helps avoid duplicate buys, but it is information only, never a block. This also wires up the "I own this" button on the game sheet.

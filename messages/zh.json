@@ -131,5 +131,146 @@
       "body": "我们这边出了点问题，请稍后再试。",
       "retry": "重试"
     }
+  },
+  "auth": {
+    "meta": {
+      "signIn": {
+        "title": "登录",
+        "description": "登录或加入社区的桌游书架。"
+      },
+      "forgot": {
+        "title": "忘记密码",
+        "description": "获取设置新密码的链接。"
+      },
+      "reset": {
+        "title": "新密码",
+        "description": "为你的账号设置新密码。"
+      },
+      "me": {
+        "title": "我的",
+        "description": "你的账号。"
+      }
+    },
+    "fields": {
+      "email": "邮箱",
+      "password": "密码",
+      "newPassword": "新密码",
+      "confirmPassword": "确认新密码",
+      "displayName": "显示名称",
+      "inviteCode": "邀请码"
+    },
+    "hints": {
+      "displayName": "1 到 40 个字符。其他成员会看到这个名称。",
+      "password": "至少 8 个字符。",
+      "inviteCode": "请向群里的成员索取邀请码。"
+    },
+    "fieldErrors": {
+      "required": "这一项必须填写。",
+      "nameLength": "请使用 1 到 40 个字符。",
+      "emailInvalid": "请输入有效的邮箱地址。",
+      "passwordShort": "请至少使用 8 个字符。",
+      "passwordMismatch": "两次输入的密码不一致。"
+    },
+    "errors": {
+      "credentials": "邮箱或密码不正确。",
+      "unconfirmed": "请先确认你的邮箱。注册时我们已发送确认链接。",
+      "captcha": "安全检查没有通过，请重试。",
+      "weakPassword": "密码太弱，请至少使用 8 个字符。",
+      "rateLimit": "尝试次数过多，请等几分钟后再试。",
+      "generic": "出了点问题，请重试。",
+      "inviteWrong": "邀请码不对，请检查后重试。",
+      "inviteNeeded": "注册前请先输入邀请码。",
+      "link": "这个链接已过期或已被使用，请重试。",
+      "emailTaken": "这个邮箱已经注册过了，请直接登录。"
+    },
+    "turnstile": {
+      "label": "安全检查",
+      "loading": "正在加载安全检查"
+    },
+    "signIn": {
+      "heading": "欢迎回来",
+      "submit": "登录",
+      "pending": "正在登录",
+      "forgot": "忘记密码？",
+      "subheading": "登录，继续你的旅程"
+    },
+    "invite": {
+      "heading": "加入社区",
+      "body": "输入邀请码来创建账号。浏览书架不需要邀请码。",
+      "submit": "继续",
+      "pending": "正在检查"
+    },
+    "register": {
+      "heading": "创建你的账号",
+      "submit": "创建账号",
+      "pending": "正在创建账号",
+      "privacy": "创建账号即表示你同意<link>隐私说明</link>。",
+      "subheading": "取一个其他成员会看到的名称。"
+    },
+    "checkEmail": {
+      "title": "请查收邮件",
+      "reset": "如果这个地址有账号，我们已发送设置新密码的链接。",
+      "back": "返回登录"
+    },
+    "forgot": {
+      "heading": "忘记密码了吗？",
+      "body": "输入你的邮箱，我们会发送设置新密码的链接。",
+      "submit": "发送重置链接",
+      "pending": "正在发送",
+      "rememberedPrompt": "想起来了？",
+      "remembered": "登录"
+    },
+    "reset": {
+      "heading": "设置新密码",
+      "submit": "保存新密码",
+      "pending": "正在保存",
+      "subheading": "选一个你记得住的密码。"
+    },
+    "me": {
+      "heading": "我的",
+      "email": "邮箱",
+      "save": "保存",
+      "saving": "正在保存",
+      "saved": "已保存。",
+      "passwordHeading": "密码",
+      "passwordSaved": "你的密码已更改。",
+      "googleNote": "你使用 Google 登录，所以这里没有密码可改。",
+      "signOut": "退出登录",
+      "privacy": "查看隐私说明",
+      "disabled": "你的账号目前为只读。你可以浏览，但不能添加或修改内容。如有疑问，请联系群管理员。"
+    },
+    "switch": {
+      "toRegisterPrompt": "还没有账号？",
+      "toRegister": "注册",
+      "toSignInPrompt": "已经是成员？",
+      "toSignIn": "登录"
+    },
+    "password": {
+      "show": "显示密码",
+      "hide": "隐藏密码"
+    }
+  },
+  "privacy": {
+    "meta": {
+      "title": "隐私说明",
+      "description": "游戏书架会保存你的哪些信息，以及由谁处理。"
+    },
+    "heading": "隐私说明",
+    "intro": "游戏书架是一个小型社区项目。这里直白地说明我们保存了你的哪些信息。",
+    "storedHeading": "我们保存的信息",
+    "stored": {
+      "email": "你的邮箱地址，用于登录和发送重置密码的链接。",
+      "name": "你的显示名称。其他成员会在你拥有的游戏和你写的评价旁看到它。",
+      "activity": "你添加的游戏，以及你写的评分和评论。"
+    },
+    "handlersHeading": "由谁处理",
+    "handlers": {
+      "supabase": "Supabase 存储账号和数据。",
+      "vercel": "Vercel 托管网站。",
+      "turnstile": "Cloudflare Turnstile 在登录和注册表单上检查访问者是真人。"
+    },
+    "choicesHeading": "你的选择",
+    "choices": "你可以随时在“我的”页面修改显示名称。如需删除账号，请联系群管理员。",
+    "back": "返回首页"
   }
 }

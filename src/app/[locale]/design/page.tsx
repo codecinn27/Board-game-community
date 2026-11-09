@@ -2,6 +2,11 @@ import { type Metadata } from "next";
 import { notFound } from "next/navigation";
 import { type ReactNode } from "react";
 import { BottomTabBar } from "@/components/app-shell/bottom-tab-bar";
+import {
+  AuthCard,
+  AuthSkeleton,
+  authSceneClass,
+} from "@/components/auth/auth-scene";
 import { getShellTabs } from "@/components/app-shell/shell-tabs";
 import { SiteHeader } from "@/components/app-shell/site-header";
 import { CloseLink } from "@/components/game-sheet/close-link";
@@ -45,6 +50,35 @@ const colorPairs = [
 ] as const;
 
 const lines = ["border", "input", "ring"] as const;
+
+// Auth Dice Galaxy scene (spec 0010, AC-20): text tokens on the surfaces they
+// meet, then the art colors (fills only).
+const authPairs = [
+  ["auth-sky", "auth-on-sky"],
+  ["auth-sky", "auth-on-sky-muted"],
+  ["auth-card", "auth-ink"],
+  ["auth-field", "auth-ink-muted"],
+  ["auth-card", "auth-link"],
+  ["auth-button-from", "auth-on-button"],
+  ["auth-button-to", "auth-on-button"],
+  ["auth-danger-bg", "auth-danger"],
+] as const;
+const authFills = [
+  "auth-sky",
+  "auth-sky-mid",
+  "auth-sky-deep",
+  "auth-glow",
+  "auth-haze",
+  "auth-clay-shade",
+  "auth-clay-deep",
+  "auth-pip",
+  "auth-rose",
+  "auth-rose-deep",
+  "auth-magenta",
+  "auth-window",
+  "auth-gold",
+  "auth-spark",
+] as const;
 const covers = [1, 2, 3, 4, 5, 6] as const;
 
 const typeScale = [
@@ -261,6 +295,73 @@ export default function DesignPage() {
               body="Something went wrong on our side. Try again in a moment."
               retryLabel="Try again"
             />
+          </div>
+        </div>
+      </Section>
+
+      <Section title="Auth Dice Galaxy scene">
+        <p className="max-w-xl text-muted-foreground">
+          The second scoped theme (spec 0010): sign in, forgot, and reset only.
+          Text on the sky uses the on sky tokens, the card uses ink, link, and
+          danger, and the art colors are fills. The form card below is a sample;
+          the real forms need their messages, so see them on /sign-in.
+        </p>
+        <div
+          className={`${authSceneClass} flex flex-col gap-6 rounded-[28px] bg-[radial-gradient(130%_75%_at_50%_0%,var(--auth-sky)_0%,var(--auth-sky-mid)_55%,var(--auth-sky-deep)_100%)] p-4 text-auth-on-sky md:p-8`}
+        >
+          <ul className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {authPairs.map(([surface, text]) => (
+              <li
+                key={`${surface}-${text}`}
+                className="flex flex-col overflow-hidden rounded-xl border border-auth-on-sky/20"
+              >
+                <div
+                  className="flex h-16 items-center justify-center text-xl font-semibold"
+                  style={{
+                    background: `var(--${surface})`,
+                    color: `var(--${text})`,
+                  }}
+                >
+                  Aa
+                </div>
+                <p className="flex flex-col gap-0.5 bg-auth-card p-2 font-mono text-xs text-auth-ink-muted">
+                  <span>--{text}</span>
+                  <span>on --{surface}</span>
+                </p>
+              </li>
+            ))}
+          </ul>
+          <ul className="grid grid-cols-3 gap-3 sm:grid-cols-7">
+            {authFills.map((fill) => (
+              <li key={fill} className="flex flex-col gap-1">
+                <div
+                  className="h-12 rounded-full border border-auth-on-sky/20"
+                  style={{ background: `var(--${fill})` }}
+                />
+                <span className="font-mono text-xs text-auth-on-sky-muted">
+                  --{fill}
+                </span>
+              </li>
+            ))}
+          </ul>
+          <div className="grid items-start justify-items-center gap-6 md:grid-cols-2">
+            <div className="w-full max-w-110">
+              <AuthCard
+                title="Welcome back"
+                subtitle="Sign in to continue your journey"
+              >
+                <div className="flex flex-col gap-5">
+                  <div className="h-13 rounded-xl border border-auth-field-line bg-auth-field" />
+                  <div className="h-13 rounded-xl border border-auth-field-line bg-auth-field" />
+                  <div className="flex h-14 items-center justify-center rounded-full bg-linear-to-r from-auth-button-from to-auth-button-to text-lg font-bold text-auth-on-button">
+                    Sign in
+                  </div>
+                </div>
+              </AuthCard>
+            </div>
+            <div className="w-full max-w-110">
+              <AuthSkeleton label="Loading sign in" />
+            </div>
           </div>
         </div>
       </Section>

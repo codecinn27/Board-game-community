@@ -59,7 +59,7 @@ export const navItems: readonly NavItem[] = [
     labelKey: "signIn",
     audience: "guest",
     raised: false,
-    enabled: false,
+    enabled: true,
   },
   {
     // Feature 6 (Member accounts).
@@ -69,7 +69,7 @@ export const navItems: readonly NavItem[] = [
     labelKey: "me",
     audience: "member",
     raised: false,
-    enabled: false,
+    enabled: true,
   },
 ];
 

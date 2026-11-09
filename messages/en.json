@@ -131,5 +131,146 @@
       "body": "Something went wrong on our side. Try again in a moment.",
       "retry": "Try again"
     }
+  },
+  "auth": {
+    "meta": {
+      "signIn": {
+        "title": "Sign in",
+        "description": "Sign in or join the community board game shelf."
+      },
+      "forgot": {
+        "title": "Forgot password",
+        "description": "Get a link to set a new password."
+      },
+      "reset": {
+        "title": "New password",
+        "description": "Choose a new password for your account."
+      },
+      "me": {
+        "title": "Me",
+        "description": "Your account."
+      }
+    },
+    "fields": {
+      "email": "Email",
+      "password": "Password",
+      "newPassword": "New password",
+      "confirmPassword": "Confirm new password",
+      "displayName": "Display name",
+      "inviteCode": "Invite code"
+    },
+    "hints": {
+      "displayName": "1 to 40 characters. Other members see this name.",
+      "password": "At least 8 characters.",
+      "inviteCode": "Ask a member of the group for the code."
+    },
+    "fieldErrors": {
+      "required": "This field is needed.",
+      "nameLength": "Use 1 to 40 characters.",
+      "emailInvalid": "Enter a valid email address.",
+      "passwordShort": "Use at least 8 characters.",
+      "passwordMismatch": "The two passwords do not match."
+    },
+    "errors": {
+      "credentials": "The email or password is wrong.",
+      "unconfirmed": "Confirm your email first. We sent you a link when you registered.",
+      "captcha": "The security check did not pass. Please try again.",
+      "weakPassword": "That password is too weak. Use at least 8 characters.",
+      "rateLimit": "Too many tries. Please wait a few minutes and try again.",
+      "generic": "Something went wrong. Please try again.",
+      "inviteWrong": "That code is not right. Check it and try again.",
+      "inviteNeeded": "Enter the invite code before you register.",
+      "link": "That link has expired or was already used. Please try again.",
+      "emailTaken": "An account with this email already exists. Try signing in."
+    },
+    "turnstile": {
+      "label": "Security check",
+      "loading": "Loading the security check"
+    },
+    "signIn": {
+      "heading": "Welcome back",
+      "submit": "Sign in",
+      "pending": "Signing in",
+      "forgot": "Forgot password?",
+      "subheading": "Sign in to continue your journey"
+    },
+    "invite": {
+      "heading": "Join the community",
+      "body": "Enter the invite code to create an account. Browsing the shelf never needs one.",
+      "submit": "Continue",
+      "pending": "Checking"
+    },
+    "register": {
+      "heading": "Create your account",
+      "submit": "Create account",
+      "pending": "Creating account",
+      "privacy": "By creating an account you agree to the <link>privacy note</link>.",
+      "subheading": "Pick the name other members will see."
+    },
+    "checkEmail": {
+      "title": "Check your email",
+      "reset": "If that address has an account, we sent a link to set a new password.",
+      "back": "Back to sign in"
+    },
+    "forgot": {
+      "heading": "Forgot your password?",
+      "body": "Enter your email and we will send you a link to set a new one.",
+      "submit": "Send reset link",
+      "pending": "Sending",
+      "rememberedPrompt": "Remembered it?",
+      "remembered": "Sign in"
+    },
+    "reset": {
+      "heading": "Choose a new password",
+      "submit": "Save new password",
+      "pending": "Saving",
+      "subheading": "Pick one you will remember."
+    },
+    "me": {
+      "heading": "Me",
+      "email": "Email",
+      "save": "Save",
+      "saving": "Saving",
+      "saved": "Saved.",
+      "passwordHeading": "Password",
+      "passwordSaved": "Your password is changed.",
+      "googleNote": "You sign in with Google, so there is no password to change here.",
+      "signOut": "Sign out",
+      "privacy": "Read the privacy note",
+      "disabled": "Your account is read only. You can browse, but you cannot add or change anything. Ask the group admin if this looks wrong."
+    },
+    "switch": {
+      "toRegisterPrompt": "Don't have an account?",
+      "toRegister": "Sign up",
+      "toSignInPrompt": "Already a member?",
+      "toSignIn": "Sign in"
+    },
+    "password": {
+      "show": "Show password",
+      "hide": "Hide password"
+    }
+  },
+  "privacy": {
+    "meta": {
+      "title": "Privacy",
+      "description": "What Game Shelf stores about you, and who handles it."
+    },
+    "heading": "Privacy",
+    "intro": "Game Shelf is a small community project. This page says plainly what we keep about you.",
+    "storedHeading": "What we store",
+    "stored": {
+      "email": "Your email address, used to sign you in and to send you a password reset link.",
+      "name": "Your display name. Other members see it next to the games you own and the notes you write.",
+      "activity": "The games you add, and the ratings and comments you write."
+    },
+    "handlersHeading": "Who handles it",
+    "handlers": {
+      "supabase": "Supabase stores accounts and data.",
+      "vercel": "Vercel hosts the website.",
+      "turnstile": "Cloudflare Turnstile checks that a visitor is a person, on the sign in and sign up forms."
+    },
+    "choicesHeading": "Your choices",
+    "choices": "You can change your display name any time on the Me page. To delete your account, ask the group admin.",
+    "back": "Back to home"
   }
 }
