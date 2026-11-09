@@ -157,22 +157,28 @@
       "newPassword": "新密码",
       "confirmPassword": "确认新密码",
       "displayName": "显示名称",
-      "inviteCode": "邀请码"
+      "inviteCode": "邀请码",
+      "username": "用户名",
+      "identifier": "用户名或邮箱",
+      "confirmRegister": "确认密码"
     },
     "hints": {
       "displayName": "1 到 40 个字符。其他成员会看到这个名称。",
       "password": "至少 8 个字符。",
-      "inviteCode": "请向群里的成员索取邀请码。"
+      "inviteCode": "请向群里的成员索取邀请码。",
+      "username": "3 到 20 个字母、数字、_ 或 -，用于登录，其他成员看不到。"
     },
     "fieldErrors": {
       "required": "这一项必须填写。",
       "nameLength": "请使用 1 到 40 个字符。",
       "emailInvalid": "请输入有效的邮箱地址。",
       "passwordShort": "请至少使用 8 个字符。",
-      "passwordMismatch": "两次输入的密码不一致。"
+      "passwordMismatch": "两次输入的密码不一致。",
+      "usernameInvalid": "请使用 3 到 20 个字母、数字、_ 或 -，不能有空格或 @。",
+      "usernameTaken": "这个用户名已被使用，请换一个。"
     },
     "errors": {
-      "credentials": "邮箱或密码不正确。",
+      "credentials": "用户名、邮箱或密码不正确。",
       "unconfirmed": "请先确认你的邮箱。注册时我们已发送确认链接。",
       "captcha": "安全检查没有通过，请重试。",
       "weakPassword": "密码太弱，请至少使用 8 个字符。",
@@ -205,7 +211,7 @@
       "submit": "创建账号",
       "pending": "正在创建账号",
       "privacy": "创建账号即表示你同意<link>隐私说明</link>。",
-      "subheading": "取一个其他成员会看到的名称。"
+      "subheading": "填写其他成员会看到的显示名称，以及用于登录的用户名。"
     },
     "checkEmail": {
       "title": "请查收邮件",
@@ -237,7 +243,9 @@
       "googleNote": "你使用 Google 登录，所以这里没有密码可改。",
       "signOut": "退出登录",
       "privacy": "查看隐私说明",
-      "disabled": "你的账号目前为只读。你可以浏览，但不能添加或修改内容。如有疑问，请联系群管理员。"
+      "disabled": "你的账号目前为只读。你可以浏览，但不能添加或修改内容。如有疑问，请联系群管理员。",
+      "username": "用户名",
+      "displayNameNote": "其他成员看到的是你的显示名称，不是用户名。"
     },
     "switch": {
       "toRegisterPrompt": "还没有账号？",
@@ -267,10 +275,28 @@
     "handlers": {
       "supabase": "Supabase 存储账号和数据。",
       "vercel": "Vercel 托管网站。",
-      "turnstile": "Cloudflare Turnstile 在登录和注册表单上检查访问者是真人。"
+      "turnstile": "Cloudflare Turnstile 在登录和注册表单上检查访问者是真人。",
+      "resend": "Resend 负责发送账号邮件（例如欢迎邮件和重设密码邮件），为此会收到你的邮箱地址和显示名称。"
     },
     "choicesHeading": "你的选择",
     "choices": "你可以随时在“我的”页面修改显示名称。如需删除账号，请联系群管理员。",
     "back": "返回首页"
+  },
+  "WelcomeEmail": {
+    "siteName": "桌游书架",
+    "subject": "欢迎加入桌游书架",
+    "preheader": "你的账号已经准备好了，从这里开始吧。",
+    "greeting": "欢迎你，{name}！",
+    "ready": "你的账号已经准备好了。在社区里你可以：",
+    "canDoHeading": "会员可以做什么",
+    "canDoBrowse": "浏览书架，看看谁拥有哪些游戏",
+    "canDoAddGames": "添加你拥有的游戏",
+    "canDoRate": "给游戏评分",
+    "canDoComment": "留下评论",
+    "canDoTopFive": "列出你的前五名",
+    "canDoWishlist": "建立愿望清单",
+    "button": "打开书架",
+    "signoff": "桌游桌上见！",
+    "footer": "你收到这封邮件，是因为你在 {site} 创建了账号。"
   }
 }

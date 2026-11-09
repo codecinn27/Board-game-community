@@ -3,6 +3,7 @@ import {
   checkDisplayName,
   checkEmail,
   checkPassword,
+  checkUsername,
   field,
 } from "./validation";
 
@@ -50,4 +51,23 @@ describe("field", () => {
     expect(field(data, "missing")).toBe("");
     expect(field(data, "f")).toBe("");
   });
+});
+
+describe("checkUsername", () => {
+  it("accepts 3 to 20 letters, digits, _ and -, and keeps the case", () => {
+    expect(checkUsername("  Kobe_9-x ")).toEqual({ value: "Kobe_9-x" });
+    expect(checkUsername("abc").error).toBeUndefined();
+    expect(checkUsername("a".repeat(20)).error).toBeUndefined();
+  });
+
+  it("refuses empty input", () => {
+    expect(checkUsername("   ").error).toBe("required");
+  });
+
+  it.each(["ab", "a".repeat(21), "a b", "me@home", "a.b", "名字名字名", "a!b"])(
+    "refuses %j",
+    (value) => {
+      expect(checkUsername(value).error).toBe("usernameInvalid");
+    },
+  );
 });

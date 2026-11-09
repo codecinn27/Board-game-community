@@ -35,8 +35,9 @@ describe("RocketHero", () => {
       expect(puff).toContain('cx="117" cy="48"');
       expect(puff).toContain("opacity-0");
     }
-    for (const delay of ["-0.6s", "-1.2s", "-1.8s", "-2.4s"])
-      expect(html).toContain(`[animation-delay:${delay}]`);
+    // Inline, so the `animation` shorthand cannot reset them to 0.
+    for (const delay of ["0s", "-0.6s", "-1.2s", "-1.8s", "-2.4s"])
+      expect(html).toContain(`animation-delay:${delay}`);
   });
 
   it("slides a light along the trail, clipped to the trail's outline", () => {

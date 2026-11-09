@@ -23,12 +23,11 @@ export function SignInForm({ siteKey, next }: SignInFormProps) {
         <input type="hidden" name="turnstileToken" value={token} />
         <FormError error={state.error} />
         <AuthField
-          name="email"
-          label="email"
-          type="email"
-          autoComplete="email"
-          defaultValue={state.values?.email}
-          error={state.fields?.email}
+          name="identifier"
+          label="identifier"
+          autoComplete="username"
+          defaultValue={state.values?.identifier}
+          error={state.fields?.identifier}
         />
         <AuthField
           name="password"

@@ -32,6 +32,7 @@ Pages: `src/app/[locale]/{sign-in,forgot-password,reset-password,me,privacy}/`. 
 - Role and status are never read from user editable metadata.
 - `/sign-in`, `/forgot-password`, and `/reset-password` render inside `AuthScene` (`src/components/auth/auth-scene.tsx`); `/me` and `/privacy` keep `AuthColumn` (`auth-layout.tsx`). Scene colors are `--auth-*` tokens that exist only inside `.auth-scene` (`src/app/globals.css`), so scene components write no literal colors.
 - The scene's look and motion rules (art, rockets in flight, tokens, `authSceneClass` as a plain string) live in the "Auth Dice Galaxy scene" section of [docs/design.md](../../../docs/design.md); change them there along with the code.
+- Stagger scene animations with an inline `style={{ animationDelay }}`, never an `[animation-delay:…]` class: `motion-safe:animate-auth-*` emits the `animation` shorthand later and resets the class delay to 0 (the five exhaust puffs stacked into one this way).
 
 ## Gotchas
 

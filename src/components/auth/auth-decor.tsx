@@ -142,13 +142,10 @@ const BIG_FLIGHT: Flight = {
 };
 
 // Five puffs on a 3s loop, one leaving the flame every 0.6s.
-const PUFF_DELAYS = [
-  "",
-  "[animation-delay:-0.6s]",
-  "[animation-delay:-1.2s]",
-  "[animation-delay:-1.8s]",
-  "[animation-delay:-2.4s]",
-];
+// The delay is an inline style: a class loses to the `animation` shorthand
+// that `motion-safe:animate-auth-puff` emits later, which would reset every
+// delay to 0 and stack all five puffs into one.
+const PUFF_DELAYS = ["0s", "-0.6s", "-1.2s", "-1.8s", "-2.4s"];
 
 /**
  * The rocket in flight: the rocket, its trail, and everything on the trail
@@ -203,7 +200,8 @@ function RocketFlight({
               cx={puff.cx}
               cy={puff.cy}
               r={puff.r}
-              className={`origin-center opacity-0 transform-fill motion-safe:animate-auth-puff ${puff.travel} ${delay}`}
+              style={{ animationDelay: delay }}
+              className={`origin-center opacity-0 transform-fill motion-safe:animate-auth-puff ${puff.travel}`}
             />
           ))}
         </g>

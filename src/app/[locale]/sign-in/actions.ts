@@ -1,7 +1,8 @@
 "use server";
 
 import { cookies } from "next/headers";
-import { goTo, localeOf, nextOf } from "@/lib/auth/actions-support";
+import { after } from "next/server";
+import { goTo, localeOf, nextOf, siteUrl } from "@/lib/auth/actions-support";
 import { authErrorKey } from "@/lib/auth/errors";
 import {
   INVITE_COOKIE,
@@ -16,32 +17,47 @@ import {
   checkDisplayName,
   checkEmail,
   checkPassword,
+  checkUsername,
   field,
   type FieldCode,
 } from "@/lib/auth/validation";
+import { sendWelcomeEmail } from "@/lib/email/send-welcome";
 import { requireEnv } from "@/lib/supabase/env";
 import { createClient } from "@/lib/supabase/server";
+import { findEmailByUsername, isUsernameTaken } from "@/lib/supabase/usernames";
 
 export async function signInWithEmail(
   _previous: FormState,
   data: FormData,
 ): Promise<FormState> {
   const locale = localeOf(data);
-  const email = checkEmail(field(data, "email"));
+  const identifier = field(data, "identifier").trim();
   const password = field(data, "password");
   const token = field(data, "turnstileToken");
-  const values = { email: email.value };
+  const values = { identifier };
 
   if (token === "") return { error: "captcha", values };
   const fields: Record<string, FieldCode> = {};
-  if (email.error) fields.email = email.error;
+  if (identifier === "") fields.identifier = "required";
   if (password === "") fields.password = "required";
   if (Object.keys(fields).length > 0) return { fields, values };
+
+  // An `@` means an email; a username can never contain one.
+  let email = identifier;
+  if (identifier.includes("@")) {
+    const checked = checkEmail(identifier);
+    if (checked.error) return { fields: { identifier: checked.error }, values };
+  } else {
+    const found = await findEmailByUsername(identifier);
+    // Same answer as a wrong password, so it never reveals which names exist.
+    if (!found) return { error: "credentials", values };
+    email = found;
+  }
 
   const supabase = await createClient();
   // Supabase checks the Turnstile token itself (a token works only once).
   const { error } = await supabase.auth.signInWithPassword({
-    email: email.value,
+    email,
     password,
     options: { captchaToken: token },
   });
@@ -84,10 +100,16 @@ export async function signUpWithEmail(
   const locale = localeOf(data);
   const next = nextOf(data);
   const name = checkDisplayName(field(data, "displayName"));
+  const username = checkUsername(field(data, "username"));
   const email = checkEmail(field(data, "email"));
   const password = field(data, "password");
+  const confirm = field(data, "confirm");
   const token = field(data, "turnstileToken");
-  const values = { displayName: name.value, email: email.value };
+  const values = {
+    displayName: name.value,
+    username: username.value,
+    email: email.value,
+  };
 
   const cookieStore = await cookies();
   const secret = requireEnv(
@@ -101,18 +123,24 @@ export async function signUpWithEmail(
 
   const fields: Record<string, FieldCode> = {};
   if (name.error) fields.displayName = name.error;
+  if (username.error) fields.username = username.error;
   if (email.error) fields.email = email.error;
   const passwordError = checkPassword(password);
   if (passwordError) fields.password = passwordError;
+  else if (password !== confirm) fields.confirm = "passwordMismatch";
   if (Object.keys(fields).length > 0) return { fields, values };
+
+  if (await isUsernameTaken(username.value))
+    return { fields: { username: "usernameTaken" }, values };
 
   const supabase = await createClient();
   const { data: result, error } = await supabase.auth.signUp({
     email: email.value,
     password,
     options: {
-      // The existing sign up trigger reads this for the profile name.
-      data: { full_name: name.value },
+      // The sign up trigger reads both: the public display name and the
+      // private username used to sign in.
+      data: { full_name: name.value, username: username.value },
       captchaToken: token,
     },
   });
@@ -122,5 +150,19 @@ export async function signUpWithEmail(
   // Email confirmation is off, so sign up returns a session: the member is
   // signed in at once. No session means the project setting is wrong.
   if (!result.session) return { error: "generic", values };
+
+  // The welcome email goes out after the response, so it never slows or blocks
+  // sign up (spec 0011, AC-4). It never throws.
+  const userId = result.user?.id;
+  if (userId) {
+    const request = {
+      userId,
+      email: email.value,
+      displayName: name.value,
+      locale,
+      siteUrl: siteUrl(),
+    };
+    after(() => sendWelcomeEmail(request));
+  }
   return goTo(locale, next);
 }

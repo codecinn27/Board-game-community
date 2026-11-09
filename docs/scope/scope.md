@@ -22,6 +22,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 22 | Shelf: By owner view | Next (frontend, dummy data) | planned |
 | 21 | Live data for home, shelf, and game sheet | Slice 2 | in-progress |
 | 6 | Member accounts | Slice 2 | in-progress |
+| 23 | Welcome email | Slice 2 | in-progress |
 | 7 | Add a game I own | Slice 2 | planned |
 | 10 | Online game lookup | Slice 3 | planned |
 | 11 | Paste a link to auto fill | Slice 3 | planned |
@@ -189,6 +190,17 @@ Register, sign in, sign out. Anyone can browse without an account; only members 
   - [x] Dice Galaxy checks: browser checks at 360 and 1280, `/design` block, "Auth Dice Galaxy scene" section in `docs/design.md` (AC-16 to 21)
 Spec [0010](../specs/0010-member-accounts/index.md) · design [design D, Dice Galaxy](https://claude.ai/artifact/DZFyiGJt9u5mP3sL34Rfnk) · code in `src/lib/auth/`, `src/components/auth/`, `src/app/[locale]/sign-in/`, `src/app/auth/`, `src/proxy.ts`, `messages/`
 
+### 23. Welcome email · in-progress
+After a person registers, they get a welcome email in the language they signed up in, sent through Resend from `mail@tabletop.ianhee.com`, capped at 80 a day. The same Resend account makes password reset emails work on the hosted project. One Playwright command proves register, email, and cleanup on the local stack.
+**Done when:** a new member receives the welcome email in English or Chinese, sign up still works when email fails, reset emails reach real members, and `pnpm test:e2e` checks the email in Mailpit and deletes its test accounts.
+- [x] Design it (spec): `/architect welcome email`
+- [ ] Build it: `/develop welcome email`
+  - [x] Local mail path, `email_sends` table with `claim_email_slot`, pgTAP (AC-1, 6 to 9)
+  - [x] Thin thread: `after()` in sign up, transport, minimal English email, Playwright reads Mailpit and cleans up (AC-1, 4, 11)
+  - [x] Full content in both languages, escaping, cap and failure handling, sweeper, privacy bullet, Vitest (AC-2, 3, 5 to 7, 11, 13)
+  - [ ] Production: Resend domain and DNS at Shinjiru, Vercel env, hosted Supabase SMTP (AC-1, 10, 12)
+Spec [0011](../specs/0011-welcome-email/index.md) · code in `src/lib/email/`, `src/lib/supabase/email-sends.ts`, `src/app/[locale]/sign-in/actions.ts`, `supabase/migrations/`, `e2e/`, `messages/`
+
 ### 7. Add a game I own · needs a decision
 A member searches your own database first; if the game is there they mark "I own this", if not they enter it manually. Seeing who already owns a game helps avoid duplicate buys, but it is information only, never a block. This also wires up the "I own this" button on the game sheet.
 **Done when:** a member can add a game they own; the search shows if the community already owns it (and who), and the member can still add themselves as an owner; the game's details are stored once and shared by all its owners; a member can add or remove themselves as an owner from the game sheet.
@@ -264,6 +276,7 @@ Out of scope for the current build pass, kept so the plan stays honest.
 - **Big catalog import**: preload thousands of games from online · you chose to list only games members add
 - **Malay language**: a third language · needs a decision
 - **Usage analytics**: see how often the site is used · needs a decision
+- **E2E and database tests in CI**: a GitHub Actions job running `supabase start`, pgTAP, and Playwright with `E2E_REGISTER=1` · from spec 0011
 
 ## Legend
 

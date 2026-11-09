@@ -25,14 +25,14 @@ export type Database = {
           Tables: {
             "admin_actions": {
                   Row: {
-                    "action": string,"admin_id": string | null,"created_at": string,"details": Json,"id": number,"target_id": string,"target_table": string
+                    "action": string,"admin_id": string | null,"created_at": string,"details": NonNullable<Json>,"id": number,"target_id": string,"target_table": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "action": string,"admin_id"?: string | null,"created_at"?: string,"details"?: Json,"id"?: never,"target_id": string,"target_table": string
+                    "action": string,"admin_id"?: string | null,"created_at"?: string,"details"?: NonNullable<Json>,"id"?: never,"target_id": string,"target_table": string
                   }
                   Update: {
-                    "action"?: string,"admin_id"?: string | null,"created_at"?: string,"details"?: Json,"id"?: never,"target_id"?: string,"target_table"?: string
+                    "action"?: string,"admin_id"?: string | null,"created_at"?: string,"details"?: NonNullable<Json>,"id"?: never,"target_id"?: string,"target_table"?: string
                   }
                   Relationships: [
                     {
@@ -74,6 +74,20 @@ isOneToOne: false
       referencedRelation: "profiles"
       referencedColumns: ["id"]
     }
+                  ]
+                },"email_sends": {
+                  Row: {
+                    "id": number,"kind": string,"sent_at": string,"status": string,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "id"?: never,"kind": string,"sent_at"?: string,"status"?: string,"user_id": string
+                  }
+                  Update: {
+                    "id"?: never,"kind"?: string,"sent_at"?: string,"status"?: string,"user_id"?: string
+                  }
+                  Relationships: [
+                    
                   ]
                 },"game_owners": {
                   Row: {
@@ -129,14 +143,14 @@ isOneToOne: false
                   ]
                 },"profiles": {
                   Row: {
-                    "avatar_path": string | null,"created_at": string,"display_name": string,"id": string,"role": Database["public"]['Enums']["member_role"],"status": Database["public"]['Enums']["member_status"]
+                    "avatar_path": string | null,"created_at": string,"display_name": string,"id": string,"role": Database["public"]['Enums']["member_role"],"status": Database["public"]['Enums']["member_status"],"username": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "avatar_path"?: string | null,"created_at"?: string,"display_name": string,"id": string,"role"?: Database["public"]['Enums']["member_role"],"status"?: Database["public"]['Enums']["member_status"]
+                    "avatar_path"?: string | null,"created_at"?: string,"display_name": string,"id": string,"role"?: Database["public"]['Enums']["member_role"],"status"?: Database["public"]['Enums']["member_status"],"username": string
                   }
                   Update: {
-                    "avatar_path"?: string | null,"created_at"?: string,"display_name"?: string,"id"?: string,"role"?: Database["public"]['Enums']["member_role"],"status"?: Database["public"]['Enums']["member_status"]
+                    "avatar_path"?: string | null,"created_at"?: string,"display_name"?: string,"id"?: string,"role"?: Database["public"]['Enums']["member_role"],"status"?: Database["public"]['Enums']["member_status"],"username"?: string
                   }
                   Relationships: [
                     
@@ -258,9 +272,12 @@ isOneToOne: false
           }
           Functions: {
             "admin_set_member_status":
-{ Args: { "new_status": Database["public"]["Enums"]["member_status"],"target": string }; Returns: undefined
-                           }
-            "save_top_picks":
+{ Args: { "new_status": Database["public"]['Enums']["member_status"],"target": string }; Returns: undefined
+                           },
+"claim_email_slot":
+{ Args: { "p_cap": number,"p_kind": string,"p_user_id": string }; Returns: string
+                           },
+"save_top_picks":
 { Args: { "game_ids": (number)[] }; Returns: undefined
                            }
           }

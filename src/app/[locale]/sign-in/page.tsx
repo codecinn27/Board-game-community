@@ -4,6 +4,9 @@ import { Suspense } from "react";
 import { AuthScene, AuthSkeleton } from "@/components/auth/auth-scene";
 import { SignInContent } from "@/components/auth/sign-in-content";
 
+// Room for `after()` to finish the welcome email (spec 0011): three 10 s SMTP timeouts plus two database calls.
+export const maxDuration = 30;
+
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("auth.meta.signIn");
   return {
