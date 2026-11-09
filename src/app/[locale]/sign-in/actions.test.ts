@@ -23,6 +23,12 @@ vi.mock("@/lib/supabase/server", () => ({
   createClient: async () => ({ auth }),
 }));
 
+vi.mock("next/server", () => ({ after: (f: () => unknown) => void f() }));
+const sendWelcomeEmail = vi.fn();
+vi.mock("@/lib/email/send-welcome", () => ({
+  sendWelcomeEmail: (request: unknown) => sendWelcomeEmail(request),
+}));
+
 const verifyTurnstile = vi.fn();
 vi.mock("@/lib/auth/turnstile", () => ({
   verifyTurnstile: (token: string) => verifyTurnstile(token),
@@ -131,7 +137,7 @@ describe("signUpWithEmail", () => {
   it("sends the name and the token, then signs the member in at once", async () => {
     cookieJar.set("invite_pass", await validPass());
     auth.signUp.mockResolvedValue({
-      data: { session: { access_token: "t" }, user: {} },
+      data: { session: { access_token: "t" }, user: { id: "u1" } },
       error: null,
     });
     const { signUpWithEmail } = await import("./actions");
@@ -144,6 +150,57 @@ describe("signUpWithEmail", () => {
     expect(call.options.data.full_name).toBe("Mei");
     expect(call.options.captchaToken).toBe("tok");
     expect(cookieStore.delete).toHaveBeenCalledWith("invite_pass");
+  });
+
+  it("sends the welcome email after sign up, in the page language", async () => {
+    cookieJar.set("invite_pass", await validPass());
+    auth.signUp.mockResolvedValue({
+      data: { session: { access_token: "t" }, user: { id: "u1" } },
+      error: null,
+    });
+    const { signUpWithEmail } = await import("./actions");
+    await expect(signUpWithEmail({}, form(register))).rejects.toThrow(
+      "REDIRECT",
+    );
+    expect(sendWelcomeEmail).toHaveBeenCalledTimes(1);
+    expect(sendWelcomeEmail).toHaveBeenCalledWith({
+      userId: "u1",
+      email: "mei@example.com",
+      displayName: "Mei",
+      locale: "en",
+      siteUrl: "http://localhost:3000",
+    });
+  });
+
+  it("uses the Chinese locale from the form", async () => {
+    cookieJar.set("invite_pass", await validPass());
+    auth.signUp.mockResolvedValue({
+      data: { session: { access_token: "t" }, user: { id: "u1" } },
+      error: null,
+    });
+    const { signUpWithEmail } = await import("./actions");
+    await expect(
+      signUpWithEmail({}, form({ ...register, locale: "zh" })),
+    ).rejects.toThrow("REDIRECT");
+    expect(sendWelcomeEmail).toHaveBeenCalledWith(
+      expect.objectContaining({ locale: "zh" }),
+    );
+  });
+
+  it("sends no email when sign up fails or returns no session", async () => {
+    cookieJar.set("invite_pass", await validPass());
+    const { signUpWithEmail } = await import("./actions");
+    auth.signUp.mockResolvedValue({
+      data: { session: null },
+      error: { code: "user_already_exists", status: 422 },
+    });
+    await signUpWithEmail({}, form(register));
+    auth.signUp.mockResolvedValue({
+      data: { session: null, user: { id: "u1" } },
+      error: null,
+    });
+    await signUpWithEmail({}, form(register));
+    expect(sendWelcomeEmail).not.toHaveBeenCalled();
   });
 
   it("says so when the email already has an account", async () => {

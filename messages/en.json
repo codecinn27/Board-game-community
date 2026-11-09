@@ -267,10 +267,28 @@
     "handlers": {
       "supabase": "Supabase stores accounts and data.",
       "vercel": "Vercel hosts the website.",
-      "turnstile": "Cloudflare Turnstile checks that a visitor is a person, on the sign in and sign up forms."
+      "turnstile": "Cloudflare Turnstile checks that a visitor is a person, on the sign in and sign up forms.",
+      "resend": "Resend sends our account emails (such as the welcome email and password resets). It receives your email address and display name for that purpose."
     },
     "choicesHeading": "Your choices",
     "choices": "You can change your display name any time on the Me page. To delete your account, ask the group admin.",
     "back": "Back to home"
+  },
+  "WelcomeEmail": {
+    "siteName": "Board Game Shelf",
+    "subject": "Welcome to Board Game Shelf",
+    "preheader": "Your account is ready. Here is where to start.",
+    "greeting": "Welcome, {name}!",
+    "ready": "Your account is ready. Here is what you can do in the community:",
+    "canDoHeading": "What members can do",
+    "canDoBrowse": "Browse the shelf and see who owns what",
+    "canDoAddGames": "Add the games you own",
+    "canDoRate": "Rate games",
+    "canDoComment": "Leave comments",
+    "canDoTopFive": "Keep a top 5",
+    "canDoWishlist": "Grow a wishlist",
+    "button": "Open the shelf",
+    "signoff": "See you at the table!",
+    "footer": "You are receiving this because you created an account at {site}."
   }
 }

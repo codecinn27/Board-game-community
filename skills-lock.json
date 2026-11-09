@@ -43,6 +43,12 @@
       "skillPath": "skills/document/SKILL.md",
       "computedHash": "a47c5d29a1263d987c2fa05dbc993a5276aaf6c4ddc54fbd329463a5f3a1aa77"
     },
+    "email-best-practices": {
+      "source": "resend/email-best-practices",
+      "sourceType": "github",
+      "skillPath": "SKILL.md",
+      "computedHash": "b4a437c9755548eb281dab3ee8e7e85010effa0f3f90ec5371b3c1084d3b257a"
+    },
     "playwright-cli": {
       "source": "microsoft/playwright-cli",
       "sourceType": "github",

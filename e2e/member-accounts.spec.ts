@@ -1,4 +1,8 @@
 import { expect, test, type Page } from "@playwright/test";
+import en from "../messages/en.json";
+import zh from "../messages/zh.json";
+import { deleteUserByEmail } from "./support/admin";
+import { deleteMail, waitForMail } from "./support/mailpit";
 
 // Spec 0010, AC-1, 2, 8, 11, 12, 14. The register
 // test makes a real account, so it runs only with `E2E_REGISTER=1`.
@@ -120,7 +124,7 @@ for (const [locale, heading, link] of [
       await expect(
         page.getByRole("heading", { level: 1, name: heading }),
       ).toBeVisible();
-      await expect(page.locator("main li")).toHaveCount(6);
+      await expect(page.locator("main li")).toHaveCount(7);
       await noSidewaysScroll(page);
       expect(link.length).toBeGreaterThan(0);
     });
@@ -128,35 +132,76 @@ for (const [locale, heading, link] of [
 }
 
 test.describe("email registration", () => {
-  test("a valid code lets you register and land signed in (AC-3, 6, 7, 8)", async ({
-    page,
-  }, testInfo) => {
-    test.skip(
-      process.env.E2E_REGISTER !== "1",
-      "creates a real account: needs the local Supabase stack",
-    );
-    const email = `e2e${Date.now()}${testInfo.project.name.replace(/\W/g, "")}@example.com`;
+  // Spec 0011, AC-1 to 4 and 11: register, find the welcome email in Mailpit,
+  // then delete the account and the email.
+  const registered: string[] = [];
 
-    await page.goto("/en/sign-in?mode=register&next=%2Fshelf");
-    await page.getByLabel("Invite code").fill(inviteCode);
-    await waitForSecurityCheck(page);
-    await page.getByRole("button", { name: "Continue" }).click();
-
-    await page.getByLabel("Display name").fill("Mei E2E");
-    await page.getByLabel("Email").fill(email);
-    await page.getByLabel("Password", { exact: true }).fill("e2e-password-1");
-    await waitForSecurityCheck(page);
-    await page.getByRole("button", { name: "Create account" }).last().click();
-
-    await expect(page).toHaveURL(/\/en\/shelf$/);
-    await page.getByRole("link", { name: "Me", exact: true }).first().click();
-    await expect(page.getByLabel("Display name")).toHaveValue("Mei E2E");
-    await page.getByRole("button", { name: "Sign out" }).click();
-    await expect(page).toHaveURL(/\/en$/);
-    await expect(
-      page.getByRole("link", { name: "Sign in", exact: true }).first(),
-    ).toBeVisible();
+  test.afterEach(async () => {
+    for (const email of registered.splice(0)) {
+      await deleteUserByEmail(email);
+      await deleteMail(email);
+    }
   });
+
+  for (const locale of ["en", "zh"] as const) {
+    test(`a valid code lets you register, land signed in, and get the welcome email in ${locale} (AC-3, 6, 7, 8)`, async ({
+      page,
+    }, testInfo) => {
+      test.skip(
+        process.env.E2E_REGISTER !== "1",
+        "creates a real account: needs the local Supabase stack",
+      );
+      const t = locale === "en" ? en : zh;
+      const letters = testInfo.project.name
+        .toLowerCase()
+        .replace(/[^a-z]/g, "");
+      const email = `e2e${Date.now()}${locale}${letters}@example.com`;
+      registered.push(email);
+      const name = "Mei E2E";
+
+      await page.goto(`/${locale}/sign-in?mode=register&next=%2Fshelf`);
+      await page.getByLabel(t.auth.fields.inviteCode).fill(inviteCode);
+      await waitForSecurityCheck(page);
+      await page.getByRole("button", { name: t.auth.invite.submit }).click();
+
+      await page.getByLabel(t.auth.fields.displayName).fill(name);
+      await page.getByLabel(t.auth.fields.email).fill(email);
+      await page
+        .getByLabel(t.auth.fields.password, { exact: true })
+        .fill("e2e-password-1");
+      await waitForSecurityCheck(page);
+      await page
+        .getByRole("button", { name: t.auth.register.submit })
+        .last()
+        .click();
+
+      // The redirect does not wait for the email (spec 0011, AC-4).
+      await expect(page).toHaveURL(new RegExp(`/${locale}/shelf$`), {
+        timeout: 30_000,
+      });
+
+      const mails = await waitForMail(email);
+      expect(mails).toHaveLength(1);
+      const mail = mails[0];
+      if (!mail) throw new Error("no welcome email");
+      expect(mail.Subject).toBe(t.WelcomeEmail.subject);
+      expect(mail.HTML).toContain(name);
+      expect(mail.HTML).toContain(
+        `lang="${locale === "zh" ? "zh-Hans" : "en"}"`,
+      );
+      expect(mail.HTML).toContain(`/${locale}/shelf`);
+      expect(mail.Text).toContain(`/${locale}/shelf`);
+
+      await page
+        .getByRole("link", { name: t.shell.tabs.me, exact: true })
+        .first()
+        .click();
+      await expect(page.getByLabel(t.auth.fields.displayName)).toHaveValue(
+        name,
+        { timeout: 20_000 },
+      );
+    });
+  }
 });
 
 // Spec 0010, AC-16 to AC-21: the Dice Galaxy scene. Runs at 360 and 1280

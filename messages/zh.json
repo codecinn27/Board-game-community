@@ -267,10 +267,28 @@
     "handlers": {
       "supabase": "Supabase 存储账号和数据。",
       "vercel": "Vercel 托管网站。",
-      "turnstile": "Cloudflare Turnstile 在登录和注册表单上检查访问者是真人。"
+      "turnstile": "Cloudflare Turnstile 在登录和注册表单上检查访问者是真人。",
+      "resend": "Resend 负责发送账号邮件（例如欢迎邮件和重设密码邮件），为此会收到你的邮箱地址和显示名称。"
     },
     "choicesHeading": "你的选择",
     "choices": "你可以随时在“我的”页面修改显示名称。如需删除账号，请联系群管理员。",
     "back": "返回首页"
+  },
+  "WelcomeEmail": {
+    "siteName": "桌游书架",
+    "subject": "欢迎加入桌游书架",
+    "preheader": "你的账号已经准备好了，从这里开始吧。",
+    "greeting": "欢迎你，{name}！",
+    "ready": "你的账号已经准备好了。在社区里你可以：",
+    "canDoHeading": "会员可以做什么",
+    "canDoBrowse": "浏览书架，看看谁拥有哪些游戏",
+    "canDoAddGames": "添加你拥有的游戏",
+    "canDoRate": "给游戏评分",
+    "canDoComment": "留下评论",
+    "canDoTopFive": "列出你的前五名",
+    "canDoWishlist": "建立愿望清单",
+    "button": "打开书架",
+    "signoff": "桌游桌上见！",
+    "footer": "你收到这封邮件，是因为你在 {site} 创建了账号。"
   }
 }

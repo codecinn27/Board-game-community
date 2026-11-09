@@ -14,7 +14,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 const STORED = ["email", "name", "activity"] as const;
-const HANDLERS = ["supabase", "vercel", "turnstile"] as const;
+const HANDLERS = ["supabase", "vercel", "turnstile", "resend"] as const;
 
 export default async function PrivacyPage() {
   const t = await getTranslations("privacy");

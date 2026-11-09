@@ -1,7 +1,8 @@
 "use server";
 
 import { cookies } from "next/headers";
-import { goTo, localeOf, nextOf } from "@/lib/auth/actions-support";
+import { after } from "next/server";
+import { goTo, localeOf, nextOf, siteUrl } from "@/lib/auth/actions-support";
 import { authErrorKey } from "@/lib/auth/errors";
 import {
   INVITE_COOKIE,
@@ -19,6 +20,7 @@ import {
   field,
   type FieldCode,
 } from "@/lib/auth/validation";
+import { sendWelcomeEmail } from "@/lib/email/send-welcome";
 import { requireEnv } from "@/lib/supabase/env";
 import { createClient } from "@/lib/supabase/server";
 
@@ -122,5 +124,19 @@ export async function signUpWithEmail(
   // Email confirmation is off, so sign up returns a session: the member is
   // signed in at once. No session means the project setting is wrong.
   if (!result.session) return { error: "generic", values };
+
+  // The welcome email goes out after the response, so it never slows or blocks
+  // sign up (spec 0011, AC-4). It never throws.
+  const userId = result.user?.id;
+  if (userId) {
+    const request = {
+      userId,
+      email: email.value,
+      displayName: name.value,
+      locale,
+      siteUrl: siteUrl(),
+    };
+    after(() => sendWelcomeEmail(request));
+  }
   return goTo(locale, next);
 }
