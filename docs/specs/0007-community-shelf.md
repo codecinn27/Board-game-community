@@ -249,8 +249,8 @@ Order follows the project default, Tracer Bullet: the thin thread (read layer, t
 9. [x] Vitest component tests for AC-7 to AC-9; browser checks in `e2e/shelf.spec.ts` (360px and 1280px, light theme, both languages) for AC-1 to AC-6; update `e2e/home.spec.ts` where it expects the tracer page, satisfies **AC-1** to **AC-9**.
 
 *Part 2: By owner (later strand of this feature)*
-10. Extend `buildShelfData` with `owners: OwnerShelf[]` (members A to Z, games A to Z, members with no games left out) and tests, satisfies **AC-13**.
-11. `OwnerShelves` (sections, avatar, strips); delete `by-owner-placeholder.tsx` and its two messages; add `shelf.byOwner.count`, satisfies **AC-13**, **AC-14**, **AC-15**.
+10. [x] Extend `buildShelfData` with `owners: OwnerShelf[]` (members A to Z, games A to Z, members with no games left out) and tests, satisfies **AC-13**.
+11. [x] `OwnerShelves` (sections, avatar, strips); delete `by-owner-placeholder.tsx` and its two messages; add `shelf.byOwner.count`, satisfies **AC-13**, **AC-14**, **AC-15**.
 12. Browser checks for the By owner view at both widths, light theme, both languages, satisfies **AC-13**, **AC-14**.
 
 ## Consequences

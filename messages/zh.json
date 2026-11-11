@@ -86,9 +86,13 @@
       "retry": "重试"
     },
     "byOwner": {
-      "soon": {
-        "title": "按主人查看即将上线",
-        "body": "很快就能在这里看到每位成员的游戏。"
+      "count": "{count, plural, other {# 款游戏}}",
+      "filter": {
+        "label": "按主人筛选",
+        "placeholder": "搜索主人",
+        "clear": "清除",
+        "empty": "没有匹配的主人",
+        "remove": "移除 {name}"
       }
     }
   },

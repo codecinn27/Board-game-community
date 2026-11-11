@@ -30,8 +30,23 @@ const data: ShelfData = {
       avgRecommendation: null,
     },
   ],
+  owners: [
+    {
+      memberId: "m1",
+      name: "Mei",
+      games: [
+        { id: 1, name: "Azul", coverTint: null, coverPath: null },
+        { id: 2, name: "Dixit", coverTint: null, coverPath: null },
+      ],
+    },
+    {
+      memberId: "m2",
+      name: "Sara",
+      games: [{ id: 1, name: "Azul", coverTint: null, coverPath: null }],
+    },
+  ],
 };
-const empty: ShelfData = { games: [] };
+const empty: ShelfData = { games: [], owners: [] };
 
 describe("ShelfContent", () => {
   beforeEach(() => setLocale("en"));
@@ -46,7 +61,7 @@ describe("ShelfContent", () => {
 
   // covers: AC-1
   it("says 1 game, and counts in Chinese", () => {
-    const one: ShelfData = { games: data.games.slice(0, 1) };
+    const one: ShelfData = { ...data, games: data.games.slice(0, 1) };
     expect(textOf(render(<ShelfContent data={one} view="all" />))).toContain(
       "1 game",
     );
@@ -82,14 +97,52 @@ describe("ShelfContent", () => {
     expect(textOf(html)).toContain("按主人");
   });
 
-  // covers: AC-6
-  it("shows the placeholder, the count, and the switch but no grid for By owner", () => {
+  // covers: AC-13, AC-14
+  it("shows one section per member with their games for By owner", () => {
     const html = render(<ShelfContent data={data} view="owner" />);
 
-    expect(textOf(html)).toContain("By owner is coming soon");
     expect(textOf(html)).toContain("2 games");
     expect(html).toContain("<nav");
-    expect(html).not.toContain("<li");
+    expect(html.match(/<h2/g)).toHaveLength(2);
+    expect(html.indexOf("Mei")).toBeLessThan(html.indexOf("Sara"));
+    expect(textOf(html)).toContain("1 game");
+    expect(html.match(/href="\/en\/games\/\d+"/g)).toHaveLength(3);
+  });
+
+  // covers: AC-16
+  it("shows the owner filter with every section and no chips or Clear at first", () => {
+    const html = render(<ShelfContent data={data} view="owner" />);
+
+    expect(html).toContain('placeholder="Search owners"');
+    expect(html).toContain('role="combobox"');
+    expect(html.match(/<h2/g)).toHaveLength(2);
+    expect(textOf(html)).not.toContain("Clear");
+  });
+
+  // covers: AC-14
+  it("gives the avatar a static cover color class", () => {
+    const html = render(<ShelfContent data={data} view="owner" />);
+
+    expect(html).toMatch(/class="[^"]*text-foreground[^"]*bg-cover-[1-6]/);
+  });
+
+  // covers: AC-13
+  it("shows the empty block for By owner when nobody owns a game", () => {
+    const html = render(
+      <ShelfContent data={{ ...data, owners: [] }} view="owner" />,
+    );
+
+    expect(textOf(html)).toContain("The shelf is empty");
+    expect(html).not.toContain("<nav");
+  });
+
+  // covers: AC-13
+  it("writes the member count in Chinese", () => {
+    setLocale("zh");
+
+    const html = render(<ShelfContent data={data} view="owner" />);
+
+    expect(textOf(html)).toContain("2 款游戏");
   });
 
   // covers: AC-7

@@ -86,9 +86,13 @@
       "retry": "Try again"
     },
     "byOwner": {
-      "soon": {
-        "title": "By owner is coming soon",
-        "body": "Soon you will see each member's games here."
+      "count": "{count, plural, one {# game} other {# games}}",
+      "filter": {
+        "label": "Filter by owner",
+        "placeholder": "Search owners",
+        "clear": "Clear",
+        "empty": "No owner matches",
+        "remove": "Remove {name}"
       }
     }
   },

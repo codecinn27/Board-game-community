@@ -141,7 +141,7 @@ describe("getShelfData", () => {
   // covers: AC-9
   it("is an empty shelf, not an error, for an empty database", async () => {
     use(emptyTables());
-    expect(await getShelfData()).toEqual({ games: [] });
+    expect(await getShelfData()).toEqual({ games: [], owners: [] });
   });
 
   // covers: AC-11

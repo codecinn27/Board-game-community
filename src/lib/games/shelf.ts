@@ -1,8 +1,11 @@
 import { cacheLife, cacheTag } from "next/cache";
 import { createPublicClient } from "@/lib/supabase/public";
 import { GAMES_TAG } from "./cache";
-import { fetchOwnerRows, fetchShelfGames } from "./rows";
+import { compareNames } from "./compare-names";
+import { fetchOwnerRows, fetchProfileRows, fetchShelfGames } from "./rows";
 import { type OwnerRow, type ProfileRow, type ShelfGame } from "./types";
+
+export { compareNames };
 
 export type ShelfCard = {
   id: number;
@@ -13,29 +16,68 @@ export type ShelfCard = {
   avgRecommendation: number | null;
 };
 
-export type ShelfData = { games: ShelfCard[] };
+export type OwnerGame = {
+  id: number;
+  name: string;
+  coverTint: string | null;
+  coverPath: string | null;
+};
+
+export type OwnerShelf = {
+  memberId: string;
+  name: string;
+  games: OwnerGame[];
+};
+
+export type ShelfData = { games: ShelfCard[]; owners: OwnerShelf[] };
 
 /**
- * Name A to Z: lowercased with `toLowerCase()` (not the locale version), then
- * compared one character at a time by code point; the shorter name wins a tie.
- * Ties on the whole name are broken by the caller, by id.
+ * One section per member who owns at least one game: members A to Z (ties by
+ * id), each with their games A to Z (ties by id), every game once.
  */
-export function compareNames(a: string, b: string): number {
-  const left = Array.from(a.toLowerCase());
-  const right = Array.from(b.toLowerCase());
-  const shared = Math.min(left.length, right.length);
-  for (let i = 0; i < shared; i++) {
-    const diff =
-      (left[i]?.codePointAt(0) ?? 0) - (right[i]?.codePointAt(0) ?? 0);
-    if (diff !== 0) return diff;
+function buildOwnerShelves(
+  games: ShelfGame[],
+  profiles: ProfileRow[],
+  owners: OwnerRow[],
+): OwnerShelf[] {
+  const gamesById = new Map(games.map((g) => [g.id, g]));
+  const byMember = new Map<string, Map<number, ShelfGame>>();
+  for (const o of owners) {
+    const game = gamesById.get(o.game_id);
+    if (game === undefined) continue;
+    const owned = byMember.get(o.member_id) ?? new Map<number, ShelfGame>();
+    owned.set(game.id, game);
+    byMember.set(o.member_id, owned);
   }
-  return left.length - right.length;
+
+  const shelves: OwnerShelf[] = [];
+  for (const profile of profiles) {
+    const owned = byMember.get(profile.id);
+    if (owned === undefined || owned.size === 0) continue;
+    shelves.push({
+      memberId: profile.id,
+      name: profile.display_name,
+      games: [...owned.values()]
+        .sort((a, b) => compareNames(a.name, b.name) || a.id - b.id)
+        .map((g) => ({
+          id: g.id,
+          name: g.name,
+          coverTint: g.cover_tint,
+          coverPath: g.cover_path,
+        })),
+    });
+  }
+  return shelves.sort(
+    (a, b) =>
+      compareNames(a.name, b.name) ||
+      (a.memberId < b.memberId ? -1 : a.memberId > b.memberId ? 1 : 0),
+  );
 }
 
 /** Pure: everything the shelf shows, from the row sets. */
 export function buildShelfData(
   games: ShelfGame[],
-  _profiles: ProfileRow[],
+  profiles: ProfileRow[],
   owners: OwnerRow[],
 ): ShelfData {
   const ownerCounts = new Map<number, number>();
@@ -44,6 +86,7 @@ export function buildShelfData(
   }
 
   return {
+    owners: buildOwnerShelves(games, profiles, owners),
     games: [...games]
       .sort((a, b) => compareNames(a.name, b.name) || a.id - b.id)
       .map((g) => ({
@@ -64,11 +107,12 @@ export async function getShelfData(): Promise<ShelfData> {
   cacheTag(GAMES_TAG);
 
   const client = createPublicClient();
-  const [games, owners] = await Promise.all([
+  const [games, owners, profiles] = await Promise.all([
     fetchShelfGames(client),
     fetchOwnerRows(client),
+    fetchProfileRows(client),
   ]);
-  return buildShelfData(games, [], owners);
+  return buildShelfData(games, profiles, owners);
 }
 
 export type ShelfView = "all" | "owner";
