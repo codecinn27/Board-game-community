@@ -55,7 +55,7 @@ describe("ShelfLoader", () => {
     ["x", "all"],
     [["owner", "owner"], "all"],
   ])("reads ?view=%j as %s", async (value, expected) => {
-    shelf.getShelfData.mockResolvedValue({ games: [] });
+    shelf.getShelfData.mockResolvedValue({ games: [], owners: [] });
 
     const out = (await ShelfLoader({
       searchParams: Promise.resolve({ view: value }),

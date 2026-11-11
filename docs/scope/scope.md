@@ -19,7 +19,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 15 | Home page | Slice 1 (frontend, dummy data) | done |
 | 8 | Community shelf | Slice 1 (frontend, dummy data) | in-progress |
 | 9 | Game detail sheet | Slice 1 (frontend, dummy data) | in-progress |
-| 22 | Shelf: By owner view | Next (frontend, dummy data) | planned |
+| 22 | Shelf: By owner view | Next (frontend, dummy data) | in-progress |
 | 21 | Live data for home, shelf, and game sheet | Slice 2 | in-progress |
 | 6 | Member accounts | Slice 2 | in-progress |
 | 23 | Welcome email | Slice 2 | in-progress |
@@ -148,13 +148,13 @@ Spec [0008](../specs/0008-game-detail-sheet.md) · code in `src/app/[locale]/gam
 
 Moved out of feature 8 (Community shelf) so the shelf could be finished. It is still dummy data and still front end only, so do it before Slice 2.
 
-### 22. Shelf: By owner view · planned
+### 22. Shelf: By owner view · in-progress
 The "By owner" view at `/shelf?view=owner`: one section per member who owns at least one game, members A to Z, each with a row of their games that scrolls sideways inside itself. It replaces the "coming soon" note the shelf shows today.
 **Done when:** a visitor switches to By owner and sees every member with their games as a sideways strip of covers, with no sideways scroll of the page at 360px, and the loading and error states match All games.
 - [x] Design it (spec): already written as part 2 of [spec 0007](../specs/0007-community-shelf.md) (AC-13 to 15, build plan tasks 10 to 12); `/architect shelf by owner view` can split it into its own spec
 - [ ] Build it: `/develop shelf by owner view`
-  - [ ] Read layer: owner rows in `buildShelfData` (members A to Z, games A to Z, members with no games left out) and tests (AC-13)
-  - [ ] `OwnerShelves`: member sections with avatar and game strips; delete the placeholder and its two messages (AC-13 to 15)
+  - [x] Read layer: owner rows in `buildShelfData` (members A to Z, games A to Z, members with no games left out) and tests (AC-13)
+  - [x] `OwnerShelves`: member sections with avatar and game strips; delete the placeholder and its two messages (AC-13 to 15)
   - [ ] Browser checks for By owner at both widths and both languages (AC-13, 14)
 Spec [0007](../specs/0007-community-shelf.md) (part 2) · code in `src/components/shelf/`, `src/lib/games/shelf.ts`, `messages/`
 

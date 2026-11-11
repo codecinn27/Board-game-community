@@ -22,7 +22,8 @@ const copy = {
     count: "12 games",
     all: "All games",
     owner: "By owner",
-    soon: "By owner is coming soon",
+    members: ["Arif", "Jun", "Mei", "Sara"],
+    counts: ["5 games", "5 games", "5 games", "6 games"],
     owners: "4 owners",
     rating: "8.7 out of 10",
   },
@@ -30,7 +31,8 @@ const copy = {
     count: "12 款游戏",
     all: "全部游戏",
     owner: "按主人",
-    soon: "按主人查看即将上线",
+    members: ["Arif", "Jun", "Mei", "Sara"],
+    counts: ["5 款游戏", "5 款游戏", "5 款游戏", "6 款游戏"],
     owners: "4 位主人",
     rating: "8.7 分（满分 10）",
   },
@@ -117,9 +119,11 @@ for (const locale of ["en", "zh"] as const) {
       await expect(page).toHaveURL(
         new RegExp(`/${locale}/shelf[?]view=owner$`),
       );
-      await expect(page.getByText(t.soon)).toBeVisible();
       await expect(page.getByText(t.count)).toBeVisible();
-      await expect(page.locator("main ul > li")).toHaveCount(0);
+      await expect(page.locator("main h2")).toHaveText(t.members);
+      for (const count of new Set(t.counts)) {
+        await expect(page.getByText(count).first()).toBeVisible();
+      }
       await expect(nav.getByRole("link", { name: t.owner })).toHaveAttribute(
         "aria-current",
         "page",
@@ -127,6 +131,23 @@ for (const locale of ["en", "zh"] as const) {
 
       await nav.getByRole("link", { name: t.all }).click();
       await expect(page.locator("main ul > li")).toHaveCount(12);
+    });
+
+    test("By owner rows scroll inside themselves, not the page", async ({
+      page,
+    }) => {
+      await page.goto(`/${locale}/shelf?view=owner`);
+      await expect(page.locator("main h2")).toHaveCount(4);
+
+      const overflow = await page.evaluate(
+        () =>
+          document.documentElement.scrollWidth -
+          document.documentElement.clientWidth,
+      );
+      expect(overflow).toBeLessThanOrEqual(0);
+
+      const sara = page.locator("main section").filter({ hasText: "Sara" });
+      await expect(sara.locator("ul > li")).toHaveCount(6);
     });
 
     test("an unknown or repeated view shows All games", async ({ page }) => {

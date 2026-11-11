@@ -109,6 +109,62 @@ describe("buildShelfData ties", () => {
   });
 });
 
+describe("buildShelfData owners", () => {
+  const { owners } = buildShelfData(
+    fixtureGames,
+    fixtureProfiles,
+    fixtureOwners,
+  );
+
+  // covers: AC-13
+  it("lists members A to Z with their game counts", () => {
+    expect(owners.map((o) => [o.name, o.games.length])).toEqual([
+      ["Arif", 5],
+      ["Jun", 5],
+      ["Mei", 5],
+      ["Sara", 6],
+    ]);
+  });
+
+  // covers: AC-13
+  it("lists each member's games A to Z, once each", () => {
+    for (const owner of owners) {
+      const names = owner.games.map((g) => g.name);
+      expect(names).toEqual([...names].sort((a, b) => compareNames(a, b)));
+      expect(new Set(owner.games.map((g) => g.id)).size).toBe(names.length);
+    }
+  });
+
+  // covers: AC-13
+  it("leaves out a member who owns nothing and counts a repeated link once", () => {
+    const profiles = [
+      { id: "b", display_name: "Bo" },
+      { id: "a", display_name: "Al" },
+      { id: "z", display_name: "Zed" },
+    ];
+    const link = (game_id: number, member_id: string) => ({
+      game_id,
+      member_id,
+      created_at: "2026-01-01T00:00:00Z",
+    });
+    const built = buildShelfData(
+      [fixture(1, "One"), fixture(2, "Two")],
+      profiles,
+      [link(2, "b"), link(1, "b"), link(1, "b"), link(1, "a")],
+    );
+
+    expect(built.owners.map((o) => o.name)).toEqual(["Al", "Bo"]);
+    expect(built.owners[1]?.games.map((g) => g.id)).toEqual([1, 2]);
+  });
+
+  // covers: AC-13
+  it("has no owners when no links exist", () => {
+    expect(buildShelfData(fixtureGames, fixtureProfiles, []).owners).toEqual(
+      [],
+    );
+  });
+});
+
 describe("parseShelfView", () => {
   // covers: AC-5
   it("reads owner as By owner", () => {
