@@ -3,7 +3,7 @@
 A shared, public board game shelf for your local community: it shows every game the group owns and who owns it, so nobody buys a duplicate. Members register to add their games, fill in a standard rating form, comment, keep a top 5, and grow a wishlist of games still to conquer. Mobile first, desktop second, in English and Chinese.
 
 **Build approach:** Tracer Bullet (prove one real thread through every layer first, then thicken it one strand at a time). After the foundations, the front end comes first: home, shelf, and game sheet are built on hardcoded dummy data until the design is right (Slice 1), and only then wired to the database (Slice 2 onward).
-**Workflow:** Prototype (after `/develop`: nothing more, the engineer does the self check). The project default level of rigor. `/architect` is the recommended first stop for a feature with a real decision, but skippable when you already know the build. Any feature can carry its own tag (e.g. `· GA`) to do more or less.
+**Workflow:** Prototype (after `/develop`: nothing more, the engineer does the  self check). The project default level of rigor. `/architect` is the recommended first stop for a feature with a real decision, but skippable when you already know the build. Any feature can carry its own tag (e.g. `· GA`) to do more or less.
 
 _These are recommendations to keep your build orderly, not requirements. Skip anything that does not fit: if you already know how to build a feature, use `/develop` and skip `/architect`. You decide when a feature is `done`._
 
@@ -23,7 +23,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 21 | Live data for home, shelf, and game sheet | Slice 2 | in-progress |
 | 6 | Member accounts | Slice 2 | in-progress |
 | 23 | Welcome email | Slice 2 | in-progress |
-| 7 | Add a game I own | Slice 2 | planned |
+| 7 | Add a game I own | Slice 2 | in-progress |
 | 10 | Online game lookup | Slice 3 | planned |
 | 11 | Paste a link to auto fill | Slice 3 | planned |
 | 12 | Rating form | Slice 4 | planned |
@@ -201,10 +201,17 @@ After a person registers, they get a welcome email in the language they signed u
   - [ ] Production: Resend domain and DNS at Shinjiru, Vercel env, hosted Supabase SMTP (AC-1, 10, 12)
 Spec [0011](../specs/0011-welcome-email/index.md) · code in `src/lib/email/`, `src/lib/supabase/email-sends.ts`, `src/app/[locale]/sign-in/actions.ts`, `supabase/migrations/`, `e2e/`, `messages/`
 
-### 7. Add a game I own · needs a decision
+### 7. Add a game I own · in-progress
 A member searches your own database first; if the game is there they mark "I own this", if not they enter it manually. Seeing who already owns a game helps avoid duplicate buys, but it is information only, never a block. This also wires up the "I own this" button on the game sheet.
 **Done when:** a member can add a game they own; the search shows if the community already owns it (and who), and the member can still add themselves as an owner; the game's details are stored once and shared by all its owners; a member can add or remove themselves as an owner from the game sheet.
-- [ ] Design it (spec): `/architect add a game I own`
+- [x] Design it (spec): `/architect add a game I own`
+- [ ] Build it: `/develop add a game I own`
+  - [ ] Database: migration (unique name, review columns, `search_games`, `add_game`, `set_game_reviewed`), foundation test update, pgTAP file 09 (AC-2, 4 to 6, 10, 12, 14)
+  - [ ] Thin thread to full form: `/games/new` with search, results with "I own this", manual form with every field, duplicate answer, Add tab on (AC-1 to 6)
+  - [ ] Cover: shrink and tint in the browser, server checks, upload and cleanup (AC-7, 8)
+  - [ ] Sheet dock: own state, add and remove with Undo, guest link, read only (AC-9 to 11)
+  - [ ] Admin review: viewer role, Review tab, `/admin/review` with two tabs; seeds marked reviewed; messages, metadata, browser checks (AC-12 to 15)
+Spec [0013](../specs/0013-add-game-i-own/index.md)
 
 ## Slice 3: Fill game details from online
 
