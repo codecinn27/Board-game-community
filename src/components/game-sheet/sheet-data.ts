@@ -28,7 +28,14 @@ export type SheetData = {
     sinceAfter: string;
     rows: { memberId: string; initial: string; name: string; since: string }[];
   };
-  dock: { own: string; soon: string };
+  dock: {
+    own: string;
+    owned: string;
+    removed: string;
+    undo: string;
+    readOnly: string;
+    error: string;
+  };
   share: { label: string; copied: string; copyFailed: string };
   closeLabel: string;
   /** The game's own address, such as `/en/games/1`. Absent: the current page. */
@@ -116,7 +123,14 @@ export async function buildSheetData(
         since: owner.since,
       })),
     },
-    dock: { own: t("dock.own"), soon: t("dock.soon") },
+    dock: {
+      own: t("dock.own"),
+      owned: t("dock.owned"),
+      removed: t("dock.removed"),
+      undo: t("dock.undo"),
+      readOnly: t("dock.readOnly"),
+      error: t("dock.error"),
+    },
     share: {
       label: t("share.label"),
       copied: t("share.copied"),

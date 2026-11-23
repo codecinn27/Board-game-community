@@ -1,3 +1,4 @@
+import { navViewer } from "@/lib/app-shell/nav";
 import { getViewer } from "@/lib/auth/viewer";
 import { BottomTabBar } from "./bottom-tab-bar";
 import { getShellTabs } from "./shell-tabs";
@@ -9,10 +10,10 @@ import { SiteHeader } from "./site-header";
 
 export async function ShellHeader() {
   const viewer = await getViewer();
-  return <SiteHeader tabs={await getShellTabs(viewer.kind)} />;
+  return <SiteHeader tabs={await getShellTabs(navViewer(viewer))} />;
 }
 
 export async function ShellBottomBar() {
   const viewer = await getViewer();
-  return <BottomTabBar tabs={await getShellTabs(viewer.kind)} />;
+  return <BottomTabBar tabs={await getShellTabs(navViewer(viewer))} />;
 }

@@ -5,6 +5,7 @@ import { LocalTime } from "@/components/time/local-time";
 import { NEUTRAL_SHEET_TINT } from "@/lib/games/neutral-tint";
 import { cn } from "@/lib/utils";
 import { Description } from "./description";
+import { OwnButton } from "./own-button";
 import { type SheetData } from "./sheet-data";
 import { ShareButton, ShareProvider } from "./share-button";
 import { SHEET_TITLE_ID, sheetStyle } from "./sheet-theme";
@@ -162,14 +163,7 @@ export function SheetView({
           )}
         >
           <div className="flex items-center gap-2 rounded-full border border-(--sheet-line) bg-(--sheet-dock) p-2 backdrop-blur-md">
-            <button
-              type="button"
-              disabled
-              className="flex min-h-12 flex-1 cursor-not-allowed flex-col items-center justify-center rounded-full bg-(--sheet-ink) px-4 leading-tight font-semibold text-(--sheet-ink-inverse)"
-            >
-              {data.dock.own}
-              <span className="text-xs font-medium">{data.dock.soon}</span>
-            </button>
+            <OwnButton gameId={data.id} variant={variant} labels={data.dock} />
             <ShareButton variant="dock" label={data.share.label} />
           </div>
         </div>

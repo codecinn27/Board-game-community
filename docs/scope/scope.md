@@ -206,10 +206,10 @@ A member searches your own database first; if the game is there they mark "I own
 **Done when:** a member can add a game they own; the search shows if the community already owns it (and who), and the member can still add themselves as an owner; the game's details are stored once and shared by all its owners; a member can add or remove themselves as an owner from the game sheet.
 - [x] Design it (spec): `/architect add a game I own`
 - [ ] Build it: `/develop add a game I own`
-  - [ ] Database: migration (unique name, review columns, `search_games`, `add_game`, `set_game_reviewed`), foundation test update, pgTAP file 09 (AC-2, 4 to 6, 10, 12, 14)
-  - [ ] Thin thread to full form: `/games/new` with search, results with "I own this", manual form with every field, duplicate answer, Add tab on (AC-1 to 6)
-  - [ ] Cover: shrink and tint in the browser, server checks, upload and cleanup (AC-7, 8)
-  - [ ] Sheet dock: own state, add and remove with Undo, guest link, read only (AC-9 to 11)
+  - [x] Database: migration (unique name, review columns, `search_games`, `add_game`, `set_game_reviewed`), foundation test update, pgTAP file 09 (AC-2, 4 to 6, 10, 12, 14)
+  - [x] Thin thread to full form: `/games/new` with search, results with "I own this", manual form with every field, duplicate answer, Add tab on (AC-1 to 6)
+  - [x] Cover: shrink and tint in the browser, server checks, upload and cleanup (AC-7, 8)
+  - [x] Sheet dock: own state, add and remove with Undo, guest link, read only (AC-9 to 11)
   - [ ] Admin review: viewer role, Review tab, `/admin/review` with two tabs; seeds marked reviewed; messages, metadata, browser checks (AC-12 to 15)
 Spec [0013](../specs/0013-add-game-i-own/index.md)
 

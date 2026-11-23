@@ -90,6 +90,24 @@ export function prefetchSheet(
   return request;
 }
 
+/** Forget a game's fetched sheet in every language (an owner changed). */
+export function invalidateSheet(id: number) {
+  const suffix = `:${id}`;
+  for (const key of [...results.keys()]) {
+    if (key.endsWith(suffix)) results.delete(key);
+  }
+}
+
+/**
+ * Fetch an open sheet again after an owner change and swap the new data in,
+ * without showing the loading state (spec 0013, AC-9).
+ */
+export async function refreshSheet(id: number, locale: string) {
+  invalidateSheet(id);
+  const result = await prefetchSheet(id, locale);
+  if (result.status === "ready") apply(id, result);
+}
+
 function apply(id: number, result: SheetResult) {
   if (!state.open || state.card?.id !== id) return;
   stopTimer();

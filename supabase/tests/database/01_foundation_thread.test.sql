@@ -222,15 +222,15 @@ select throws_ok($$ insert into public.games (name, source_provider, source_id)
   'AC-2: a manual game cannot carry a provider');
 select is((select name_normalized from public.games where name = 'Catan'), 'catan',
   'AC-2: name_normalized lowercases');
-insert into public.games (name, added_by) values ('Catan!', '00000000-0000-0000-0000-00000000000a');
+select throws_ok($$ insert into public.games (name, added_by)
+  values ('Catan!', '00000000-0000-0000-0000-00000000000a') $$, '23505', null,
+  'AC-2: a second spelling of an existing name is refused (spec 0013 unique rule)');
 insert into public.games (name, added_by) values ('卡坦岛', '00000000-0000-0000-0000-00000000000a');
-insert into public.games (name, added_by) values ('卡坦 岛！', '00000000-0000-0000-0000-00000000000a');
-select is((select name_normalized from public.games where name = 'Catan!'), 'catan',
-  'AC-2: punctuation is dropped so an exact match finds the existing game');
+select throws_ok($$ insert into public.games (name, added_by)
+  values ('卡坦 岛！', '00000000-0000-0000-0000-00000000000a') $$, '23505', null,
+  'AC-2: spaces and full width punctuation are ignored in the Chinese match');
 select is((select name_normalized from public.games where name = '卡坦岛'), '卡坦岛',
   'AC-2: Chinese names keep their characters');
-select is((select count(*)::int from public.games where name_normalized = '卡坦岛'), 2,
-  'AC-2: spaces and full width punctuation are ignored in the Chinese match');
 
 select * from finish();
 rollback;

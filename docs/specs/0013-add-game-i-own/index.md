@@ -1,7 +1,7 @@
 # 0013. Add a game I own, ownership toggle, and admin review
 
 **Date**: 2026-11-19
-**Status**: Proposed
+**Status**: In Progress
 
 ## Summary
 
@@ -173,15 +173,15 @@ Pages and wiring:
 
 Ordered as Tracer Bullet (the project approach): one thin thread from the database to a saved game first, then each strand thickened.
 
-1. Migration `20261119090000_add_game.sql`: duplicate check, unique name index, `reviewed_at`, `reviewed_by` (named constraint), backfill, guard update, grants, `search_games`, `add_game`, `set_game_reviewed`. Rewrite lines 225 to 233 of `01_foundation_thread.test.sql` for the unique rule. Regenerate `database.types.ts`. Satisfies **AC-5**, **AC-6**, **AC-12**
-2. pgTAP file `supabase/tests/database/09_add_game.test.sql`: search normalization and order, `%` as plain text, `mine` and `exact`, `add_game` makes game plus owner, same name `23505`, punctuation only `22023`, guest no execute, disabled member refused, adder cannot write `reviewed_*` or `cover_path` (`42501`), admin `set_game_reviewed` both ways and a double mark keeping the first reviewer, backfill marked existing rows. Satisfies **AC-2**, **AC-4**, **AC-5**, **AC-6**, **AC-10**, **AC-12**, **AC-14**
-3. Thin thread: `src/proxy.ts` skips `new`, `authRedirect` guards `/games/new`, Add tab `enabled: true`, `/games/new` page with the search box, `searchGames`, results with names and owners, "Add it yourself" with a name only form, `addGame` (no cover) redirecting to the new game page, `revalidateGames()`. Satisfies **AC-1**, **AC-2**, **AC-4**, **AC-5**
-4. Full form: `validateNewGame` (shared, Vitest), all fields with field messages, the `exists` answer showing the existing game with "I own this", result "I own this" via `markOwned`. Satisfies **AC-3**, **AC-4**, **AC-6**
-5. Cover: `cover-image.ts` (`pickTint`, quality steps, byte checks, Vitest), `cover-picker.tsx` with preview, server checks, upload, cover columns, cleanup on each failure. Satisfies **AC-7**, **AC-8**
-6. Sheet dock: `getViewer` gains `role` and `status`; `own-actions.ts` (`getOwnState`, `markOwned`, `unmarkOwned`); `own-button.tsx` with guest link, read only state, Undo for 5 seconds, sheet reload or `router.refresh()`; read only message on the Add page. Satisfies **AC-9**, **AC-10**, **AC-11**
-7. Admin: nav `admin` audience and the Review item; `getReviewQueue`; `/admin/review` page, loader with `notFound()`, tabs, rows, Show more, Looks right and Mark as not reviewed actions. Satisfies **AC-13**, **AC-14**
-8. Seeds: `supabase/seed.sql` and `src/lib/games/games-file.ts` (the SQL `pnpm seed:games` writes) set `reviewed_at = now()` on insert, and `reviewed_at = coalesce(reviewed_at, now())` in the update branch (a file entry you wrote counts as checked); update their tests. Satisfies **AC-12**
-9. Messages in `messages/en.json` and `messages/zh.json` (`addGame`, `review`, `shell.tabs.review`, dock additions), metadata with alternates and `robots: { index: false }`, Vitest for nav audiences and `authRedirect`, browser checks for add, toggle, and review at 360 px and 1280 px. Satisfies **AC-1**, **AC-13**, **AC-15**
+1. [x] Migration `20261119090000_add_game.sql`: duplicate check, unique name index, `reviewed_at`, `reviewed_by` (named constraint), backfill, guard update, grants, `search_games`, `add_game`, `set_game_reviewed`. Rewrite lines 225 to 233 of `01_foundation_thread.test.sql` for the unique rule. Regenerate `database.types.ts`. Satisfies **AC-5**, **AC-6**, **AC-12**
+2. [x] pgTAP file `supabase/tests/database/09_add_game.test.sql`: search normalization and order, `%` as plain text, `mine` and `exact`, `add_game` makes game plus owner, same name `23505`, punctuation only `22023`, guest no execute, disabled member refused, adder cannot write `reviewed_*` or `cover_path` (`42501`), admin `set_game_reviewed` both ways and a double mark keeping the first reviewer, backfill marked existing rows. Satisfies **AC-2**, **AC-4**, **AC-5**, **AC-6**, **AC-10**, **AC-12**, **AC-14**
+3. [x] Thin thread: `src/proxy.ts` skips `new`, `authRedirect` guards `/games/new`, Add tab `enabled: true`, `/games/new` page with the search box, `searchGames`, results with names and owners, "Add it yourself" with a name only form, `addGame` (no cover) redirecting to the new game page, `revalidateGames()`. Satisfies **AC-1**, **AC-2**, **AC-4**, **AC-5**
+4. [x] Full form: `validateNewGame` (shared, Vitest), all fields with field messages, the `exists` answer showing the existing game with "I own this", result "I own this" via `markOwned`. Satisfies **AC-3**, **AC-4**, **AC-6**
+5. [x] Cover: `cover-image.ts` (`pickTint`, quality steps, byte checks, Vitest), `cover-picker.tsx` with preview, server checks, upload, cover columns, cleanup on each failure. Satisfies **AC-7**, **AC-8**
+6. [x] Sheet dock: `getViewer` gains `role` and `status`; `own-actions.ts` (`getOwnState`, `markOwned`, `unmarkOwned`); `own-button.tsx` with guest link, read only state, Undo for 5 seconds, sheet reload or `router.refresh()`; read only message on the Add page. Satisfies **AC-9**, **AC-10**, **AC-11**
+7. [x] Admin: nav `admin` audience and the Review item; `getReviewQueue`; `/admin/review` page, loader with `notFound()`, tabs, rows, Show more, Looks right and Mark as not reviewed actions. Satisfies **AC-13**, **AC-14**
+8. [x] Seeds: `supabase/seed.sql` and `src/lib/games/games-file.ts` (the SQL `pnpm seed:games` writes) set `reviewed_at = now()` on insert, and `reviewed_at = coalesce(reviewed_at, now())` in the update branch (a file entry you wrote counts as checked); update their tests. Satisfies **AC-12**
+9. [ ] Messages in `messages/en.json` and `messages/zh.json` (`addGame`, `review`, `shell.tabs.review`, dock additions), metadata with alternates and `robots: { index: false }`, Vitest for nav audiences and `authRedirect`, browser checks for add, toggle, and review at 360 px and 1280 px. Satisfies **AC-1**, **AC-13**, **AC-15**
 
 ## Consequences
 

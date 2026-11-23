@@ -6,6 +6,7 @@ import {
   LibraryBig,
   LogIn,
   Plus,
+  ShieldCheck,
   type LucideIcon,
 } from "lucide-react";
 import { Suspense } from "react";
@@ -20,6 +21,7 @@ const icons: Record<NavIcon, LucideIcon> = {
   House,
   LibraryBig,
   Plus,
+  ShieldCheck,
   LogIn,
   CircleUser,
 };

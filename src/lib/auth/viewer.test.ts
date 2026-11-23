@@ -13,10 +13,16 @@ vi.mock("next/server", () => ({
 }));
 
 const getClaims = vi.fn();
+const maybeSingle = vi.fn();
 vi.mock("@/lib/supabase/server", () => ({
   createClient: async () => {
     calls.push("createClient");
-    return { auth: { getClaims } };
+    return {
+      auth: { getClaims },
+      from: () => ({
+        select: () => ({ eq: () => ({ maybeSingle }) }),
+      }),
+    };
   },
 }));
 
@@ -25,6 +31,10 @@ const { getViewer } = await import("./viewer");
 beforeEach(() => {
   calls.length = 0;
   getClaims.mockReset();
+  maybeSingle.mockReset();
+  maybeSingle.mockResolvedValue({
+    data: { role: "member", status: "active", display_name: "Arif" },
+  });
   getClaims.mockImplementation(async () => {
     calls.push("getClaims");
     return { data: null };
@@ -49,6 +59,30 @@ describe("getViewer", () => {
       kind: "member",
       id: "user-1",
       email: "a@b.co",
+      role: "member",
+      status: "active",
+      displayName: "Arif",
+    });
+  });
+
+  it("reads the admin role and a disabled status from the profile", async () => {
+    getClaims.mockResolvedValue({ data: { claims: { sub: "user-1" } } });
+    maybeSingle.mockResolvedValue({
+      data: { role: "admin", status: "disabled", display_name: "Jun" },
+    });
+    await expect(getViewer()).resolves.toMatchObject({
+      role: "admin",
+      status: "disabled",
+    });
+  });
+
+  it("counts a missing profile as an active member, never an admin", async () => {
+    getClaims.mockResolvedValue({ data: { claims: { sub: "user-1" } } });
+    maybeSingle.mockResolvedValue({ data: null });
+    await expect(getViewer()).resolves.toMatchObject({
+      role: "member",
+      status: "active",
+      displayName: null,
     });
   });
 });
