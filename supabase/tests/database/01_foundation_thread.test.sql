@@ -49,14 +49,14 @@ grant execute on all functions in schema tests to public;
 
 -- Fixture users (the sign up trigger creates their profiles) -------------------
 insert into auth.users (id, email, raw_user_meta_data) values
-  ('00000000-0000-0000-0000-00000000000a', 'alice@example.com', '{"full_name": "Alice Wong"}'),
-  ('00000000-0000-0000-0000-00000000000b', 'bob@example.com', '{}'),
-  ('00000000-0000-0000-0000-00000000000c', 'carol@example.com', '{"full_name": "   "}'),
-  ('00000000-0000-0000-0000-00000000000d', 'dave@example.com', '{}'),
-  ('00000000-0000-0000-0000-00000000000e', 'erin@example.com', '{}'),
-  ('00000000-0000-0000-0000-00000000000f', '@example.com', '{}'),
-  ('00000000-0000-0000-0000-000000000010', 'long@example.com', jsonb_build_object('full_name', repeat('x', 50))),
-  ('00000000-0000-0000-0000-000000000011', 'gina@example.com', '{}');
+  ('00000000-0000-0000-0000-00000000000a', 'alice@example.com', '{"full_name": "Alice Wong", "username": "alice"}'),
+  ('00000000-0000-0000-0000-00000000000b', 'bob@example.com', '{"username": "bob"}'),
+  ('00000000-0000-0000-0000-00000000000c', 'carol@example.com', '{"full_name": "   ", "username": "carol"}'),
+  ('00000000-0000-0000-0000-00000000000d', 'dave@example.com', '{"username": "dave"}'),
+  ('00000000-0000-0000-0000-00000000000e', 'erin@example.com', '{"username": "erin"}'),
+  ('00000000-0000-0000-0000-00000000000f', '@example.com', '{"username": "Member"}'),
+  ('00000000-0000-0000-0000-000000000010', 'long@example.com', jsonb_build_object('full_name', repeat('x', 50), 'username', 'long')),
+  ('00000000-0000-0000-0000-000000000011', 'gina@example.com', '{"username": "gina"}');
 
 -- Bootstrap by SQL: dave is the first admin, erin is disabled, gina is a disabled admin.
 update public.profiles set role = 'admin' where id = '00000000-0000-0000-0000-00000000000d';

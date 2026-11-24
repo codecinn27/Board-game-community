@@ -29,12 +29,12 @@ $$;
 
 grant execute on all functions in schema tests to public;
 
-insert into auth.users (id, email) values
-  ('00000000-0000-0000-0000-0000000000a1', 'a1@example.com'),
-  ('00000000-0000-0000-0000-0000000000a2', 'a2@example.com'),
-  ('00000000-0000-0000-0000-0000000000a3', 'a3@example.com'),
-  ('00000000-0000-0000-0000-0000000000a4', 'a4@example.com'),
-  ('00000000-0000-0000-0000-0000000000a5', 'a5@example.com');
+insert into auth.users (id, email, raw_user_meta_data) values
+  ('00000000-0000-0000-0000-0000000000a1', 'a1@example.com', '{"username": "a1_user"}'),
+  ('00000000-0000-0000-0000-0000000000a2', 'a2@example.com', '{"username": "a2_user"}'),
+  ('00000000-0000-0000-0000-0000000000a3', 'a3@example.com', '{"username": "a3_user"}'),
+  ('00000000-0000-0000-0000-0000000000a4', 'a4@example.com', '{"username": "a4_user"}'),
+  ('00000000-0000-0000-0000-0000000000a5', 'a5@example.com', '{"username": "a5_user"}');
 
 -- AC-6, AC-7: cap and duplicate ----------------------------------------------------
 set local role service_role;

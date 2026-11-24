@@ -7,6 +7,8 @@
 
 Members get an Add page (`/games/new`, the Add tab) that searches the games already on the shelf first, so they mark "I own this" on the existing record instead of creating a copy; only when nothing matches do they fill a short form, with an optional cover picture that the browser shrinks to under 150 KB. The game sheet's "I own this" button starts working: one tap adds you as an owner, one tap removes you, with a short Undo. Every new game goes live at once but starts unreviewed, and a new admin only Review tab lists those games so you can check their details and mark them "Looks right". A unique name rule in the database keeps each game stored once, even when two members save at the same moment.
 
+**Amendment 2026-11-24 (review editing)**: on the "To review" tab the admin can open any game (tap its cover, title, or description) and fix everything before approving it: name and description in English and Chinese, cover picture, players, play time, categories, and owners. "Looks right" on the card still approves at once with no editor. A reviewed game cannot be edited until it is marked "not reviewed". Every edit is written to an edit history table, and a replaced or removed cover goes to a 30 day recycle bin before it is deleted for good. This replaces the earlier plan to defer editing to feature 19 (AC-16 to AC-25, build steps 10 to 16).
+
 ## Rationale
 
 Reasoning and options: see [rationale.md](rationale.md).
@@ -19,6 +21,8 @@ Reasoning and options: see [rationale.md](rationale.md).
 - As a member, I want to add or remove myself as an owner from the game sheet, so that the shelf stays true when I buy or give away a game.
 - As a visitor, I want "I own this" to take me to sign in and back, so that I can join and mark the game without searching again.
 - As the admin, I want a list of games members added that I have not checked yet, so that I can catch wrong details early.
+- As the admin, I want to open a game in the review list and fix its name, description (English and Chinese), cover, players, play time, categories, and owners, so that I approve only correct data.
+- As the admin, I want every edit and every replaced cover kept for a while, so that I can find out what changed and undo a mistake.
 
 **Acceptance criteria**:
 - **AC-1**: The Add tab is turned on for members and admins and opens `/{locale}/games/new`. A signed out visitor who opens that path is sent to `/{locale}/sign-in?next=/games/new` and comes back to it after signing in. `/games/new` never answers the game 404 (the proxy rewrite skips it).
@@ -36,6 +40,18 @@ Reasoning and options: see [rationale.md](rationale.md).
 - **AC-13**: A Review tab (`/{locale}/admin/review`) shows in the bottom bar and the desktop header only for active admins, with no count badge. Anyone else who opens that path, guest or member, gets the not found page.
 - **AC-14**: The Review page has two tabs. "To review" lists unreviewed games, oldest added first. "Reviewed" lists reviewed games, latest reviewed first. Each row shows the cover tile, name, players, play time, description, who added it and when, and a link to the game page; Reviewed rows also show who reviewed it and when. "Looks right" moves a game to Reviewed (stamps `reviewed_at` and `reviewed_by`); "Mark as not reviewed" moves it back (clears both). Each tab shows 30 rows, with "Show more" for the next 30, and its own empty state ("All games are reviewed", "Nothing reviewed yet").
 - **AC-15**: Every new piece of text exists in English and Chinese. `/games/new` and `/admin/review` set `alternates: await getAlternates(...)` and `robots: { index: false }`. Both pages and the dock work at 360 px wide with no sideways page scroll, and the five tab bottom bar fits at 360 px for admins.
+
+**Acceptance criteria, review editing (amendment)**:
+- **AC-16**: On the "To review" tab, the cover, the name, and the description of a row are each a button (min 44 px target) that opens the editor in a modal: a bottom sheet at 360 px, a centered dialog at 1280 px. "Looks right" on the card still marks the game reviewed at once, without opening the editor, and without saving anything else. On the "Reviewed" tab the cover, name, and description do not open the editor (the name keeps its link to the game page); only "Mark as not reviewed" is offered, and after it the game is editable in "To review".
+- **AC-17**: The editor has these fields, filled with the saved values: name (English, required, same rules as AC-4), name (Chinese, optional, 1 to 200 characters after trimming, blank stored as null), description (English and Chinese, each optional, up to 4000 characters, blank stored as null), players min and max, play time min and max (same rules as AC-4), categories (any number, picked from the list), owners (any number of active members, picked from a member list with the current owners ticked), and cover (AC-18). English and Chinese text sit side by side in two tabs ("English", "中文") inside the editor; a field error switches to the tab that holds it.
+- **AC-18**: The cover field shows the current picture with "Replace" and "Remove". A new picture goes through the same browser pipeline as AC-7 (600 px, WebP or JPEG, under 150 KB, tint saved); the server checks it again as in AC-7. "Remove" clears `cover_path` and `cover_tint` and the game shows the tint tile. Nothing changes until Save.
+- **AC-19**: The editor has "Save", "Save and looks right", and "Cancel". "Save" writes every change in one transaction and keeps the game in "To review" (the row shows the new values after the page refreshes). "Save and looks right" does the same and marks the game reviewed in the same transaction (the game moves to "Reviewed"). Closing a modal with unsaved changes asks first. A field that breaks a rule shows its message next to it, nothing is saved, and every field keeps what was typed (same hand built `onSubmit` rule as the add form). Saving with no change closes the modal and writes no history row.
+- **AC-20**: A name that clashes with another game (same `name_normalized`, or the same normalized Chinese name) saves nothing and shows a message naming the other game. If the game was marked reviewed by another tab while the editor was open, the save is refused with a message ("This game is already reviewed; mark it not reviewed to edit it") and the row refreshes. Only an active admin can save; anyone else is refused with `42501`.
+- **AC-21**: Every successful save writes one `game_edits` row: the game id and its name at that moment, the editor (`auth.uid()`), the time, the list of changed fields, and the full before and after values of those fields (including cover path, category ids, and owner ids). Rows are readable only by admins, never changed or deleted by the app, and survive the game being deleted. The edit and its history row are written in the same transaction, so there is never one without the other.
+- **AC-22**: When a save replaces or removes a cover, the old file is moved from the public `covers` bucket to the private `covers-trash` bucket and recorded in `cover_trash` (path, game id, trashed at, trashed by). A file nobody points to is never left public. If the new cover upload fails or the save fails, the new file is removed, the old cover stays, and nothing is trashed. If moving the old file fails after a successful save, the save stands, the error is logged, and the old file stays in `covers` (harmless orphan).
+- **AC-23**: A daily job deletes trashed covers older than 30 days: it removes the file through the Storage API and then the `cover_trash` row. A failure on one file keeps its row so the next run retries. Within 30 days an admin can restore a cover by moving the file back and setting `cover_path` in the Supabase dashboard (no UI).
+- **AC-24**: Games get optional `name_zh` and `description_zh`. On `/zh` pages (home, shelf, sheet, game page, Add search, Review) the Chinese text is shown when it exists, otherwise the English text; on `/en` pages the English text is always shown. `search_games` matches the English or the Chinese name. A game with no Chinese text behaves exactly as before.
+- **AC-25**: Categories live in a `categories` table (slug, English label, Chinese label) with a `game_categories` link table. Everyone can read them; only an active admin can add or change them. The editor can add a new category (English and Chinese label required) and pick it at once. Migration seeds a starter list (Strategy, Party, Family, Co-op, Card, Dice, Deduction, Abstract, Thematic, War). Showing categories on the public shelf, home, or sheet is out of scope here (follow-up).
 
 ## Decision
 
@@ -58,6 +74,19 @@ Build the add flow as a search first page backed by three Postgres functions (`s
 - Validation is hand written in one shared pure module (`src/lib/games/new-game.ts`), like `src/lib/auth/validation.ts`. Runner up: add zod; not in the project, and the rules are few.
 - The admin not found is `notFound()` from the page's loader under `Suspense`. Streaming may send status 200 with the not found UI; acceptable for a page nobody links to. Runner up: a role check in `src/proxy.ts`, which adds a database read to every request.
 - Review lists page by 30 with `?tab=` and `?shown=` read inside the loader under `Suspense`.
+
+**Calls made in the review editing amendment** (each with the runner up):
+- One Postgres function `admin_update_game(...)`, `security invoker`, writes the game, its categories, its owners, the optional review stamp, and the `game_edits` row in one transaction; the Server Action calls it with the admin's session. Runner up: several table updates from the action; a failure between them leaves a half saved game and a history row that lies.
+- Cover order on save: validate, upload the new file with the admin client, call `admin_update_game` with the new path, then move the old file to trash and insert `cover_trash`. A failure before the function succeeds removes the new file; a failure after keeps the save (see AC-22). Runner up: trash first; a later failure would leave a game pointing at a trashed file.
+- The recycle bin is a private bucket `covers-trash` plus a `cover_trash` table, not a folder in the public `covers` bucket (a public bucket serves any file in it to anyone who knows the URL). The move uses the Storage API (`move` with `destinationBucket`). Runner up: a `trash/` prefix in `covers`; simpler, but the "deleted" picture stays publicly reachable.
+- The daily cleanup is a Supabase Edge Function `purge-cover-trash` run by `pg_cron` through `pg_net`. Deleting `storage.objects` rows in SQL does not delete the stored file, so SQL alone cannot do it; the function uses the Storage API with the service key stored as an Edge Function secret. Runner up: a Vercel cron hitting a protected route; adds a public route and a `CRON_SECRET`. To check while building: `pg_cron` and `pg_net` are enabled on the real project. If they are not, fall back to the Vercel cron and record it here.
+- History is a `game_edits` table written by the same function, not the generic admin log trigger, because the admin log cannot see categories, owners, or the cover move as one edit. Runner up: rely on the admin log alone. It records only the `games` row.
+- Chinese text is two new nullable columns (`name_zh`, `description_zh`), not a translations table. Runner up: a `game_translations` table, built for a third language we do not plan. Display uses one pure helper `localized(text, textZh, locale)`; cached reads take `locale` as an argument so the cache keeps one entry per language.
+- Uniqueness for the Chinese name: a generated `name_zh_normalized` with its own partial unique index (`where name_zh is not null`). English and Chinese names are not compared with each other. Runner up: one shared index over both; blocks a game whose Chinese name equals another game's English name (for example both written as "Catan").
+- Categories: `categories` plus `game_categories` (many to many) with English and Chinese labels. Runner up: a free text tags column; spelling drifts and each tag would need two languages.
+- Owners editing needs a new admin only policy on `game_owners` (insert and delete any row). Members still change only their own rows. The picker lists active members (`profiles.status = 'active'`), loaded by the Review loader with the admin's session.
+- Decisions made while writing the migration (step 10): `game_stats` is rebuilt so public reads see `name_zh` and `description_zh` (it expands `g.*` at creation; it now also shows `reviewed_at` and `reviewed_by`). The history row is written by `private.write_game_edit` (`security definer`, checks `is_admin()`), so nobody, admin included, has insert on `game_edits` and history cannot be forged over the API. `search_games` gains `name_zh` and `exact_zh` (last two columns; `exact` stays English only) so the action can name the other game on a Chinese name clash without repeating the normalizing rule. `admin_update_game` refuses null category or owner lists (`22023`) so a client bug cannot wipe them; a new owner must be an active member, but a current owner may stay even when disabled. `pg_cron` and `pg_net` are available but not installed on the real project (checked 2026-11-24), so the cron schedule is a separate migration at step 15. `game_edits` and `cover_trash` keep `game_id` with no foreign key, so `05_merge_readiness.test.sql` skips them and lists `game_categories`.
+- The editor modal reuses `cover-picker.tsx`, `shrink-cover.ts`, and `src/lib/games/cover-image.ts` from the add flow, and shadcn `Dialog` (centered) with `Sheet`/drawer behavior at small widths via the existing shadcn components. Validation reuses `validateNewGame` rules, extended in `src/lib/games/edit-game.ts` with the Chinese fields (pure, Vitest).
 
 ## Feature design
 
@@ -158,7 +187,61 @@ Pages and wiring:
 - The secret key is used only in `src/app/[locale]/games/new/actions.ts` (allowed: a file named `actions.ts`) for the cover upload, the cover columns, and cleanup, always after the action has checked the member's session and active status.
 - No new personal data. Display names were already public.
 
-**Configuration required**: none (existing Supabase keys).
+**Review editing, data model sketch** (second migration, `supabase/migrations/20261124090000_review_edit.sql`):
+
+| Table or object | Change | Rules |
+|---|---|---|
+| `games` | add `name_zh text`, `description_zh text` | `name_zh` 1 to 200 chars after trim; `description_zh` at most 4000; both null by default |
+| `games` | add generated `name_zh_normalized`, unique partial index `where name_zh is not null` | same normalizing expression as `name_normalized` |
+| `games` | grant `update (cover_tint, name_zh, description_zh)` to `authenticated`; guard trigger refuses non admin changes to `cover_tint`, `name_zh`, `description_zh` | admin only, like the other protected columns |
+| `categories` | new: `id` identity, `slug` unique, `name_en`, `name_zh`, `created_at` | RLS: public read, active admin insert and update; seeded with the starter list |
+| `game_categories` | new: `game_id` (fk cascade), `category_id` (fk cascade), primary key both | RLS: public read, active admin insert and delete |
+| `game_owners` | add admin only insert and delete policies | members keep their own row policies |
+| `game_edits` | new: `id`, `game_id bigint` (no foreign key, history survives deletion), `game_name`, `edited_by uuid` (fk profiles on delete set null), `edited_at`, `changed text[]`, `before jsonb`, `after jsonb` | RLS: admin select only; no update or delete grant; insert only through `admin_update_game` |
+| `cover_trash` | new: `id`, `path`, `game_id bigint` (no fk), `trashed_by`, `trashed_at` | RLS: admin select; written by the admin client in the action; the purge function deletes rows |
+| `covers-trash` bucket | new, private, no public policies | files reachable only with the service key |
+| `search_games` | also match `name_zh_normalized`; return `name_zh` | ranking unchanged: exact, prefix, rest |
+| `admin_update_game(p_game_id bigint, p_name text, p_name_zh text, p_description text, p_description_zh text, p_players_min smallint, p_players_max smallint, p_play_time_min smallint, p_play_time_max smallint, p_category_ids bigint[], p_owner_ids uuid[], p_cover_path text, p_cover_tint text, p_mark_reviewed boolean) returns text` | new, `security invoker`, `set search_path = ''` | raises `42501` unless `private.is_admin()`; returns `'reviewed'` when the game is already reviewed (nothing written), `'notfound'`, `'clash'` for a `23505` on either name, else `'ok'`; in one transaction updates the game, replaces its category links and owner links with the given lists, stamps `reviewed_at`, `reviewed_by` when `p_mark_reviewed`, and inserts the `game_edits` row (only when something changed) |
+| `purge-cover-trash` Edge Function | new, plus a daily `cron.schedule` | deletes files in `covers-trash` whose `trashed_at` is older than 30 days, then their rows |
+
+Types are regenerated into `src/lib/supabase/database.types.ts`. The migration `20261119090000_add_game.sql` is not edited (it may already be pushed).
+
+**Review editing, API surface** (Server Actions, `src/app/[locale]/admin/review/actions.ts`, all take `locale`):
+
+| Action | Key inputs | Key outputs | Auth | Key errors |
+|---|---|---|---|---|
+| `saveGame` | `FormData`: `gameId`, `name`, `nameZh`, `description`, `descriptionZh`, `playersMin`, `playersMax`, `playTimeMin`, `playTimeMax`, `categoryIds`, `ownerIds`, `cover` (File, opt), `coverTint` (opt), `removeCover`, `markReviewed` | `{ status: "ok" }` | active admin | `invalid` (field keys), `clash` (other game), `alreadyReviewed`, `notFound`, `coverInvalid`, `uploadFailed`, `forbidden`, `error` |
+| `createCategory` | `nameEn`, `nameZh` | `{ status: "ok", category }` | active admin | `invalid`, `exists`, `forbidden`, `error` |
+
+Reads: `getReviewQueue` also returns, per row, the Chinese fields, the category ids, and the owners; the loader fetches `getEditorLists()` (all categories, active members) once per page view, in `src/lib/games/review.ts`. After a save the action calls `revalidateGames()` and the client calls `router.refresh()`.
+
+**Review editing, value sourcing**:
+
+| Action | Value produced / displayed | Source |
+|---|---|---|
+| editor | initial field values | the review row (`games`, `game_categories`, `game_owners`) |
+| editor | category choices | `categories` (labels by locale, English fallback) |
+| editor | owner choices | `profiles` where `status = 'active'`, `display_name` |
+| `saveGame` | new cover path | server generated `{uuid}.webp` or `.jpg` in `covers` |
+| `saveGame` | tint | browser `pickTint`, checked on the server as in AC-7 |
+| `saveGame` | old cover path | `games.cover_path` read inside `admin_update_game` before the update; the action reads it first to know what to trash |
+| `admin_update_game` | `edited_by`, `edited_at` | `auth.uid()`, `now()` |
+| `admin_update_game` | `changed`, `before`, `after` | compared field by field inside the function |
+| `cover_trash.trashed_at` | purge age | `now()` at insert; the purge uses `trashed_at < now() - interval '30 days'` |
+| any page | shown name and description | `localized(name, nameZh, locale)` |
+
+**Review editing, state and invariants**:
+- A game is editable only while `reviewed_at` is null; the function enforces it, not just the UI.
+- Every `games` change made through the editor has exactly one `game_edits` row (same transaction).
+- A file in `covers-trash` has a `cover_trash` row until the purge removes both; no public path ever points at a trashed file.
+- Replacing the owner list can leave a game with 0 owners (allowed, AC-11).
+
+**Review editing, security model**:
+- Only an active admin can call `admin_update_game`, create categories, change owners of others, read `game_edits` and `cover_trash`, or reach `covers-trash`. Members and guests are refused by RLS and `42501`, tested in pgTAP.
+- The secret key is used in `src/app/[locale]/admin/review/actions.ts` (allowed: `actions.ts`) for the cover upload and move, only after the action checks the admin's session and active status, and inside the `purge-cover-trash` Edge Function (service key as a function secret, never in the repo).
+- History holds admin and member ids and names. Admin only, no public exposure.
+
+**Configuration required**: none for the original feature (existing Supabase keys). For the amendment: `pg_cron` and `pg_net` enabled on the real project, the `purge-cover-trash` Edge Function deployed, and its service key set as an Edge Function secret (`supabase secrets set`).
 
 **Critical test scenarios**:
 - Happy path: a member searches "brass", sees no match, adds "Brass: Birmingham" with players, time, and a cover, lands on its page as owner, and it shows on the shelf; verifies **AC-2**, **AC-4**, **AC-5**, **AC-7**.
@@ -168,6 +251,12 @@ Pages and wiring:
 - Auth: a guest is redirected from `/games/new`; a member gets not found on `/admin/review` and `42501` from `set_game_reviewed`; a member's direct update of `reviewed_at` or `cover_path` is refused (pgTAP); verifies **AC-1**, **AC-12**, **AC-13**.
 - Review: Looks right moves a game to Reviewed with the admin's name; Mark as not reviewed clears both columns; verifies **AC-14**.
 - Search ranking and normalization: "CAT" ranks "Catan" before "Concatenate Cats"; a Chinese query matches a Chinese name; `%` matches only a literal percent (pgTAP and Vitest on `pickTint`, `validateNewGame`); verifies **AC-2**, **AC-7**.
+- Editor happy path: the admin opens a game by tapping its title, changes the name, adds a Chinese name, sets two categories, adds an owner, replaces the cover, and taps "Save and looks right"; the game is in "Reviewed" with the new values, one `game_edits` row, and the old cover in `covers-trash`; verifies **AC-16** to **AC-19**, **AC-21**, **AC-22**.
+- "Looks right" on the card marks the game reviewed without opening the editor; a Reviewed row has no editor and "Mark as not reviewed" makes it editable; verifies **AC-16**.
+- Refusals (pgTAP): a member and a guest cannot call `admin_update_game`, create a category, insert someone else's `game_owners` row, or read `game_edits` and `cover_trash`; the function returns `reviewed` for a reviewed game and `clash` for a taken English or Chinese name, writing nothing; verifies **AC-20**, **AC-21**, **AC-25**.
+- Failure: a failed new cover upload and a failed `admin_update_game` each leave the old cover public and no trash row; a failed move of the old file keeps the save; verifies **AC-22**.
+- Purge: a `cover_trash` row 31 days old is deleted with its file, a 29 day old row stays, and a failed delete keeps its row (Edge Function test with a stubbed Storage client); verifies **AC-23**.
+- Chinese display: `/zh` shows the Chinese name and description when present and the English otherwise; `/en` never shows Chinese; Vitest on `localized`, browser check on home, shelf, and sheet; verifies **AC-24**.
 
 ## Build plan
 
@@ -181,6 +270,13 @@ Ordered as Tracer Bullet (the project approach): one thin thread from the databa
 6. [x] Sheet dock: `getViewer` gains `role` and `status`; `own-actions.ts` (`getOwnState`, `markOwned`, `unmarkOwned`); `own-button.tsx` with guest link, read only state, Undo for 5 seconds, sheet reload or `router.refresh()`; read only message on the Add page. Satisfies **AC-9**, **AC-10**, **AC-11**
 7. [x] Admin: nav `admin` audience and the Review item; `getReviewQueue`; `/admin/review` page, loader with `notFound()`, tabs, rows, Show more, Looks right and Mark as not reviewed actions. Satisfies **AC-13**, **AC-14**
 8. [x] Seeds: `supabase/seed.sql` and `src/lib/games/games-file.ts` (the SQL `pnpm seed:games` writes) set `reviewed_at = now()` on insert, and `reviewed_at = coalesce(reviewed_at, now())` in the update branch (a file entry you wrote counts as checked); update their tests. Satisfies **AC-12**
+10. [x] Migration `20261124090000_review_edit.sql`: Chinese columns and indexes, guard update, `categories` and `game_categories` with seed, admin `game_owners` policies, `game_edits`, `cover_trash`, private `covers-trash` bucket, `search_games` update, `admin_update_game`. Regenerate `database.types.ts`. Satisfies **AC-17**, **AC-20**, **AC-21**, **AC-24**, **AC-25**
+11. [ ] pgTAP file `supabase/tests/database/10_review_edit.test.sql` for every refusal and result in the critical scenarios above; update `05_merge_readiness.test.sql` if it flags the new tables. Satisfies **AC-20**, **AC-21**, **AC-25**
+12. [ ] Pure code with Vitest: `src/lib/games/edit-game.ts` (validation for the editor fields), `localized()`, and the "what changed" helper if the client needs one. Satisfies **AC-17**, **AC-19**, **AC-24**
+13. [ ] Editor thin thread: Review loader passes editor data; clickable cover, name, and description on "To review" rows; `ReviewEditor` modal with text fields, players, minutes, `saveGame` (no cover, categories, or owners yet), "Save" and "Save and looks right", `router.refresh()`. Satisfies **AC-16**, **AC-17**, **AC-19**
+14. [ ] Strands: Chinese tab, categories picker with `createCategory`, owners picker, cover replace and remove with trash move and failure cleanup, unsaved changes prompt, clash and already reviewed messages. Satisfies **AC-17**, **AC-18**, **AC-19**, **AC-20**, **AC-22**, **AC-25**
+15. [ ] Recycle bin purge: `purge-cover-trash` Edge Function, `pg_cron` schedule through `pg_net`, secret set, test with a stubbed client. Verify `pg_cron` and `pg_net` first; if unavailable, switch to the Vercel cron and update this spec. Satisfies **AC-23**
+16. [ ] Chinese display on public pages: cached reads take `locale`, `localized()` in home, shelf, sheet, game page, Add search, and Review; messages in `messages/en.json` and `messages/zh.json` for the editor; browser checks at 360 px and 1280 px (editor open, save, Chinese tab). Satisfies **AC-24**, **AC-15**
 9. [ ] Messages in `messages/en.json` and `messages/zh.json` (`addGame`, `review`, `shell.tabs.review`, dock additions), metadata with alternates and `robots: { index: false }`, Vitest for nav audiences and `authRedirect`, browser checks for add, toggle, and review at 360 px and 1280 px. Satisfies **AC-1**, **AC-13**, **AC-15**
 
 ## Consequences
@@ -195,7 +291,10 @@ Ordered as Tracer Bullet (the project approach): one thin thread from the databa
 - Admins get a fifth bottom tab, so tabs are narrower at 360 px for you only.
 - The cover goes through three steps (upload, insert, cover update) with manual cleanup instead of one transaction; a crash between steps can leave an orphan file in the bucket (no game points to it, harmless, removable later).
 - `getViewer()` now reads `profiles` on every nav render (one indexed row, under `Suspense`).
-- A wrong detail can only be fixed in the Supabase dashboard until editing arrives with feature 19.
+- (Amendment) The admin edits a game's details in the Review editor (replaces the earlier "fix in the Supabase dashboard until feature 19" note). Only unreviewed games are editable; a reviewed game must be marked not reviewed first.
+- (Amendment) Chinese display touches every public read, so the cached reads now cache once per language.
+- (Amendment) The recycle bin purge depends on `pg_cron`, `pg_net`, and an Edge Function, which is more moving parts than the rest of the app.
+- (Amendment) A trashed cover can only be restored by hand in the dashboard within 30 days.
 - The admin not found page may stream with status 200.
 
 - Search and the own toggle share the one at a time Server Action queue, so a slow search can delay a tap by a moment.
@@ -208,7 +307,9 @@ Ordered as Tracer Bullet (the project approach): one thin thread from the databa
 
 ## Follow-up
 
-- [ ] Feature 19 (Admin tools): editing game details from the Review page, merging duplicates, deleting junk, and cleaning orphan cover files.
+- [ ] Feature 19 (Admin tools): merging duplicates, deleting junk, and cleaning orphan cover files. (Editing game details from the Review page moved into this spec, AC-16 to AC-25.)
+- [ ] Show categories on the shelf, home, and game sheet, and filter by category (not in this spec).
+- [ ] A UI to restore a trashed cover and to read `game_edits`.
 - [ ] Features 10 and 11 must reuse `add_game` (with `source_kind` set) and respect the unique name rule.
 - [ ] Check on a real iPhone that Safari shrinks HEIC photos; if `createImageBitmap` cannot read them, the message tells the member to pick a JPEG or PNG.
 - [ ] Spec 0012 (shelf owner filter) is still `Assumed`; unrelated to this feature, but still owed.

@@ -43,6 +43,20 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"categories": {
+                  Row: {
+                    "created_at": string,"id": number,"name_en": string,"name_zh": string,"slug": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"id"?: never,"name_en": string,"name_zh": string,"slug": string
+                  }
+                  Update: {
+                    "created_at"?: string,"id"?: never,"name_en"?: string,"name_zh"?: string,"slug"?: string
+                  }
+                  Relationships: [
+                    
+                  ]
                 },"comments": {
                   Row: {
                     "body": string,"created_at": string,"game_id": number,"id": number,"member_id": string,"updated_at": string
@@ -75,6 +89,26 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"cover_trash": {
+                  Row: {
+                    "game_id": number | null,"id": number,"path": string,"trashed_at": string,"trashed_by": string | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "game_id"?: number | null,"id"?: never,"path": string,"trashed_at"?: string,"trashed_by"?: string | null
+                  }
+                  Update: {
+                    "game_id"?: number | null,"id"?: never,"path"?: string,"trashed_at"?: string,"trashed_by"?: string | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "cover_trash_trashed_by_fkey"
+      columns: ["trashed_by"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"email_sends": {
                   Row: {
                     "id": number,"kind": string,"sent_at": string,"status": string,"user_id": string
@@ -88,6 +122,58 @@ isOneToOne: false
                   }
                   Relationships: [
                     
+                  ]
+                },"game_categories": {
+                  Row: {
+                    "category_id": number,"game_id": number
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "category_id": number,"game_id": number
+                  }
+                  Update: {
+                    "category_id"?: number,"game_id"?: number
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "game_categories_category_id_fkey"
+      columns: ["category_id"]
+isOneToOne: false
+      referencedRelation: "categories"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "game_categories_game_id_fkey"
+      columns: ["game_id"]
+isOneToOne: false
+      referencedRelation: "game_stats"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "game_categories_game_id_fkey"
+      columns: ["game_id"]
+isOneToOne: false
+      referencedRelation: "games"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"game_edits": {
+                  Row: {
+                    "after": NonNullable<Json>,"before": NonNullable<Json>,"changed": (string)[],"edited_at": string,"edited_by": string | null,"game_id": number,"game_name": string,"id": number
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "after": NonNullable<Json>,"before": NonNullable<Json>,"changed": (string)[],"edited_at"?: string,"edited_by"?: string | null,"game_id": number,"game_name": string,"id"?: never
+                  }
+                  Update: {
+                    "after"?: NonNullable<Json>,"before"?: NonNullable<Json>,"changed"?: (string)[],"edited_at"?: string,"edited_by"?: string | null,"game_id"?: number,"game_name"?: string,"id"?: never
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "game_edits_edited_by_fkey"
+      columns: ["edited_by"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    }
                   ]
                 },"game_owners": {
                   Row: {
@@ -123,14 +209,14 @@ isOneToOne: false
                   ]
                 },"games": {
                   Row: {
-                    "added_by": string | null,"cover_path": string | null,"cover_tint": string | null,"created_at": string,"description": string | null,"id": number,"name": string,"name_normalized": string | null,"play_time_max": number | null,"play_time_min": number | null,"players_max": number | null,"players_min": number | null,"reviewed_at": string | null,"reviewed_by": string | null,"source_id": string | null,"source_kind": Database["public"]['Enums']["game_source_kind"],"source_provider": string | null,"source_url": string | null,"updated_at": string
+                    "added_by": string | null,"cover_path": string | null,"cover_tint": string | null,"created_at": string,"description": string | null,"description_zh": string | null,"id": number,"name": string,"name_normalized": string | null,"name_zh": string | null,"name_zh_normalized": string | null,"play_time_max": number | null,"play_time_min": number | null,"players_max": number | null,"players_min": number | null,"reviewed_at": string | null,"reviewed_by": string | null,"source_id": string | null,"source_kind": Database["public"]['Enums']["game_source_kind"],"source_provider": string | null,"source_url": string | null,"updated_at": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "added_by"?: string | null,"cover_path"?: string | null,"cover_tint"?: string | null,"created_at"?: string,"description"?: string | null,"id"?: never,"name": string,"name_normalized"?: never,"play_time_max"?: number | null,"play_time_min"?: number | null,"players_max"?: number | null,"players_min"?: number | null,"reviewed_at"?: string | null,"reviewed_by"?: string | null,"source_id"?: string | null,"source_kind"?: Database["public"]['Enums']["game_source_kind"],"source_provider"?: string | null,"source_url"?: string | null,"updated_at"?: string
+                    "added_by"?: string | null,"cover_path"?: string | null,"cover_tint"?: string | null,"created_at"?: string,"description"?: string | null,"description_zh"?: string | null,"id"?: never,"name": string,"name_normalized"?: never,"name_zh"?: string | null,"name_zh_normalized"?: never,"play_time_max"?: number | null,"play_time_min"?: number | null,"players_max"?: number | null,"players_min"?: number | null,"reviewed_at"?: string | null,"reviewed_by"?: string | null,"source_id"?: string | null,"source_kind"?: Database["public"]['Enums']["game_source_kind"],"source_provider"?: string | null,"source_url"?: string | null,"updated_at"?: string
                   }
                   Update: {
-                    "added_by"?: string | null,"cover_path"?: string | null,"cover_tint"?: string | null,"created_at"?: string,"description"?: string | null,"id"?: never,"name"?: string,"name_normalized"?: never,"play_time_max"?: number | null,"play_time_min"?: number | null,"players_max"?: number | null,"players_min"?: number | null,"reviewed_at"?: string | null,"reviewed_by"?: string | null,"source_id"?: string | null,"source_kind"?: Database["public"]['Enums']["game_source_kind"],"source_provider"?: string | null,"source_url"?: string | null,"updated_at"?: string
+                    "added_by"?: string | null,"cover_path"?: string | null,"cover_tint"?: string | null,"created_at"?: string,"description"?: string | null,"description_zh"?: string | null,"id"?: never,"name"?: string,"name_normalized"?: never,"name_zh"?: string | null,"name_zh_normalized"?: never,"play_time_max"?: number | null,"play_time_min"?: number | null,"players_max"?: number | null,"players_min"?: number | null,"reviewed_at"?: string | null,"reviewed_by"?: string | null,"source_id"?: string | null,"source_kind"?: Database["public"]['Enums']["game_source_kind"],"source_provider"?: string | null,"source_url"?: string | null,"updated_at"?: string
                   }
                   Relationships: [
                     {
@@ -262,13 +348,19 @@ isOneToOne: false
           Views: {
             "game_stats": {
                   Row: {
-                    "added_by": string | null,"avg_entertainment": number | null,"avg_luck": number | null,"avg_recommendation": number | null,"avg_strategy": number | null,"avg_time_to_learn": number | null,"best_players_mode": number | null,"cover_path": string | null,"cover_tint": string | null,"created_at": string | null,"description": string | null,"id": number | null,"name": string | null,"name_normalized": string | null,"owner_count": number | null,"play_time_max": number | null,"play_time_min": number | null,"players_max": number | null,"players_min": number | null,"rating_count": number | null,"source_id": string | null,"source_kind": Database["public"]['Enums']["game_source_kind"] | null,"source_provider": string | null,"source_url": string | null,"updated_at": string | null,"wishlist_count": number | null
+                    "added_by": string | null,"avg_entertainment": number | null,"avg_luck": number | null,"avg_recommendation": number | null,"avg_strategy": number | null,"avg_time_to_learn": number | null,"best_players_mode": number | null,"cover_path": string | null,"cover_tint": string | null,"created_at": string | null,"description": string | null,"description_zh": string | null,"id": number | null,"name": string | null,"name_normalized": string | null,"name_zh": string | null,"name_zh_normalized": string | null,"owner_count": number | null,"play_time_max": number | null,"play_time_min": number | null,"players_max": number | null,"players_min": number | null,"rating_count": number | null,"reviewed_at": string | null,"reviewed_by": string | null,"source_id": string | null,"source_kind": Database["public"]['Enums']["game_source_kind"] | null,"source_provider": string | null,"source_url": string | null,"updated_at": string | null,"wishlist_count": number | null
                   }
                   ComputedFields: never
                   Relationships: [
                     {
       foreignKeyName: "games_added_by_fkey"
       columns: ["added_by"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "games_reviewed_by_fkey"
+      columns: ["reviewed_by"]
 isOneToOne: false
       referencedRelation: "profiles"
       referencedColumns: ["id"]
@@ -283,6 +375,9 @@ isOneToOne: false
 "admin_set_member_status":
 { Args: { "new_status": Database["public"]['Enums']["member_status"],"target": string }; Returns: undefined
                            },
+"admin_update_game":
+{ Args: { "p_category_ids": (number)[],"p_cover_path": string,"p_cover_tint": string,"p_description": string,"p_description_zh": string,"p_game_id": number,"p_mark_reviewed": boolean,"p_name": string,"p_name_zh": string,"p_owner_ids": (string)[],"p_play_time_max": number,"p_play_time_min": number,"p_players_max": number,"p_players_min": number }; Returns: string
+                           },
 "claim_email_slot":
 { Args: { "p_cap": number,"p_kind": string,"p_user_id": string }; Returns: string
                            },
@@ -291,7 +386,7 @@ isOneToOne: false
                            },
 "search_games":
 { Args: { "q": string }; Returns: {
-              "cover_path": string,"cover_tint": string,"exact": boolean,"id": number,"mine": boolean,"name": string,"owner_names": (string)[]
+              "cover_path": string,"cover_tint": string,"exact": boolean,"exact_zh": boolean,"id": number,"mine": boolean,"name": string,"name_zh": string,"owner_names": (string)[]
             }[]
                            },
 "set_game_reviewed":

@@ -38,9 +38,9 @@ grant execute on all functions in schema tests to public;
 
 -- Fixtures: alice, bob active; erin disabled; six games ----------------------------
 insert into auth.users (id, email, raw_user_meta_data) values
-  ('00000000-0000-0000-0000-00000000000a', 'alice@example.com', '{}'),
-  ('00000000-0000-0000-0000-00000000000b', 'bob@example.com', '{}'),
-  ('00000000-0000-0000-0000-00000000000e', 'erin@example.com', '{}');
+  ('00000000-0000-0000-0000-00000000000a', 'alice@example.com', '{"username": "alice"}'),
+  ('00000000-0000-0000-0000-00000000000b', 'bob@example.com', '{"username": "bob"}'),
+  ('00000000-0000-0000-0000-00000000000e', 'erin@example.com', '{"username": "erin"}');
 update public.profiles set status = 'disabled' where id = '00000000-0000-0000-0000-00000000000e';
 
 insert into public.games (name, added_by)
