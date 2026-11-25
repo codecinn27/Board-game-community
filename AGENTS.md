@@ -114,5 +114,6 @@ Stored in `docs/specs/`. Format: `docs/specs/NNNN-title.md`. Feature scope lives
 - [supabase/AGENTS.md](supabase/AGENTS.md) (migrations, pgTAP tests, seed, and running Docker for the local stack)
 - [src/components/game-sheet/AGENTS.md](src/components/game-sheet/AGENTS.md) (the game detail sheet: modal, page, store, and animation rules)
 - [src/lib/auth/AGENTS.md](src/lib/auth/AGENTS.md) (member accounts: session checks, the invite gate, auth redirects, and the auth pages)
+- [src/lib/email/AGENTS.md](src/lib/email/AGENTS.md) (welcome email: transport, daily cap, no addresses in logs)
 
 _Drafted by /audit from the repo, worth a quick human pass. Edit freely: once a line stops matching this draft, later runs treat it as curated and will flag rather than overwrite it._

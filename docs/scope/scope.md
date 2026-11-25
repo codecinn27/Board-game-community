@@ -17,13 +17,13 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 4 | Design system & mobile first UI | Foundation | done |
 | 5 | Two languages (English + Chinese) | Foundation | done |
 | 15 | Home page | Slice 1 (frontend, dummy data) | done |
-| 8 | Community shelf | Slice 1 (frontend, dummy data) | in-progress |
-| 9 | Game detail sheet | Slice 1 (frontend, dummy data) | in-progress |
-| 22 | Shelf: By owner view | Next (frontend, dummy data) | in-progress |
-| 21 | Live data for home, shelf, and game sheet | Slice 2 | in-progress |
-| 6 | Member accounts | Slice 2 | in-progress |
-| 23 | Welcome email | Slice 2 | in-progress |
-| 7 | Add a game I own | Slice 2 | in-progress |
+| 8 | Community shelf | Slice 1 (frontend, dummy data) | done |
+| 9 | Game detail sheet | Slice 1 (frontend, dummy data) | done |
+| 22 | Shelf: By owner view | Next (frontend, dummy data) | done |
+| 21 | Live data for home, shelf, and game sheet | Slice 2 | done |
+| 6 | Member accounts | Slice 2 | done |
+| 23 | Welcome email | Slice 2 | done |
+| 7 | Add a game I own | Slice 2 | done |
 | 10 | Online game lookup | Slice 3 | planned |
 | 11 | Paste a link to auto fill | Slice 3 | planned |
 | 12 | Rating form | Slice 4 | planned |
@@ -118,7 +118,7 @@ The landing section: how many games the community owns, newest additions, top ra
 - [x] Test it: `/test home page`
 Spec [0006](../specs/0006-home-page.md) · code in `src/app/[locale]/`, `src/lib/games/`, `src/components/home/`, `src/lib/app-shell/`, `messages/`
 
-### 8. Community shelf · in-progress
+### 8. Community shelf · done
 The "all board games" section at `/shelf`: every game the community owns, as a mobile friendly grid of covers, with a switch between all games and games grouped by owner.
 **Done when:** a visitor sees every dummy game with cover, name, owner count, and average recommendation, can switch to the By owner tab (it shows a "coming soon" note; the real view moved to feature 22), and the empty and loading states render.
 - [x] Mock it on the canvas (phone and desktop) and get your OK
@@ -131,7 +131,7 @@ The "all board games" section at `/shelf`: every game the community owns, as a m
 - [x] Test it: `/test community shelf`
 Spec [0007](../specs/0007-community-shelf.md) · code in `src/app/[locale]/shelf/`, `src/lib/games/`, `src/components/shelf/`, `src/components/games/`, `messages/`
 
-### 9. Game detail sheet · in-progress
+### 9. Game detail sheet · done
 Tap a game on the shelf or home page to open its sheet, built to Design 5 (Cover Tint): the cover on top fading into its own color, name, rating and owner chips, a stats card, the description, the list of owners, and the "I own this" dock. Already designed on the canvas (phone and desktop dialog); the color rules are built in `src/lib/design/cover-tint.ts`.
 **Done when:** every dummy game opens its own tinted sheet at `/games/[id]` over the shelf (Back closes it, a direct visit shows it as a page), it shows the details and every owner, and "I own this" is visible but not wired up yet.
 - [x] Design it (spec): `/architect game detail sheet`
@@ -148,7 +148,7 @@ Spec [0008](../specs/0008-game-detail-sheet.md) · code in `src/app/[locale]/gam
 
 Moved out of feature 8 (Community shelf) so the shelf could be finished. It is still dummy data and still front end only, so do it before Slice 2.
 
-### 22. Shelf: By owner view · in-progress
+### 22. Shelf: By owner view · done
 The "By owner" view at `/shelf?view=owner`: one section per member who owns at least one game, members A to Z, each with a row of their games that scrolls sideways inside itself. It replaces the "coming soon" note the shelf shows today.
 **Done when:** a visitor switches to By owner and sees every member with their games as a sideways strip of covers, with no sideways scroll of the page at 360px, and the loading and error states match All games.
 - [x] Design it (spec): already written as part 2 of [spec 0007](../specs/0007-community-shelf.md) (AC-13 to 15, build plan tasks 10 to 12); `/architect shelf by owner view` can split it into its own spec
@@ -162,7 +162,7 @@ Spec [0007](../specs/0007-community-shelf.md) (part 2) · code in `src/component
 
 Starts once you are happy with the Slice 1 design.
 
-### 21. Live data for home, shelf, and game sheet · in-progress
+### 21. Live data for home, shelf, and game sheet · done
 Replace the dummy data with real reads from Supabase (public read, no sign in needed). The dummy games move into `supabase/seed.sql` as local sample data so development looks the same as before, and your real games go in through `data/games.json`, which `pnpm seed:games` turns into SQL for the real project.
 **Done when:** home, shelf, and the game sheet show real database rows with no visual change, the dummy data file is deleted, and the cover tint comes from `games.cover_tint`. Games with a cover image show it everywhere a cover appears.
 - [x] Design it (spec): `/architect live data for home, shelf, and game sheet`
@@ -176,7 +176,7 @@ Replace the dummy data with real reads from Supabase (public read, no sign in ne
   - [ ] Cover images (built: `cover` field, upload in `pnpm seed:games`, `CoverTile` image with tint fallback, covers capped at 150 KB by the bucket limit and the seed check; left: run the seed and check it in the browser): put each game's picture in the Supabase `covers` bucket, save its path in `games.cover_path`, and show it on home, shelf, and the game sheet (the tint tile stays as the fallback when a game has no image)
 Spec [0009](../specs/0009-live-data.md) · code in `src/lib/games/`, `src/lib/supabase/`, `src/components/game-sheet/`, `supabase/`, `data/`
 
-### 6. Member accounts · in-progress
+### 6. Member accounts · done
 Register, sign in, sign out. Anyone can browse without an account; only members can add games, rate, and comment. A person enters the community's shared invite code first, then registers with email and password and is signed in at once.
 **Done when:** a visitor can register and sign in, signed out visitors can only view, and a simple privacy note explains what personal data is stored.
 - [x] Design it (spec): `/architect member accounts`
@@ -190,7 +190,7 @@ Register, sign in, sign out. Anyone can browse without an account; only members 
   - [x] Dice Galaxy checks: browser checks at 360 and 1280, `/design` block, "Auth Dice Galaxy scene" section in `docs/design.md` (AC-16 to 21)
 Spec [0010](../specs/0010-member-accounts/index.md) · design [design D, Dice Galaxy](https://claude.ai/artifact/DZFyiGJt9u5mP3sL34Rfnk) · code in `src/lib/auth/`, `src/components/auth/`, `src/app/[locale]/sign-in/`, `src/app/auth/`, `src/proxy.ts`, `messages/`
 
-### 23. Welcome email · in-progress
+### 23. Welcome email · done
 After a person registers, they get a welcome email in the language they signed up in, sent through Resend from `mail@tabletop.ianhee.com`, capped at 80 a day. The same Resend account makes password reset emails work on the hosted project. One Playwright command proves register, email, and cleanup on the local stack.
 **Done when:** a new member receives the welcome email in English or Chinese, sign up still works when email fails, reset emails reach real members, and `pnpm test:e2e` checks the email in Mailpit and deletes its test accounts.
 - [x] Design it (spec): `/architect welcome email`
@@ -201,7 +201,7 @@ After a person registers, they get a welcome email in the language they signed u
   - [ ] Production: Resend domain and DNS at Shinjiru, Vercel env, hosted Supabase SMTP (AC-1, 10, 12)
 Spec [0011](../specs/0011-welcome-email/index.md) · code in `src/lib/email/`, `src/lib/supabase/email-sends.ts`, `src/app/[locale]/sign-in/actions.ts`, `supabase/migrations/`, `e2e/`, `messages/`
 
-### 7. Add a game I own · in-progress
+### 7. Add a game I own · done
 A member searches your own database first; if the game is there they mark "I own this", if not they enter it manually. Seeing who already owns a game helps avoid duplicate buys, but it is information only, never a block. This also wires up the "I own this" button on the game sheet.
 **Done when:** a member can add a game they own; the search shows if the community already owns it (and who), and the member can still add themselves as an owner; the game's details are stored once and shared by all its owners; a member can add or remove themselves as an owner from the game sheet.
 - [x] Design it (spec): `/architect add a game I own`

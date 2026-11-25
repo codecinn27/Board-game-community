@@ -1,7 +1,7 @@
 # 0010. Member accounts: invite code gate, email sign in
 
 **Date**: 2026-11-06
-**Status**: In Progress
+**Status**: Accepted
 **Revised**: 2026-11-07, by the engineer: no email confirmation (so no SMTP for sign up) and no Google sign in. A valid invite code plus the register form signs the member in at once. Forgot password stays and uses Supabase's built in mail.
 **Revised**: 2026-11-07, by the engineer: the auth pages get a new look, the "clay scene" (soft pastel purple, 3D clay group of members leaning over the form card, glass and clay surfaces). Reference image: [docs/design/member-accounts/sign-in-reference.png](../../design/member-accounts/sign-in-reference.png); illustration brief: `docs/design/member-accounts/brief.md` (removed 2026-11-08 with the clay scene). Adds AC-16 to AC-21 and build plan tasks 14 to 18. Behaviour, actions, and security are unchanged.
 **Revised**: 2026-11-08, by the engineer: the clay scene is replaced by the "Dice Galaxy" look (a night sky with stars, a clay rocket with a cloud trail, clay dice, a ringed planet, and a cloud bank the white form card rests on), picked as design D on the [Sign-in Page Options canvas](https://claude.ai/artifact/DZFyiGJt9u5mP3sL34Rfnk). All art is drawn in code, so the illustration brief and the picture files are dropped (the earlier clay reference image stays in `docs/design/member-accounts/` for history). The header and tab bar keep their cream look; text uses Baloo 2 on these pages only. Rewrites AC-16, AC-18 to AC-21, the scene design, and build plan tasks 14 to 18. Behaviour, actions, and security are unchanged.
