@@ -31,7 +31,7 @@ grant execute on all functions in schema tests to public;
 insert into auth.users (id, email, raw_user_meta_data) values
   ('00000000-0000-0000-0000-0000000000b1', 'b1@example.com', '{"username":"Kobe_9"}'),
   ('00000000-0000-0000-0000-0000000000b2', 'b2@example.com', '{}'),
-  ('00000000-0000-0000-0000-0000000000b3', 'b3@example.com', '{"username":"bad name!"}');
+  ('b3000000-0000-0000-0000-0000000000b3', 'b3@example.com', '{"username":"bad name!"}');
 
 -- The sign up trigger -------------------------------------------------------------
 select is(
@@ -44,7 +44,7 @@ select matches(
   (select username from public.profiles where id = '00000000-0000-0000-0000-0000000000b2'),
   '^member_[0-9a-f]{12}$', 'a missing username gets a generated one');
 select matches(
-  (select username from public.profiles where id = '00000000-0000-0000-0000-0000000000b3'),
+  (select username from public.profiles where id = 'b3000000-0000-0000-0000-0000000000b3'),
   '^member_[0-9a-f]{12}$', 'a malformed username gets a generated one');
 
 -- Constraints -----------------------------------------------------------------------

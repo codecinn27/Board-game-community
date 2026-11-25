@@ -1,11 +1,12 @@
 // The one source of tabs for the bottom bar and the desktop header.
 // Each feature that ships a page flips its `enabled` flag here.
 
-export type Viewer = "guest" | "member";
+export type Viewer = "guest" | "member" | "admin";
 
-export type NavKey = "home" | "shelf" | "add" | "signIn" | "me";
+export type NavKey = "home" | "shelf" | "add" | "review" | "signIn" | "me";
 
-export type NavIcon = "House" | "LibraryBig" | "Plus" | "LogIn" | "CircleUser";
+export type NavIcon =
+  "House" | "LibraryBig" | "Plus" | "ShieldCheck" | "LogIn" | "CircleUser";
 
 export type NavItem = {
   key: NavKey;
@@ -19,7 +20,8 @@ export type NavItem = {
   enabled: boolean;
 };
 
-// Order matters: guest is home, shelf, signIn; member is home, shelf, add, me.
+// Order matters: guest is home, shelf, signIn; member is home, shelf, add, me;
+// an admin also gets review, between add and me.
 export const navItems: readonly NavItem[] = [
   {
     // Feature 15 (Home page).
@@ -49,7 +51,17 @@ export const navItems: readonly NavItem[] = [
     labelKey: "add",
     audience: "member",
     raised: true,
-    enabled: false,
+    enabled: true,
+  },
+  {
+    // Feature 7 (Add a game I own): the admin only review list.
+    key: "review",
+    href: "/admin/review",
+    icon: "ShieldCheck",
+    labelKey: "review",
+    audience: "admin",
+    raised: false,
+    enabled: true,
   },
   {
     // Feature 6 (Member accounts).
@@ -80,8 +92,28 @@ export function visibleTabs(
 ): NavItem[] {
   return items.filter(
     (item) =>
-      item.enabled && (item.audience === "all" || item.audience === viewer),
+      item.enabled &&
+      (item.audience === "all" ||
+        item.audience === viewer ||
+        // An admin is a member with extra tabs.
+        (item.audience === "member" && viewer === "admin")),
   );
+}
+
+/** The tab set for a signed in or signed out viewer. Disabled admins are members. */
+export function navViewer(
+  viewer:
+    | { kind: "guest" }
+    | {
+        kind: "member";
+        role: "member" | "admin";
+        status: "active" | "disabled";
+      },
+): Viewer {
+  if (viewer.kind === "guest") return "guest";
+  return viewer.role === "admin" && viewer.status === "active"
+    ? "admin"
+    : "member";
 }
 
 /** The bar and the inline links only render with 2 or more tabs. */

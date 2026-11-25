@@ -34,6 +34,7 @@ export const intlServerMock = {
 
 /** Stands in for `@/i18n/navigation`: the same `/<locale>` prefix, as a plain link. */
 export const navigationMock = {
+  useRouter: () => ({ refresh: () => {} }),
   Link: ({
     href,
     children,

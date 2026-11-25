@@ -21,7 +21,12 @@ export default async function proxy(request: NextRequest) {
   const match = GAME_PATH.exec(request.nextUrl.pathname);
   // A cached read cannot run here, so this is a plain one-row check. If the
   // database is down the request goes on and the page shows its error block.
-  if (match !== null && !(await gameExists(match[2] ?? ""))) {
+  // `/games/new` is the Add page, not a game id (spec 0013, AC-1).
+  if (
+    match !== null &&
+    match[2] !== "new" &&
+    !(await gameExists(match[2] ?? ""))
+  ) {
     return NextResponse.rewrite(new URL(`/${match[1]}/_missing`, request.url));
   }
 

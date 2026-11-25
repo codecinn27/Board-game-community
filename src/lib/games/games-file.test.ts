@@ -195,7 +195,7 @@ describe("toGamesSql", () => {
   it("saves the cover file name as cover_path, or null", () => {
     expect(sql).toContain("cover_path = 'wingspan.webp',");
     expect(sql).toContain("cover_path = null,");
-    expect(sql).toContain("cover_tint, cover_path, created_at)");
+    expect(sql).toContain("cover_tint, cover_path, created_at, reviewed_at)");
   });
 
   // covers: AC-14
@@ -214,6 +214,12 @@ describe("toGamesSql", () => {
     expect(sql.match(/insert into public\.games/g)).toHaveLength(2);
   });
 
+  // covers: spec 0013 AC-12
+  it("marks every game reviewed, keeping an earlier review time", () => {
+    expect(sql).toContain("reviewed_at = coalesce(reviewed_at, now())");
+    expect(sql).toMatch(/, now\(\)\nwhere not exists/);
+  });
+
   // covers: AC-14
   it("escapes quotes and keeps Chinese text", () => {
     expect(sql).toContain("'O''Brien''s 三国杀'");
@@ -222,10 +228,10 @@ describe("toGamesSql", () => {
   // covers: AC-14
   it("keeps the existing date when a game has none, and uses nothing but plain game columns", () => {
     expect(sql).toContain(
-      "created_at = coalesce('2026-11-04T00:00:00.000Z'::timestamptz, created_at)",
+      "created_at = coalesce('2026-11-04T00:00:00.000Z'::timestamptz, created_at),",
     );
     expect(sql).toContain(
-      "created_at = coalesce(null::timestamptz, created_at)",
+      "created_at = coalesce(null::timestamptz, created_at),",
     );
     expect(sql).not.toMatch(/added_by|game_owners|ratings|auth\./);
   });

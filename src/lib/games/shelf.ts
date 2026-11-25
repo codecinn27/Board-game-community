@@ -100,15 +100,18 @@ export function buildShelfData(
   };
 }
 
-/** Everything the shelf shows, from the database, cached for 5 minutes under the `games` tag. */
-export async function getShelfData(): Promise<ShelfData> {
+/**
+ * Everything the shelf shows, from the database, cached for 5 minutes under the
+ * `games` tag. `locale` is an argument, so the cache keeps one entry per language.
+ */
+export async function getShelfData(locale: string): Promise<ShelfData> {
   "use cache";
   cacheLife("games");
   cacheTag(GAMES_TAG);
 
   const client = createPublicClient();
   const [games, owners, profiles] = await Promise.all([
-    fetchShelfGames(client),
+    fetchShelfGames(client, locale),
     fetchOwnerRows(client),
     fetchProfileRows(client),
   ]);

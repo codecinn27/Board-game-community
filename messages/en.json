@@ -9,6 +9,7 @@
       "home": "Home",
       "shelf": "Shelf",
       "add": "Add",
+      "review": "Review",
       "signIn": "Sign in",
       "me": "Me"
     },
@@ -127,7 +128,11 @@
     },
     "dock": {
       "own": "I own this",
-      "soon": "Coming soon"
+      "owned": "You own this",
+      "removed": "Removed",
+      "undo": "Undo",
+      "readOnly": "Read only",
+      "error": "Could not save. Try again."
     },
     "loading": "Loading game",
     "error": {
@@ -302,5 +307,215 @@
     "button": "Open the shelf",
     "signoff": "See you at the table!",
     "footer": "You are receiving this because you created an account at {site}."
+  },
+  "addGame": {
+    "meta": {
+      "title": "Add a game",
+      "description": "Search the shelf, then mark a game you own or add a new one."
+    },
+    "heading": "Add a game",
+    "intro": "Search the shelf first. If the game is already here, mark it as yours.",
+    "loading": "Loading",
+    "readOnly": "Your account is read only, so you cannot add games right now.",
+    "you": "You",
+    "search": {
+      "label": "Search the shelf",
+      "placeholder": "Search by game name",
+      "start": "Type a game name to see if it is already on the shelf.",
+      "none": "No game with that name yet.",
+      "error": "Search failed. Try again in a moment.",
+      "guest": "Your session ended.",
+      "signIn": "Sign in again"
+    },
+    "addYourself": "Not here? Add it yourself",
+    "owners": {
+      "none": "Nobody owns this yet",
+      "list": "Owned by {names}",
+      "others": "{count, plural, one {# other} other {# others}}"
+    },
+    "result": {
+      "own": "I own this",
+      "owned": "You own this",
+      "error": "Could not save. Try again."
+    },
+    "form": {
+      "fields": {
+        "name": "Name",
+        "description": "Description"
+      },
+      "errors": {
+        "nameRequired": "Enter the game's name.",
+        "nameLong": "The name can be at most 200 characters.",
+        "nameSymbols": "The name needs at least one letter or number.",
+        "playersWhole": "Use a whole number from 1 to 99.",
+        "playTimeWhole": "Use a whole number from 1 to 1440.",
+        "playersOrder": "The most players cannot be below the fewest.",
+        "playTimeOrder": "The longest time cannot be below the shortest.",
+        "descriptionLong": "The description can be at most {max} characters."
+      },
+      "problem": {
+        "generic": "Could not save the game. Nothing was saved. Try again in a moment.",
+        "upload": "Could not store the cover picture. Nothing was saved. Try again, or save without a cover.",
+        "readOnly": "Your account is read only, so you cannot add games right now.",
+        "guest": "Your session ended. Sign in again, then try once more."
+      },
+      "exists": "This game is already on the shelf",
+      "save": "Save game",
+      "saving": "Saving",
+      "back": "Back to search",
+      "cover": {
+        "label": "Cover picture (optional)",
+        "hint": "We shrink it on your device before saving.",
+        "remove": "Remove picture",
+        "previewAlt": "Cover preview",
+        "coverTooBig": "That file is over 15 MB. Pick a smaller picture.",
+        "coverUnreadable": "We could not read that picture. Try a JPEG or PNG.",
+        "coverTooDetailed": "We could not get that picture small enough. Try a simpler one."
+      },
+      "range": {
+        "notSet": "Not set",
+        "players": {
+          "label": "Players",
+          "lowest": "Players, lowest",
+          "highest": "Players, highest",
+          "single": "{count, plural, one {# player} other {{value} players}}",
+          "span": "{min} to {max} players",
+          "presets": {
+            "solo": "Solo",
+            "two": "Two",
+            "twoToFour": "2 to 4",
+            "threeToSix": "3 to 6",
+            "sixPlus": "6 or more"
+          }
+        },
+        "playTime": {
+          "label": "Play time",
+          "lowest": "Minutes, shortest",
+          "highest": "Minutes, longest",
+          "single": "{value} min",
+          "span": "{min} to {max} min",
+          "presets": {
+            "quick": "Up to 30 min",
+            "halfHour": "30 to 60",
+            "hour": "60 to 120",
+            "long": "2 hours or more"
+          }
+        }
+      }
+    }
+  },
+  "review": {
+    "meta": {
+      "title": "Review games"
+    },
+    "heading": "Review games",
+    "loading": "Loading games to review",
+    "tabs": {
+      "label": "Review lists",
+      "todo": "To review",
+      "done": "Reviewed"
+    },
+    "empty": {
+      "todo": "All games are reviewed",
+      "done": "Nothing reviewed yet"
+    },
+    "error": "Could not load the list. Try again in a moment.",
+    "showMore": "Show more",
+    "row": {
+      "players": "Players",
+      "minutes": "Minutes",
+      "unknown": "?",
+      "addedBy": "Added by {name}",
+      "unknownMember": "Unknown member",
+      "reviewedBy": "Reviewed by {name}",
+      "setAtImport": "Set at import",
+      "looksRight": "Looks right",
+      "notReviewed": "Mark as not reviewed",
+      "actionError": "Could not save. Try again."
+    },
+    "editor": {
+      "open": "Edit {name}",
+      "gamePage": "View game page",
+      "title": "Edit game",
+      "intro": "Fix the details, then save.",
+      "fields": {
+        "name": "Name",
+        "description": "Description",
+        "nameZh": "Chinese name",
+        "descriptionZh": "Chinese description"
+      },
+      "save": "Save",
+      "saveAndApprove": "Save and looks right",
+      "cancel": "Cancel",
+      "saving": "Saving",
+      "errors": {
+        "nameRequired": "Enter the game's name.",
+        "nameLong": "The name can be at most 200 characters.",
+        "nameSymbols": "The name needs at least one letter or number.",
+        "nameZhLong": "The Chinese name can be at most 200 characters.",
+        "nameZhSymbols": "The Chinese name needs at least one letter or number.",
+        "playersWhole": "Use a whole number from 1 to 99.",
+        "playTimeWhole": "Use a whole number from 1 to 1440.",
+        "playersOrder": "The most players cannot be below the fewest.",
+        "playTimeOrder": "The longest time cannot be below the shortest.",
+        "descriptionLong": "The description can be at most {max} characters.",
+        "descriptionZhLong": "The Chinese description can be at most {max} characters."
+      },
+      "problem": {
+        "clash": "Another game already uses this name: {name}.",
+        "clashUnknown": "Another game already uses this name.",
+        "alreadyReviewed": "This game is already reviewed. Mark it not reviewed to edit it.",
+        "forbidden": "Only an admin can save changes.",
+        "notFound": "This game no longer exists.",
+        "error": "Could not save. Nothing was changed. Try again in a moment.",
+        "coverInvalid": "That picture could not be used. Pick a JPEG, PNG, or WebP picture.",
+        "uploadFailed": "Could not store the cover picture. Nothing was saved. Try again in a moment."
+      },
+      "tabs": {
+        "label": "Language",
+        "en": "English",
+        "zh": "中文"
+      },
+      "zhHint": "Optional. Shown on the Chinese pages; the English text is used when this is blank.",
+      "categories": {
+        "title": "Categories",
+        "none": "No categories yet.",
+        "add": "Add a category",
+        "nameEn": "English label",
+        "nameZh": "Chinese label",
+        "create": "Add category",
+        "creating": "Adding",
+        "exists": "That category already exists, so it is ticked for you.",
+        "failed": "Could not add the category. Try again in a moment.",
+        "errors": {
+          "required": "Enter a label.",
+          "long": "Use at most 60 characters.",
+          "symbols": "Use at least one letter or number."
+        }
+      },
+      "owners": {
+        "title": "Owners",
+        "hint": "Tick everyone who owns this game.",
+        "none": "No members to pick.",
+        "readOnly": "read only"
+      },
+      "cover": {
+        "title": "Cover",
+        "current": "Current cover",
+        "none": "No cover",
+        "replace": "Replace",
+        "remove": "Remove",
+        "undo": "Keep the current cover",
+        "willRemove": "The cover is removed when you save.",
+        "newPicture": "New picture. It is saved when you save.",
+        "hint": "Pick a picture. It is shrunk to under 150 KB."
+      },
+      "discard": {
+        "title": "Discard your changes?",
+        "body": "You changed this game and have not saved.",
+        "keep": "Keep editing",
+        "discard": "Discard changes"
+      }
+    }
   }
 }

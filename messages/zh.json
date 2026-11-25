@@ -9,6 +9,7 @@
       "home": "首页",
       "shelf": "游戏架",
       "add": "添加",
+      "review": "审核",
       "signIn": "登录",
       "me": "我的"
     },
@@ -127,7 +128,11 @@
     },
     "dock": {
       "own": "我有这款游戏",
-      "soon": "即将推出"
+      "owned": "你拥有这款游戏",
+      "removed": "已移除",
+      "undo": "撤销",
+      "readOnly": "只读",
+      "error": "保存失败，请重试。"
     },
     "loading": "正在加载游戏",
     "error": {
@@ -302,5 +307,215 @@
     "button": "打开书架",
     "signoff": "桌游桌上见！",
     "footer": "你收到这封邮件，是因为你在 {site} 创建了账号。"
+  },
+  "addGame": {
+    "meta": {
+      "title": "添加游戏",
+      "description": "先搜索游戏架，再标记你拥有的游戏，或添加新游戏。"
+    },
+    "heading": "添加游戏",
+    "intro": "请先搜索游戏架。如果这款游戏已经在这里，直接标记为你的即可。",
+    "loading": "加载中",
+    "readOnly": "你的账号目前是只读状态，暂时不能添加游戏。",
+    "you": "你",
+    "search": {
+      "label": "搜索游戏架",
+      "placeholder": "按游戏名称搜索",
+      "start": "输入游戏名称，看看它是否已经在游戏架上。",
+      "none": "还没有这个名称的游戏。",
+      "error": "搜索失败，请稍后再试。",
+      "guest": "你的登录已过期。",
+      "signIn": "重新登录"
+    },
+    "addYourself": "没找到？自己添加",
+    "owners": {
+      "none": "还没有人拥有这款游戏",
+      "list": "拥有者：{names}",
+      "others": "{count, plural, other {其他 # 人}}"
+    },
+    "result": {
+      "own": "我有这款游戏",
+      "owned": "你拥有这款游戏",
+      "error": "保存失败，请重试。"
+    },
+    "form": {
+      "fields": {
+        "name": "名称",
+        "description": "简介"
+      },
+      "errors": {
+        "nameRequired": "请输入游戏名称。",
+        "nameLong": "名称最多 200 个字符。",
+        "nameSymbols": "名称至少需要一个文字或数字。",
+        "playersWhole": "请输入 1 到 99 的整数。",
+        "playTimeWhole": "请输入 1 到 1440 的整数。",
+        "playersOrder": "最多玩家数不能小于最少玩家数。",
+        "playTimeOrder": "最长时间不能小于最短时间。",
+        "descriptionLong": "简介最多 {max} 个字符。"
+      },
+      "problem": {
+        "generic": "无法保存游戏，没有保存任何内容。请稍后再试。",
+        "upload": "无法保存封面图片，没有保存任何内容。请重试，或不加封面直接保存。",
+        "readOnly": "你的账号目前是只读状态，暂时不能添加游戏。",
+        "guest": "你的登录已过期。请重新登录后再试一次。"
+      },
+      "exists": "这款游戏已经在游戏架上",
+      "save": "保存游戏",
+      "saving": "保存中",
+      "back": "返回搜索",
+      "cover": {
+        "label": "封面图片（选填）",
+        "hint": "保存前，我们会在你的设备上缩小图片。",
+        "remove": "移除图片",
+        "previewAlt": "封面预览",
+        "coverTooBig": "文件超过 15 MB，请选择更小的图片。",
+        "coverUnreadable": "无法读取这张图片，请试试 JPEG 或 PNG。",
+        "coverTooDetailed": "无法把这张图片压缩到足够小，请换一张更简单的。"
+      },
+      "range": {
+        "notSet": "未设定",
+        "players": {
+          "label": "玩家人数",
+          "lowest": "最少玩家数",
+          "highest": "最多玩家数",
+          "single": "{count, plural, other {{value} 位玩家}}",
+          "span": "{min} 至 {max} 位玩家",
+          "presets": {
+            "solo": "单人",
+            "two": "双人",
+            "twoToFour": "2 至 4 人",
+            "threeToSix": "3 至 6 人",
+            "sixPlus": "6 人以上"
+          }
+        },
+        "playTime": {
+          "label": "游戏时长",
+          "lowest": "最短时间（分钟）",
+          "highest": "最长时间（分钟）",
+          "single": "{value} 分钟",
+          "span": "{min} 至 {max} 分钟",
+          "presets": {
+            "quick": "30 分钟内",
+            "halfHour": "30 至 60 分钟",
+            "hour": "60 至 120 分钟",
+            "long": "2 小时以上"
+          }
+        }
+      }
+    }
+  },
+  "review": {
+    "meta": {
+      "title": "审核游戏"
+    },
+    "heading": "审核游戏",
+    "loading": "正在加载待审核的游戏",
+    "tabs": {
+      "label": "审核列表",
+      "todo": "待审核",
+      "done": "已审核"
+    },
+    "empty": {
+      "todo": "所有游戏都已审核",
+      "done": "还没有已审核的游戏"
+    },
+    "error": "无法加载列表，请稍后再试。",
+    "showMore": "显示更多",
+    "row": {
+      "players": "玩家",
+      "minutes": "分钟",
+      "unknown": "?",
+      "addedBy": "添加者：{name}",
+      "unknownMember": "未知成员",
+      "reviewedBy": "审核者：{name}",
+      "setAtImport": "导入时设定",
+      "looksRight": "没问题",
+      "notReviewed": "标记为未审核",
+      "actionError": "保存失败，请重试。"
+    },
+    "editor": {
+      "open": "编辑 {name}",
+      "gamePage": "查看游戏页面",
+      "title": "编辑游戏",
+      "intro": "修改信息后保存。",
+      "fields": {
+        "name": "名称",
+        "description": "简介",
+        "nameZh": "中文名称",
+        "descriptionZh": "中文简介"
+      },
+      "save": "保存",
+      "saveAndApprove": "保存并标记没问题",
+      "cancel": "取消",
+      "saving": "正在保存",
+      "errors": {
+        "nameRequired": "请输入游戏名称。",
+        "nameLong": "名称最多 200 个字符。",
+        "nameSymbols": "名称至少需要一个文字或数字。",
+        "nameZhLong": "中文名称最多 200 个字符。",
+        "nameZhSymbols": "中文名称至少需要一个文字或数字。",
+        "playersWhole": "请输入 1 到 99 的整数。",
+        "playTimeWhole": "请输入 1 到 1440 的整数。",
+        "playersOrder": "最多玩家数不能小于最少玩家数。",
+        "playTimeOrder": "最长时间不能小于最短时间。",
+        "descriptionLong": "简介最多 {max} 个字符。",
+        "descriptionZhLong": "中文简介最多 {max} 个字符。"
+      },
+      "problem": {
+        "clash": "已有另一个游戏使用这个名称：{name}。",
+        "clashUnknown": "已有另一个游戏使用这个名称。",
+        "alreadyReviewed": "这个游戏已经审核过。请先标记为未审核，再编辑。",
+        "forbidden": "只有管理员可以保存修改。",
+        "notFound": "这个游戏已不存在。",
+        "error": "保存失败，没有任何改动。请稍后再试。",
+        "coverInvalid": "这张图片无法使用，请选择 JPEG、PNG 或 WebP 图片。",
+        "uploadFailed": "无法保存封面图片，没有保存任何内容。请稍后再试。"
+      },
+      "tabs": {
+        "label": "语言",
+        "en": "English",
+        "zh": "中文"
+      },
+      "zhHint": "选填。中文页面会显示这里的内容；留空时使用英文。",
+      "categories": {
+        "title": "分类",
+        "none": "还没有分类。",
+        "add": "添加分类",
+        "nameEn": "英文名称",
+        "nameZh": "中文名称",
+        "create": "添加分类",
+        "creating": "正在添加",
+        "exists": "这个分类已存在，已为你勾选。",
+        "failed": "无法添加分类，请稍后再试。",
+        "errors": {
+          "required": "请输入名称。",
+          "long": "最多 60 个字符。",
+          "symbols": "至少需要一个文字或数字。"
+        }
+      },
+      "owners": {
+        "title": "拥有者",
+        "hint": "勾选所有拥有这个游戏的成员。",
+        "none": "没有可选的成员。",
+        "readOnly": "只读"
+      },
+      "cover": {
+        "title": "封面",
+        "current": "当前封面",
+        "none": "没有封面",
+        "replace": "更换",
+        "remove": "移除",
+        "undo": "保留当前封面",
+        "willRemove": "保存后将移除封面。",
+        "newPicture": "新图片，保存后生效。",
+        "hint": "请选择图片，系统会压缩到 150 KB 以内。"
+      },
+      "discard": {
+        "title": "放弃修改？",
+        "body": "你修改了这个游戏，但还没有保存。",
+        "keep": "继续编辑",
+        "discard": "放弃修改"
+      }
+    }
   }
 }

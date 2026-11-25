@@ -26,7 +26,7 @@ insert into auth.users (
 select
   m.id, '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated',
   m.email, crypt('password123', gen_salt('bf')), now(),
-  '{"provider":"email","providers":["email"]}'::jsonb, json_build_object('full_name', m.full_name)::jsonb, now(), now(),
+  '{"provider":"email","providers":["email"]}'::jsonb, json_build_object('full_name', m.full_name, 'username', lower(m.full_name))::jsonb, now(), now(),
   '', '', '', '', '', '', '', ''
 from (values
   ('00000000-0000-4000-8000-000000000001'::uuid, 'mei@example.com', 'Mei'),
@@ -65,6 +65,9 @@ values
   (12, '三国杀', null, 2, 10, 30, 60, '三国题材的身份推理卡牌游戏。每位玩家扮演一位武将，隐藏自己的身份，在主公、忠臣、反贼与内奸之间互相试探，最后达成各自的胜利条件。', '2026-11-01T02:00:00Z', '00000000-0000-4000-8000-000000000001');
 
 select setval(pg_get_serial_sequence('public.games', 'id'), (select max(id) from public.games));
+
+-- Seeded games count as reviewed (spec 0013, AC-12).
+update public.games set reviewed_at = now() where reviewed_at is null;
 
 -- Owners, each link dated like its game, as if the owners had it from the start.
 insert into public.game_owners (game_id, member_id, created_at)

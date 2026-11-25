@@ -247,12 +247,13 @@ function gameSql(game: GameInput, position: number): string {
     `    play_time_max = ${number(game.playTimeMax)},`,
     `    cover_tint = ${text(game.coverTint)},`,
     `    cover_path = ${text(game.coverPath)},`,
-    `    created_at = coalesce(${when}::timestamptz, created_at)`,
+    `    created_at = coalesce(${when}::timestamptz, created_at),`,
+    `    reviewed_at = coalesce(reviewed_at, now())`,
     `  where name_normalized = ${NORMALIZED(game.name)}`,
     `  returning id`,
     `)`,
-    `insert into public.games (name, description, players_min, players_max, play_time_min, play_time_max, cover_tint, cover_path, created_at)`,
-    `select ${text(game.name)}, ${text(game.description)}, ${number(game.playersMin)}, ${number(game.playersMax)}, ${number(game.playTimeMin)}, ${number(game.playTimeMax)}, ${text(game.coverTint)}, ${text(game.coverPath)}, coalesce(${when}::timestamptz, now())`,
+    `insert into public.games (name, description, players_min, players_max, play_time_min, play_time_max, cover_tint, cover_path, created_at, reviewed_at)`,
+    `select ${text(game.name)}, ${text(game.description)}, ${number(game.playersMin)}, ${number(game.playersMax)}, ${number(game.playTimeMin)}, ${number(game.playTimeMax)}, ${text(game.coverTint)}, ${text(game.coverPath)}, coalesce(${when}::timestamptz, now()), now()`,
     `where not exists (select 1 from updated);`,
   ].join("\n");
 }

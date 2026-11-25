@@ -23,6 +23,13 @@ vi.mock(
   async () => (await import("@/components/home/test-intl")).navigationMock,
 );
 
+// The dock's Server Actions need a server; the page tests only see its first render.
+vi.mock("./own-actions", () => ({
+  getOwnState: vi.fn(),
+  markOwned: vi.fn(),
+  unmarkOwned: vi.fn(),
+}));
+
 // Spec 0008, AC-4 to AC-11.
 
 function detail(id: number, over: Partial<GameDetail> = {}): GameDetail {
@@ -165,12 +172,13 @@ describe("GameSheet", () => {
   });
 
   // covers: AC-10
-  it("renders I own this disabled, with the Coming soon hint inside it", async () => {
+  it("renders the dock's own button as I own this, disabled until the state loads", async () => {
     const html = await sheet(detail(1));
 
     const button = /<button[^>]*disabled[^>]*>([\s\S]*?)<\/button>/.exec(html);
     expect(button).not.toBeNull();
-    expect(textOf(button?.[1] ?? "")).toBe("I own this Coming soon");
+    expect(textOf(button?.[1] ?? "")).toBe("I own this");
+    expect(html).not.toContain("Coming soon");
   });
 
   // covers: AC-10

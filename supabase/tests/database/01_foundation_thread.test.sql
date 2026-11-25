@@ -49,14 +49,14 @@ grant execute on all functions in schema tests to public;
 
 -- Fixture users (the sign up trigger creates their profiles) -------------------
 insert into auth.users (id, email, raw_user_meta_data) values
-  ('00000000-0000-0000-0000-00000000000a', 'alice@example.com', '{"full_name": "Alice Wong"}'),
-  ('00000000-0000-0000-0000-00000000000b', 'bob@example.com', '{}'),
-  ('00000000-0000-0000-0000-00000000000c', 'carol@example.com', '{"full_name": "   "}'),
-  ('00000000-0000-0000-0000-00000000000d', 'dave@example.com', '{}'),
-  ('00000000-0000-0000-0000-00000000000e', 'erin@example.com', '{}'),
-  ('00000000-0000-0000-0000-00000000000f', '@example.com', '{}'),
-  ('00000000-0000-0000-0000-000000000010', 'long@example.com', jsonb_build_object('full_name', repeat('x', 50))),
-  ('00000000-0000-0000-0000-000000000011', 'gina@example.com', '{}');
+  ('00000000-0000-0000-0000-00000000000a', 'alice@example.com', '{"full_name": "Alice Wong", "username": "alice"}'),
+  ('00000000-0000-0000-0000-00000000000b', 'bob@example.com', '{"username": "bob"}'),
+  ('00000000-0000-0000-0000-00000000000c', 'carol@example.com', '{"full_name": "   ", "username": "carol"}'),
+  ('00000000-0000-0000-0000-00000000000d', 'dave@example.com', '{"username": "dave"}'),
+  ('00000000-0000-0000-0000-00000000000e', 'erin@example.com', '{"username": "erin"}'),
+  ('00000000-0000-0000-0000-00000000000f', '@example.com', '{"username": "Member"}'),
+  ('00000000-0000-0000-0000-000000000010', 'long@example.com', jsonb_build_object('full_name', repeat('x', 50), 'username', 'long')),
+  ('00000000-0000-0000-0000-000000000011', 'gina@example.com', '{"username": "gina"}');
 
 -- Bootstrap by SQL: dave is the first admin, erin is disabled, gina is a disabled admin.
 update public.profiles set role = 'admin' where id = '00000000-0000-0000-0000-00000000000d';
@@ -222,15 +222,15 @@ select throws_ok($$ insert into public.games (name, source_provider, source_id)
   'AC-2: a manual game cannot carry a provider');
 select is((select name_normalized from public.games where name = 'Catan'), 'catan',
   'AC-2: name_normalized lowercases');
-insert into public.games (name, added_by) values ('Catan!', '00000000-0000-0000-0000-00000000000a');
+select throws_ok($$ insert into public.games (name, added_by)
+  values ('Catan!', '00000000-0000-0000-0000-00000000000a') $$, '23505', null,
+  'AC-2: a second spelling of an existing name is refused (spec 0013 unique rule)');
 insert into public.games (name, added_by) values ('卡坦岛', '00000000-0000-0000-0000-00000000000a');
-insert into public.games (name, added_by) values ('卡坦 岛！', '00000000-0000-0000-0000-00000000000a');
-select is((select name_normalized from public.games where name = 'Catan!'), 'catan',
-  'AC-2: punctuation is dropped so an exact match finds the existing game');
+select throws_ok($$ insert into public.games (name, added_by)
+  values ('卡坦 岛！', '00000000-0000-0000-0000-00000000000a') $$, '23505', null,
+  'AC-2: spaces and full width punctuation are ignored in the Chinese match');
 select is((select name_normalized from public.games where name = '卡坦岛'), '卡坦岛',
   'AC-2: Chinese names keep their characters');
-select is((select count(*)::int from public.games where name_normalized = '卡坦岛'), 2,
-  'AC-2: spaces and full width punctuation are ignored in the Chinese match');
 
 select * from finish();
 rollback;

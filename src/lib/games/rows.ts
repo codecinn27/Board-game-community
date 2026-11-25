@@ -1,5 +1,6 @@
 import { type SupabaseClient } from "@supabase/supabase-js";
 import { type Database } from "@/lib/supabase/database.types";
+import { localized } from "./localized";
 import {
   type GameRow,
   type OwnerRow,
@@ -25,6 +26,7 @@ function present<T>(value: T | null, column: string): T {
 type ShelfSelect = {
   id: number | null;
   name: string | null;
+  name_zh: string | null;
   created_at: string | null;
   rating_count: number | null;
   added_by: string | null;
@@ -33,10 +35,11 @@ type ShelfSelect = {
   avg_recommendation: number | null;
 };
 
-function toShelfGame(row: ShelfSelect): ShelfGame {
+/** `name` is the Chinese name on `/zh` when there is one (spec 0013, AC-24). */
+function toShelfGame(row: ShelfSelect, locale: string): ShelfGame {
   return {
     id: present(row.id, "id"),
-    name: present(row.name, "name"),
+    name: localized(present(row.name, "name"), row.name_zh, locale),
     created_at: present(row.created_at, "created_at"),
     rating_count: present(row.rating_count, "rating_count"),
     added_by: row.added_by,
@@ -47,15 +50,18 @@ function toShelfGame(row: ShelfSelect): ShelfGame {
 }
 
 /** Every game, for the shelf and home. */
-export async function fetchShelfGames(client: Client): Promise<ShelfGame[]> {
+export async function fetchShelfGames(
+  client: Client,
+  locale: string,
+): Promise<ShelfGame[]> {
   const { data, error } = await client
     .from("game_stats")
     .select(
-      "id, name, created_at, rating_count, added_by, cover_path, cover_tint, avg_recommendation",
+      "id, name, name_zh, created_at, rating_count, added_by, cover_path, cover_tint, avg_recommendation",
     )
     .order("id");
   if (error) fail("games", error.message);
-  return (data ?? []).map(toShelfGame);
+  return (data ?? []).map((row) => toShelfGame(row, locale));
 }
 
 /** The id of every game, for the build. */
@@ -101,19 +107,20 @@ export async function fetchProfileRows(client: Client): Promise<ProfileRow[]> {
 export async function fetchGameRow(
   client: Client,
   id: number,
+  locale: string,
 ): Promise<GameRow | null> {
   const { data, error } = await client
     .from("game_stats")
     .select(
-      "id, name, created_at, rating_count, added_by, cover_path, cover_tint, avg_recommendation, description, players_min, players_max, play_time_min, play_time_max",
+      "id, name, name_zh, created_at, rating_count, added_by, cover_path, cover_tint, avg_recommendation, description, description_zh, players_min, players_max, play_time_min, play_time_max",
     )
     .eq("id", id)
     .maybeSingle();
   if (error) fail("a game", error.message);
   if (data === null) return null;
   return {
-    ...toShelfGame(data),
-    description: data.description,
+    ...toShelfGame(data, locale),
+    description: localized(data.description, data.description_zh, locale),
     players_min: data.players_min,
     players_max: data.players_max,
     play_time_min: data.play_time_min,

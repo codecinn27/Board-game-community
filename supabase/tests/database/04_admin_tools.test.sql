@@ -38,11 +38,11 @@ grant execute on all functions in schema tests to public;
 
 -- Fixtures: alice and carol admins, bob member, dan disabled admin, erin disabled member -----
 insert into auth.users (id, email, raw_user_meta_data) values
-  ('00000000-0000-0000-0000-00000000000a', 'alice@example.com', '{}'),
-  ('00000000-0000-0000-0000-00000000000b', 'bob@example.com', '{}'),
-  ('00000000-0000-0000-0000-00000000000c', 'carol@example.com', '{}'),
-  ('00000000-0000-0000-0000-00000000000d', 'dan@example.com', '{}'),
-  ('00000000-0000-0000-0000-00000000000e', 'erin@example.com', '{}');
+  ('00000000-0000-0000-0000-00000000000a', 'alice@example.com', '{"username": "alice"}'),
+  ('00000000-0000-0000-0000-00000000000b', 'bob@example.com', '{"username": "bob"}'),
+  ('00000000-0000-0000-0000-00000000000c', 'carol@example.com', '{"username": "carol"}'),
+  ('00000000-0000-0000-0000-00000000000d', 'dan@example.com', '{"username": "dan"}'),
+  ('00000000-0000-0000-0000-00000000000e', 'erin@example.com', '{"username": "erin"}');
 -- Plain SQL passes the guards and writes no log row (the caller is not an admin member).
 update public.profiles set role = 'admin'
   where id in ('00000000-0000-0000-0000-00000000000a', '00000000-0000-0000-0000-00000000000c',
@@ -228,7 +228,7 @@ select throws_ok($$ insert into storage.objects (bucket_id, name)
 -- The app removes avatars/<id>/ files first, then deletes the auth user (feature 6).
 select tests.reset();
 insert into auth.users (id, email, raw_user_meta_data)
-  values ('00000000-0000-0000-0000-00000000000f', 'frank@example.com', '{}');
+  values ('00000000-0000-0000-0000-00000000000f', 'frank@example.com', '{"username": "frank"}');
 insert into public.games (name, added_by) values ('Frank Game', '00000000-0000-0000-0000-00000000000f');
 insert into public.game_owners (game_id, member_id) values
   (tests.gid('Frank Game'), '00000000-0000-0000-0000-00000000000f'),

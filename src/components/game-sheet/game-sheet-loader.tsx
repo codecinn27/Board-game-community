@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { getGameDetail, type GameDetail } from "@/lib/games/detail";
 import { CloseLink } from "./close-link";
 import { GameSheet } from "./game-sheet";
@@ -15,11 +15,11 @@ type GameSheetLoaderProps = {
  * (spec 0008). An unknown id is the 404; a failed read is the error block.
  */
 export async function GameSheetLoader({ id }: GameSheetLoaderProps) {
-  const t = await getTranslations("game");
+  const [t, locale] = await Promise.all([getTranslations("game"), getLocale()]);
   let game: GameDetail | null = null;
   let failed = false;
   try {
-    game = await getGameDetail(id);
+    game = await getGameDetail(id, locale);
   } catch {
     failed = true;
   }

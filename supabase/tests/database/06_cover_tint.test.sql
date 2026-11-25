@@ -80,6 +80,7 @@ select columns_are('public', 'game_stats',
     'id', 'name', 'name_normalized', 'cover_path', 'players_min', 'players_max',
     'play_time_min', 'play_time_max', 'description', 'source_kind', 'source_provider',
     'source_id', 'source_url', 'added_by', 'created_at', 'updated_at', 'cover_tint',
+    'reviewed_at', 'reviewed_by', 'name_zh', 'description_zh', 'name_zh_normalized',
     'owner_count', 'rating_count', 'avg_time_to_learn', 'avg_luck', 'avg_strategy',
     'avg_entertainment', 'avg_recommendation', 'best_players_mode', 'wishlist_count'
   ],

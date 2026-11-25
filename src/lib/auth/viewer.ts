@@ -5,7 +5,15 @@ import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
 
 export type ViewerState =
-  { kind: "guest" } | { kind: "member"; id: string; email: string | null };
+  | { kind: "guest" }
+  | {
+      kind: "member";
+      id: string;
+      email: string | null;
+      role: "member" | "admin";
+      status: "active" | "disabled";
+      displayName: string | null;
+    };
 
 /**
  * Who is looking, from the verified claims (never `getSession()`, which trusts
@@ -21,9 +29,19 @@ export const getViewer = cache(async (): Promise<ViewerState> => {
   const { data } = await supabase.auth.getClaims();
   const claims = data?.claims;
   if (!claims?.sub) return { kind: "guest" };
+  // One indexed profile read. A missing row counts as an active member, never
+  // an admin (spec 0013).
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role, status, display_name")
+    .eq("id", claims.sub)
+    .maybeSingle();
   return {
     kind: "member",
     id: claims.sub,
     email: typeof claims.email === "string" ? claims.email : null,
+    role: profile?.role === "admin" ? "admin" : "member",
+    status: profile?.status === "disabled" ? "disabled" : "active",
+    displayName: profile?.display_name ?? null,
   };
 });

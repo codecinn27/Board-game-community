@@ -21,7 +21,7 @@ export async function loadGameSheet(
 ): Promise<SheetResult> {
   try {
     if (!hasLocale(locale)) return { status: "notfound" };
-    const game = await getGameDetail(String(id));
+    const game = await getGameDetail(String(id), locale);
     if (game === null) return { status: "notfound" };
     return {
       status: "ready",

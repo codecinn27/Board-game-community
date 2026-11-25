@@ -38,6 +38,9 @@ export function authRedirect(
 ): string | null {
   const clean = path.length > 1 ? path.replace(/\/+$/, "") : path;
   if (clean === "/me" && !session.signedIn) return "/sign-in?next=/me";
+  if (clean === "/games/new" && !session.signedIn) {
+    return "/sign-in?next=/games/new";
+  }
   if (
     (clean === "/sign-in" || clean === "/forgot-password") &&
     session.signedIn

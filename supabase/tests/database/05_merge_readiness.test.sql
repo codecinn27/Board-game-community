@@ -29,6 +29,8 @@ select is(
   (select array_agg(t.table_name::text order by t.table_name)
     from information_schema.columns t
     where t.table_schema = 'public' and t.column_name = 'game_id'
+      -- History tables keep game_id with no foreign key on purpose, so they outlive the game.
+      and t.table_name not in ('game_edits', 'cover_trash')
       and not exists (
         select 1 from pg_constraint c
         join pg_attribute a on a.attrelid = c.conrelid and a.attnum = any (c.conkey)
@@ -43,8 +45,8 @@ select is(
 select is(
   (select array_agg(conrelid::regclass::text order by conrelid::regclass::text)
     from pg_constraint where contype = 'f' and confrelid = 'public.games'::regclass),
-  array['comments', 'game_owners', 'ratings', 'top_picks', 'wishlist_entries'],
-  'the tables pointing at games are the known five (add new ones here with their unique rule)'
+  array['comments', 'game_categories', 'game_owners', 'ratings', 'top_picks', 'wishlist_entries'],
+  'the tables pointing at games are the known six (add new ones here with their unique rule)'
 );
 
 select * from finish();

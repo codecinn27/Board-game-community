@@ -28,6 +28,16 @@ describe("authRedirect", () => {
     expect(authRedirect("/me", none, GUEST)).toBe("/sign-in?next=/me");
   });
 
+  it("sends a guest on /games/new to sign in, keeping the way back", () => {
+    expect(authRedirect("/games/new", none, GUEST)).toBe(
+      "/sign-in?next=/games/new",
+    );
+  });
+
+  it("lets a member through /games/new", () => {
+    expect(authRedirect("/games/new", none, member)).toBeNull();
+  });
+
   it("lets a member through /me", () => {
     expect(authRedirect("/me", none, member)).toBeNull();
   });
