@@ -2,10 +2,15 @@ import { defineConfig } from "@playwright/test";
 
 // Playwright does not load `.env.local` (only the dev server does), and the
 // email checks need SUPABASE_SECRET_KEY, SMTP_URL, and MAILPIT_URL.
-try {
-  process.loadEnvFile(".env.local");
-} catch {
-  // No .env.local: the tests that need it skip or fail with a clear message.
+// `.env.e2e` (the local Supabase stack) loads first and wins: loadEnvFile never
+// overwrites a variable that is already set, and the dev server that
+// Playwright starts inherits these values over its own `.env.local`.
+for (const file of [".env.e2e", ".env.local"]) {
+  try {
+    process.loadEnvFile(file);
+  } catch {
+    // Missing file: the tests that need it skip or fail with a clear message.
+  }
 }
 
 // Local only for now (spec 0004, AC-11): runs against `pnpm dev`, which needs
