@@ -43,20 +43,6 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
-                },"categories": {
-                  Row: {
-                    "created_at": string,"id": number,"name_en": string,"name_zh": string,"slug": string
-                  }
-                  ComputedFields: never
-                  Insert: {
-                    "created_at"?: string,"id"?: never,"name_en": string,"name_zh": string,"slug": string
-                  }
-                  Update: {
-                    "created_at"?: string,"id"?: never,"name_en"?: string,"name_zh"?: string,"slug"?: string
-                  }
-                  Relationships: [
-                    
-                  ]
                 },"comments": {
                   Row: {
                     "body": string,"created_at": string,"game_id": number,"id": number,"member_id": string,"updated_at": string
@@ -123,37 +109,19 @@ isOneToOne: false
                   Relationships: [
                     
                   ]
-                },"game_categories": {
+                },"feels": {
                   Row: {
-                    "category_id": number,"game_id": number
+                    "id": number,"name_en": string,"name_zh": string,"position": number,"slug": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "category_id": number,"game_id": number
+                    "id"?: never,"name_en": string,"name_zh": string,"position": number,"slug": string
                   }
                   Update: {
-                    "category_id"?: number,"game_id"?: number
+                    "id"?: never,"name_en"?: string,"name_zh"?: string,"position"?: number,"slug"?: string
                   }
                   Relationships: [
-                    {
-      foreignKeyName: "game_categories_category_id_fkey"
-      columns: ["category_id"]
-isOneToOne: false
-      referencedRelation: "categories"
-      referencedColumns: ["id"]
-    },{
-      foreignKeyName: "game_categories_game_id_fkey"
-      columns: ["game_id"]
-isOneToOne: false
-      referencedRelation: "game_stats"
-      referencedColumns: ["id"]
-    },{
-      foreignKeyName: "game_categories_game_id_fkey"
-      columns: ["game_id"]
-isOneToOne: false
-      referencedRelation: "games"
-      referencedColumns: ["id"]
-    }
+                    
                   ]
                 },"game_edits": {
                   Row: {
@@ -172,6 +140,70 @@ isOneToOne: false
       columns: ["edited_by"]
 isOneToOne: false
       referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"game_feels": {
+                  Row: {
+                    "feel_id": number,"game_id": number
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "feel_id": number,"game_id": number
+                  }
+                  Update: {
+                    "feel_id"?: number,"game_id"?: number
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "game_feels_feel_id_fkey"
+      columns: ["feel_id"]
+isOneToOne: false
+      referencedRelation: "feels"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "game_feels_game_id_fkey"
+      columns: ["game_id"]
+isOneToOne: false
+      referencedRelation: "game_stats"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "game_feels_game_id_fkey"
+      columns: ["game_id"]
+isOneToOne: false
+      referencedRelation: "games"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"game_mechanics": {
+                  Row: {
+                    "game_id": number,"mechanic_id": number
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "game_id": number,"mechanic_id": number
+                  }
+                  Update: {
+                    "game_id"?: number,"mechanic_id"?: number
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "game_mechanics_game_id_fkey"
+      columns: ["game_id"]
+isOneToOne: false
+      referencedRelation: "game_stats"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "game_mechanics_game_id_fkey"
+      columns: ["game_id"]
+isOneToOne: false
+      referencedRelation: "games"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "game_mechanics_mechanic_id_fkey"
+      columns: ["mechanic_id"]
+isOneToOne: false
+      referencedRelation: "mechanics"
       referencedColumns: ["id"]
     }
                   ]
@@ -207,6 +239,38 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"game_themes": {
+                  Row: {
+                    "game_id": number,"theme_id": number
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "game_id": number,"theme_id": number
+                  }
+                  Update: {
+                    "game_id"?: number,"theme_id"?: number
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "game_themes_game_id_fkey"
+      columns: ["game_id"]
+isOneToOne: false
+      referencedRelation: "game_stats"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "game_themes_game_id_fkey"
+      columns: ["game_id"]
+isOneToOne: false
+      referencedRelation: "games"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "game_themes_theme_id_fkey"
+      columns: ["theme_id"]
+isOneToOne: false
+      referencedRelation: "themes"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"games": {
                   Row: {
                     "added_by": string | null,"cover_path": string | null,"cover_tint": string | null,"created_at": string,"description": string | null,"description_zh": string | null,"id": number,"name": string,"name_normalized": string | null,"name_zh": string | null,"name_zh_normalized": string | null,"play_time_max": number | null,"play_time_min": number | null,"players_max": number | null,"players_min": number | null,"reviewed_at": string | null,"reviewed_by": string | null,"source_id": string | null,"source_kind": Database["public"]['Enums']["game_source_kind"],"source_provider": string | null,"source_url": string | null,"updated_at": string
@@ -232,6 +296,20 @@ isOneToOne: false
       referencedRelation: "profiles"
       referencedColumns: ["id"]
     }
+                  ]
+                },"mechanics": {
+                  Row: {
+                    "description_en": string | null,"description_zh": string | null,"id": number,"name_en": string,"name_zh": string,"position": number,"slug": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "description_en"?: string | null,"description_zh"?: string | null,"id"?: never,"name_en": string,"name_zh": string,"position": number,"slug": string
+                  }
+                  Update: {
+                    "description_en"?: string | null,"description_zh"?: string | null,"id"?: never,"name_en"?: string,"name_zh"?: string,"position"?: number,"slug"?: string
+                  }
+                  Relationships: [
+                    
                   ]
                 },"profiles": {
                   Row: {
@@ -278,6 +356,20 @@ isOneToOne: false
       referencedRelation: "profiles"
       referencedColumns: ["id"]
     }
+                  ]
+                },"themes": {
+                  Row: {
+                    "id": number,"name_en": string,"name_zh": string,"position": number,"slug": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "id"?: never,"name_en": string,"name_zh": string,"position": number,"slug": string
+                  }
+                  Update: {
+                    "id"?: never,"name_en"?: string,"name_zh"?: string,"position"?: number,"slug"?: string
+                  }
+                  Relationships: [
+                    
                   ]
                 },"top_picks": {
                   Row: {
@@ -376,7 +468,7 @@ isOneToOne: false
 { Args: { "new_status": Database["public"]['Enums']["member_status"],"target": string }; Returns: undefined
                            },
 "admin_update_game":
-{ Args: { "p_category_ids": (number)[],"p_cover_path": string,"p_cover_tint": string,"p_description": string,"p_description_zh": string,"p_game_id": number,"p_mark_reviewed": boolean,"p_name": string,"p_name_zh": string,"p_owner_ids": (string)[],"p_play_time_max": number,"p_play_time_min": number,"p_players_max": number,"p_players_min": number }; Returns: string
+{ Args: { "p_cover_path": string,"p_cover_tint": string,"p_description": string,"p_description_zh": string,"p_feel_ids": (number)[],"p_game_id": number,"p_mark_reviewed": boolean,"p_mechanic_ids": (number)[],"p_name": string,"p_name_zh": string,"p_owner_ids": (string)[],"p_play_time_max": number,"p_play_time_min": number,"p_players_max": number,"p_players_min": number,"p_theme_ids": (number)[] }; Returns: string
                            },
 "claim_email_slot":
 { Args: { "p_cap": number,"p_kind": string,"p_user_id": string }; Returns: string

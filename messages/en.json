@@ -477,21 +477,11 @@
         "zh": "中文"
       },
       "zhHint": "Optional. Shown on the Chinese pages; the English text is used when this is blank.",
-      "categories": {
-        "title": "Categories",
-        "none": "No categories yet.",
-        "add": "Add a category",
-        "nameEn": "English label",
-        "nameZh": "Chinese label",
-        "create": "Add category",
-        "creating": "Adding",
-        "exists": "That category already exists, so it is ticked for you.",
-        "failed": "Could not add the category. Try again in a moment.",
-        "errors": {
-          "required": "Enter a label.",
-          "long": "Use at most 60 characters.",
-          "symbols": "Use at least one letter or number."
-        }
+      "groups": {
+        "feel": { "title": "Game feel" },
+        "theme": { "title": "Game theme" },
+        "mechanic": { "title": "Game mechanics" },
+        "none": "Nothing to pick."
       },
       "owners": {
         "title": "Owners",

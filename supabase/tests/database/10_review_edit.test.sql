@@ -5,7 +5,7 @@ begin;
 delete from public.games;
 delete from auth.users;
 
-select plan(51);
+select plan(53);
 
 create schema tests;
 grant usage on schema tests to public;
@@ -46,19 +46,26 @@ create function tests.gid(n text) returns bigint language sql as $$
   select id from public.games where name = n;
 $$;
 
-create function tests.cat(s text) returns bigint language sql as $$
-  select id from public.categories where slug = s;
+create function tests.feel(s text) returns bigint language sql as $$
+  select id from public.feels where slug = s;
+$$;
+create function tests.theme(s text) returns bigint language sql as $$
+  select id from public.themes where slug = s;
+$$;
+create function tests.mech(s text) returns bigint language sql as $$
+  select id from public.mechanics where slug = s;
 $$;
 
 -- Calls admin_update_game with fixed description, players, and time.
 create function tests.upd(
   p_id bigint, p_name text, p_name_zh text default null,
-  p_cats bigint[] default '{}', p_owners uuid[] default '{}',
-  p_mark boolean default false, p_cover text default null
+  p_feels bigint[] default '{}', p_owners uuid[] default '{}',
+  p_mark boolean default false, p_cover text default null,
+  p_themes bigint[] default '{}', p_mechs bigint[] default '{}'
 ) returns text language sql as $$
   select public.admin_update_game(
     p_id, p_name, p_name_zh, 'd', null, 2::smallint, 4::smallint, 30::smallint, 60::smallint,
-    p_cats, p_owners, p_cover, null, p_mark);
+    p_feels, p_themes, p_mechs, p_owners, p_cover, null, p_mark);
 $$;
 
 grant execute on all functions in schema tests to public;
@@ -79,7 +86,7 @@ insert into public.game_owners (game_id, member_id) values
   (tests.gid('Delta'), '00000000-0000-0000-0000-0000000000d1');
 
 -- Objects ---------------------------------------------------------------------------
-select is((select count(*)::int from public.categories), 10, 'AC-25: the starter categories are seeded');
+select is((select count(*)::int from public.feels), 5, 'spec 0014: the feel list is seeded');
 select is((select public from storage.buckets where id = 'covers-trash'), false,
   'AC-22: covers-trash is a private bucket');
 
@@ -91,8 +98,8 @@ select tests.act_anon();
 select throws_ok($$ select tests.upd(tests.gid('Alpha'), 'Hacked') $$, '42501', null,
   'AC-20: a guest cannot call admin_update_game');
 select tests.act_as('00000000-0000-0000-0000-0000000000a1');
-select throws_ok($$ insert into public.categories (slug, name_en, name_zh) values ('x', 'X', 'X') $$,
-  '42501', null, 'AC-25: a member cannot add a category');
+select throws_ok($$ insert into public.feels (slug, name_en, name_zh, position) values ('x', 'X', 'X', 99) $$,
+  '42501', null, 'spec 0014: a member cannot add a feel');
 select throws_ok($$ insert into public.game_owners (game_id, member_id)
   values (tests.gid('Beta'), '00000000-0000-0000-0000-0000000000d1') $$,
   '42501', null, 'a member cannot add someone else as an owner');
@@ -105,15 +112,20 @@ select throws_ok($$ update public.games set cover_tint = '#000000' where name = 
 select tests.act_as('00000000-0000-0000-0000-0000000000ad');
 select is(
   tests.upd(tests.gid('Alpha'), 'Alpha Prime', '阿尔法',
-    array[tests.cat('strategy'), tests.cat('party')],
+    array[tests.feel('strategy'), tests.feel('cooperative')],
     array['00000000-0000-0000-0000-0000000000a1', '00000000-0000-0000-0000-0000000000ad']::uuid[],
-    false, 'x.webp'),
+    false, 'x.webp',
+    array[tests.theme('fantasy')], array[tests.mech('trading'), tests.mech('bidding'), tests.mech('voting')]),
   'ok', 'AC-19: an admin edit returns ok');
 select is(
   (select name || '|' || name_zh || '|' || cover_path from public.games where name = 'Alpha Prime'),
   'Alpha Prime|阿尔法|x.webp', 'AC-19: the game row has the new values');
-select is((select count(*)::int from public.game_categories where game_id = tests.gid('Alpha Prime')), 2,
-  'AC-25: both categories are linked');
+select is((select count(*)::int from public.game_feels where game_id = tests.gid('Alpha Prime')), 2,
+  'spec 0014: both feels are linked');
+select is((select count(*)::int from public.game_themes where game_id = tests.gid('Alpha Prime')), 1,
+  'spec 0014: the theme is linked');
+select is((select count(*)::int from public.game_mechanics where game_id = tests.gid('Alpha Prime')), 3,
+  'spec 0014: all three mechanics are linked');
 select is(
   (select array_agg(member_id order by member_id) from public.game_owners where game_id = tests.gid('Alpha Prime')),
   array['00000000-0000-0000-0000-0000000000a1', '00000000-0000-0000-0000-0000000000ad']::uuid[],
@@ -123,7 +135,7 @@ select is((select count(*)::int from public.game_edits where game_id = tests.gid
 select is(
   (select changed from public.game_edits where game_id = tests.gid('Alpha Prime')),
   array['name', 'name_zh', 'description', 'players_min', 'players_max', 'play_time_min',
-        'play_time_max', 'cover_path', 'category_ids', 'owner_ids'],
+        'play_time_max', 'cover_path', 'feels', 'themes', 'mechanics', 'owner_ids'],
   'AC-21: the history row lists the changed fields');
 select is(
   (select (before ->> 'name') || '>' || (after ->> 'name') from public.game_edits where game_id = tests.gid('Alpha Prime')),
@@ -136,17 +148,19 @@ select is((select game_name from public.game_edits where game_id = tests.gid('Al
 -- Saving with no change writes no row; marking reviewed alone is not an edit.
 select is(
   tests.upd(tests.gid('Alpha Prime'), 'Alpha Prime', '阿尔法',
-    array[tests.cat('strategy'), tests.cat('party')],
+    array[tests.feel('strategy'), tests.feel('cooperative')],
     array['00000000-0000-0000-0000-0000000000a1', '00000000-0000-0000-0000-0000000000ad']::uuid[],
-    false, 'x.webp'),
+    false, 'x.webp',
+    array[tests.theme('fantasy')], array[tests.mech('trading'), tests.mech('bidding'), tests.mech('voting')]),
   'ok', 'AC-19: saving with no change is ok');
 select is((select count(*)::int from public.game_edits where game_id = tests.gid('Alpha Prime')), 1,
   'AC-19: no change writes no history row');
 select is(
   tests.upd(tests.gid('Alpha Prime'), 'Alpha Prime', '阿尔法',
-    array[tests.cat('strategy'), tests.cat('party')],
+    array[tests.feel('strategy'), tests.feel('cooperative')],
     array['00000000-0000-0000-0000-0000000000a1', '00000000-0000-0000-0000-0000000000ad']::uuid[],
-    true, 'x.webp'),
+    true, 'x.webp',
+    array[tests.theme('fantasy')], array[tests.mech('trading'), tests.mech('bidding'), tests.mech('voting')]),
   'ok', 'AC-19: save and looks right is ok');
 select is(
   (select reviewed_by from public.games where name = 'Alpha Prime'),
@@ -162,10 +176,10 @@ select is((select name from public.games where id = tests.gid('Alpha Prime')), '
 select is(tests.upd(tests.gid('Gamma'), 'Changed'), 'reviewed', 'AC-20: a seeded reviewed game is refused');
 select is(tests.upd(-1, 'Nope'), 'notfound', 'an unknown id returns notfound');
 select throws_ok($$ select public.admin_update_game(tests.gid('Beta'), 'Beta', null, null, null,
-  null, null, null, null, null, '{}', null, null, false) $$, '22023', null,
-  'a null category list is refused');
+  null, null, null, null, null, '{}', '{}', '{}', null, null, false) $$, '22023', null,
+  'a null feel list is refused');
 select throws_ok($$ select public.admin_update_game(tests.gid('Beta'), 'Beta', null, null, null,
-  null, null, null, null, '{}', null, null, null, false) $$, '22023', null,
+  null, null, null, null, '{}', '{}', '{}', null, null, null, false) $$, '22023', null,
   'a null owner list is refused');
 select throws_ok($$ select tests.upd(tests.gid('Beta'), ' !! ') $$, '22023', null,
   'a name with no letter or number is refused');

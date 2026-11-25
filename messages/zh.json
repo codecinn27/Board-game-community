@@ -477,21 +477,11 @@
         "zh": "中文"
       },
       "zhHint": "选填。中文页面会显示这里的内容；留空时使用英文。",
-      "categories": {
-        "title": "分类",
-        "none": "还没有分类。",
-        "add": "添加分类",
-        "nameEn": "英文名称",
-        "nameZh": "中文名称",
-        "create": "添加分类",
-        "creating": "正在添加",
-        "exists": "这个分类已存在，已为你勾选。",
-        "failed": "无法添加分类，请稍后再试。",
-        "errors": {
-          "required": "请输入名称。",
-          "long": "最多 60 个字符。",
-          "symbols": "至少需要一个文字或数字。"
-        }
+      "groups": {
+        "feel": { "title": "游戏氛围" },
+        "theme": { "title": "游戏主题" },
+        "mechanic": { "title": "游戏机制" },
+        "none": "没有可选项。"
       },
       "owners": {
         "title": "拥有者",

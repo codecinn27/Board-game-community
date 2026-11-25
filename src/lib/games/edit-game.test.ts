@@ -111,7 +111,9 @@ describe("toEditInput", () => {
         playTimeMax: 120,
         coverPath: null,
         coverTint: null,
-        categoryIds: [],
+        feelIds: [],
+        themeIds: [],
+        mechanicIds: [],
         owners: [],
       }),
     ).toEqual({
@@ -152,7 +154,9 @@ describe("tabForErrors", () => {
 describe("isEditDirty", () => {
   const initial: EditSnapshot = {
     fields: input({ description: "Trade" }),
-    categoryIds: [1, 2],
+    feelIds: [1, 2],
+    themeIds: [3],
+    mechanicIds: [4, 5],
     ownerIds: ["a", "b"],
     cover: "keep",
   };
@@ -166,7 +170,8 @@ describe("isEditDirty", () => {
       isEditDirty(initial, {
         ...initial,
         fields: { ...initial.fields, description: "  Trade " },
-        categoryIds: [2, 1],
+        feelIds: [2, 1],
+        mechanicIds: [5, 4],
         ownerIds: ["b", "a"],
       }),
     ).toBe(false);
@@ -181,8 +186,10 @@ describe("isEditDirty", () => {
     ).toBe(true);
   });
 
-  it("is dirty after a category or owner change", () => {
-    expect(isEditDirty(initial, { ...initial, categoryIds: [1] })).toBe(true);
+  it("is dirty after a feel, theme, mechanic, or owner change", () => {
+    expect(isEditDirty(initial, { ...initial, feelIds: [1] })).toBe(true);
+    expect(isEditDirty(initial, { ...initial, themeIds: [] })).toBe(true);
+    expect(isEditDirty(initial, { ...initial, mechanicIds: [4] })).toBe(true);
     expect(isEditDirty(initial, { ...initial, ownerIds: ["a"] })).toBe(true);
   });
 

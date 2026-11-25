@@ -58,7 +58,12 @@ export async function ReviewLoader({ searchParams }: ReviewLoaderProps) {
 
   let queue: ReviewQueue | null = null;
   // The editor's choices are only needed on the To review tab.
-  let lists: EditorLists = { categories: [], members: [] };
+  let lists: EditorLists = {
+    feels: [],
+    themes: [],
+    mechanics: [],
+    members: [],
+  };
   try {
     [queue, lists] = await Promise.all([
       getReviewQueue(tab, shown),
@@ -217,7 +222,9 @@ async function ReviewItem({
           playTimeMax: row.playTimeMax,
           coverPath: row.coverPath,
           coverTint: row.coverTint,
-          categoryIds: row.categoryIds,
+          feelIds: row.feelIds,
+          themeIds: row.themeIds,
+          mechanicIds: row.mechanicIds,
           owners: row.owners,
         }}
         lists={lists}

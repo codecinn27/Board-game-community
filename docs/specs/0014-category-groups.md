@@ -1,7 +1,7 @@
 # 0014. Game categories in three groups: feel, theme, mechanics
 
 **Date**: 2026-11-25
-**Status**: Proposed
+**Status**: In Progress
 
 ## Summary
 
@@ -192,14 +192,14 @@ The migration drops the old function by its full old signature (`drop function p
 
 Approach: Tracer Bullet (the project default). The thin thread is the feel group end to end (table, link, function, editor section), then the other two groups and the hints thicken it. Because the function signature changes once, the migration holds all three groups from the start.
 
-1. Migration `20261125090000_category_groups.sql`: drop the old function, `game_categories`, and `categories`; create the six tables with RLS and grants; seed the three lists; create the new `admin_update_game` with its grants. Satisfies **AC-1**, **AC-2**, **AC-3**, **AC-6**, **AC-7**, **AC-8**, **AC-9**.
-2. pgTAP: new file for the three groups (seed, RLS, function, null list, history keys, service role cannot write choices). Update `10_review_edit.test.sql` (the `tests.cat` helper, the exact `changed` array, the plan count) and `05_merge_readiness.test.sql` (the expected list becomes `comments, game_feels, game_mechanics, game_owners, game_themes, ratings, top_picks, wishlist_entries`, eight not six; record the link merge rule, primary key with `on conflict do nothing`, for feature 19). `seed.sql` needs no sample tags. Satisfies **AC-1**, **AC-5** to **AC-9**.
-3. Regenerate `database.types.ts`. Satisfies **AC-3**.
-4. Thin thread in code: `getEditorLists`, `getReviewQueue`, the `edit-game.ts` types and dirty check, and `saveGame` pass the feel list through; the editor shows the "Game feel" section from the new picker. Satisfies **AC-4**, **AC-5**.
-5. Thicken: theme and mechanic lists and the mechanic hint text; one shared group picker component (replacing `category-picker.tsx`); remove `createCategory`, `validateCategory`, `slugify` and their tests; keep the label helper. Satisfies **AC-4**, **AC-6**, **AC-9**.
-6. Messages in `messages/en.json` and `messages/zh.json`: replace `review.editor.categories` with the three group titles and hints (same keys in both files). Satisfies **AC-4**.
-7. Update the unit tests (`edit-game.test.ts` including the dirty check, `actions.test.ts`, `categories.test.ts` becomes `choices.test.ts` for the label and hint helpers) and `e2e/review-edit.spec.ts` (tick in all three groups, Chinese labels and hints on `/zh`, no add form, the history check expects `feels`, `themes`, `mechanics` instead of `category_ids`). Satisfies **AC-4** to **AC-6**, **AC-10**.
-8. Docs: add a one line pointer under 0013 AC-25 ("replaced by spec 0014"), update `supabase/AGENTS.md` if it names categories, remove the `categories` mention in `docs/scope/scope.md`, and tick the scope sub task. Satisfies **AC-10**.
+- [x] 1. Migration `20261125090000_category_groups.sql`: drop the old function, `game_categories`, and `categories`; create the six tables with RLS and grants; seed the three lists; create the new `admin_update_game` with its grants. Satisfies **AC-1**, **AC-2**, **AC-3**, **AC-6**, **AC-7**, **AC-8**, **AC-9**.
+- [x] 2. pgTAP: new file for the three groups (seed, RLS, function, null list, history keys, service role cannot write choices). Update `10_review_edit.test.sql` (the `tests.cat` helper, the exact `changed` array, the plan count) and `05_merge_readiness.test.sql` (the expected list becomes `comments, game_feels, game_mechanics, game_owners, game_themes, ratings, top_picks, wishlist_entries`, eight not six; record the link merge rule, primary key with `on conflict do nothing`, for feature 19). `seed.sql` needs no sample tags. Satisfies **AC-1**, **AC-5** to **AC-9**.
+- [x] 3. Regenerate `database.types.ts`. Satisfies **AC-3**.
+- [x] 4. Thin thread in code: `getEditorLists`, `getReviewQueue`, the `edit-game.ts` types and dirty check, and `saveGame` pass the feel list through; the editor shows the "Game feel" section from the new picker. Satisfies **AC-4**, **AC-5**.
+- [x] 5. Thicken: theme and mechanic lists and the mechanic hint text; one shared group picker component (replacing `category-picker.tsx`); remove `createCategory`, `validateCategory`, `slugify` and their tests; keep the label helper. Satisfies **AC-4**, **AC-6**, **AC-9**.
+- [x] 6. Messages in `messages/en.json` and `messages/zh.json`: replace `review.editor.categories` with the three group titles and hints (same keys in both files). Satisfies **AC-4**.
+- [x] 7. Update the unit tests (`edit-game.test.ts` including the dirty check, `actions.test.ts`, `categories.test.ts` becomes `choices.test.ts` for the label and hint helpers) and `e2e/review-edit.spec.ts` (tick in all three groups, Chinese labels and hints on `/zh`, no add form, the history check expects `feels`, `themes`, `mechanics` instead of `category_ids`). Satisfies **AC-4** to **AC-6**, **AC-10**.
+- [x] 8. Docs: add a one line pointer under 0013 AC-25 ("replaced by spec 0014"), update `supabase/AGENTS.md` if it names categories, remove the `categories` mention in `docs/scope/scope.md`, and tick the scope sub task. Satisfies **AC-10**.
 
 ## Migration plan
 

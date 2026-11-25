@@ -22,7 +22,6 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { useRouter } from "@/i18n/navigation";
-import { type EditorCategory } from "@/lib/games/categories";
 import {
   isEditDirty,
   tabForErrors,
@@ -39,7 +38,7 @@ import {
 } from "@/lib/games/edit-game";
 import { DESCRIPTION_MAX, NAME_MAX } from "@/lib/games/new-game";
 import { cn } from "@/lib/utils";
-import { CategoryPicker } from "./category-picker";
+import { ChoiceGroup } from "./choice-group";
 import { CoverField, type CoverState } from "./cover-field";
 import { OwnerPicker } from "./owner-picker";
 
@@ -83,10 +82,9 @@ export function ReviewEditor({ game, lists, onClose }: ReviewEditorProps) {
   const [initial] = useState(() => toEditInput(game));
   const initialOwnerIds = game.owners.map((owner) => owner.id);
   const [values, setValues] = useState<EditGameInput>(initial);
-  const [categories, setCategories] = useState<readonly EditorCategory[]>(
-    lists.categories,
-  );
-  const [categoryIds, setCategoryIds] = useState<number[]>(game.categoryIds);
+  const [feelIds, setFeelIds] = useState<number[]>(game.feelIds);
+  const [themeIds, setThemeIds] = useState<number[]>(game.themeIds);
+  const [mechanicIds, setMechanicIds] = useState<number[]>(game.mechanicIds);
   const [ownerIds, setOwnerIds] = useState<string[]>(initialOwnerIds);
   const [cover, setCover] = useState<CoverState>({
     change: "keep",
@@ -108,13 +106,17 @@ export function ReviewEditor({ game, lists, onClose }: ReviewEditorProps) {
 
   const snapshot = (): EditSnapshot => ({
     fields: values,
-    categoryIds,
+    feelIds,
+    themeIds,
+    mechanicIds,
     ownerIds,
     cover: cover.change,
   });
   const initialSnapshot: EditSnapshot = {
     fields: initial,
-    categoryIds: game.categoryIds,
+    feelIds: game.feelIds,
+    themeIds: game.themeIds,
+    mechanicIds: game.mechanicIds,
     ownerIds: initialOwnerIds,
     cover: "keep",
   };
@@ -154,7 +156,9 @@ export function ReviewEditor({ game, lists, onClose }: ReviewEditorProps) {
     const data = new FormData();
     data.set("gameId", String(game.id));
     for (const key of TEXT_KEYS) data.set(key, values[key]);
-    data.set("categoryIds", JSON.stringify(categoryIds));
+    data.set("feelIds", JSON.stringify(feelIds));
+    data.set("themeIds", JSON.stringify(themeIds));
+    data.set("mechanicIds", JSON.stringify(mechanicIds));
     data.set("ownerIds", JSON.stringify(ownerIds));
     data.set("markReviewed", approve ? "true" : "false");
     if (cover.change === "replace" && cover.picked) {
@@ -401,13 +405,27 @@ export function ReviewEditor({ game, lists, onClose }: ReviewEditorProps) {
               error={rangeError(errors.playTimeMin ?? errors.playTimeMax)}
             />
 
-            <CategoryPicker
-              categories={categories}
-              selected={categoryIds}
-              onChange={setCategoryIds}
-              onCreated={(category) =>
-                setCategories((current) => [...current, category])
-              }
+            <ChoiceGroup
+              legend={t("groups.feel.title")}
+              choices={lists.feels}
+              selected={feelIds}
+              onChange={setFeelIds}
+              disabled={pending}
+            />
+
+            <ChoiceGroup
+              legend={t("groups.theme.title")}
+              choices={lists.themes}
+              selected={themeIds}
+              onChange={setThemeIds}
+              disabled={pending}
+            />
+
+            <ChoiceGroup
+              legend={t("groups.mechanic.title")}
+              choices={lists.mechanics}
+              selected={mechanicIds}
+              onChange={setMechanicIds}
               disabled={pending}
             />
 
