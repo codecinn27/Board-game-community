@@ -72,6 +72,34 @@ describe("getGameDetail", () => {
     expect(detail?.owners).toEqual([]);
   });
 
+  // covers: spec 0014 AC-13
+  it("returns the saved feels, themes, and mechanics in position order", async () => {
+    const tables = fixtureTables();
+    const choice = (id: number, position: number) => ({
+      choice: {
+        id,
+        slug: `c${id}`,
+        name_en: `En ${id}`,
+        name_zh: `中 ${id}`,
+        position,
+      },
+    });
+    tables.games = [
+      {
+        id: 1,
+        game_feels: [choice(2, 2), choice(1, 1)],
+        game_themes: [],
+        game_mechanics: [choice(5, 3)],
+      },
+    ];
+    use(tables);
+
+    const detail = await getGameDetail("1", "en");
+    expect(detail?.feels.map((c) => c.id)).toEqual([1, 2]);
+    expect(detail?.themes).toEqual([]);
+    expect(detail?.mechanics[0]?.nameZh).toBe("中 5");
+  });
+
   // covers: AC-4
   it("returns null for an unknown id and never asks the database for a bad one", async () => {
     expect(await getGameDetail("999", "en")).toBeNull();

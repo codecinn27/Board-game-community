@@ -121,6 +121,11 @@
       "more": "More",
       "less": "Less"
     },
+    "choices": {
+      "feel": "Game feel",
+      "theme": "Game theme",
+      "mechanic": "Game mechanics"
+    },
     "owners": {
       "heading": "Owners ({count})",
       "since": "Since {date}",
@@ -420,6 +425,14 @@
       "done": "Nothing reviewed yet"
     },
     "error": "Could not load the list. Try again in a moment.",
+    "prompt": {
+      "title": "AI prompt to tag these games",
+      "hint": "Copy this into an AI chat. It lists every game still to review. Run the SQL it gives you in the Supabase SQL editor, then check the tags here.",
+      "copy": "Copy prompt",
+      "copied": "Copied",
+      "copyFailed": "Could not copy. Select the text and copy it by hand.",
+      "field": "AI tagging prompt"
+    },
     "showMore": "Show more",
     "row": {
       "players": "Players",
@@ -478,9 +491,9 @@
       },
       "zhHint": "Optional. Shown on the Chinese pages; the English text is used when this is blank.",
       "groups": {
-        "feel": { "title": "Game feel" },
-        "theme": { "title": "Game theme" },
-        "mechanic": { "title": "Game mechanics" },
+        "feel": { "title": "Game feel (optional)" },
+        "theme": { "title": "Game theme (optional)" },
+        "mechanic": { "title": "Game mechanics (optional)" },
         "none": "Nothing to pick."
       },
       "owners": {

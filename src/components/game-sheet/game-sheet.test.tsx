@@ -68,6 +68,61 @@ describe("GameSheet", () => {
     expect(html).toContain("I own this");
   });
 
+  describe("choice rows (spec 0014, AC-11)", () => {
+    const pick = (id: number, en: string, zh: string) => ({
+      id,
+      slug: en.toLowerCase(),
+      nameEn: en,
+      nameZh: zh,
+    });
+
+    it("shows feel then mechanics between description and owners, and hides the empty theme row", async () => {
+      const html = await sheet(
+        detail(1, {
+          feels: [
+            pick(1, "Party Games", "派对游戏"),
+            pick(2, "Strategy", "策略"),
+          ],
+          themes: [],
+          mechanics: [pick(3, "Trading", "交易")],
+        }),
+      );
+      const text = textOf(html);
+
+      expect(text).toContain("Game feel");
+      expect(text).not.toContain("Game theme");
+      expect(text.indexOf("Attract birds")).toBeLessThan(
+        text.indexOf("Game feel"),
+      );
+      expect(text.indexOf("Game feel")).toBeLessThan(
+        text.indexOf("Game mechanics"),
+      );
+      expect(text.indexOf("Game mechanics")).toBeLessThan(
+        text.indexOf("Owners (4)"),
+      );
+      expect(text).toContain("Party Games");
+      expect(text.indexOf("Party Games")).toBeLessThan(
+        text.indexOf("Strategy"),
+      );
+      expect(html.match(/<li[^>]*rounded-full/g)).toHaveLength(3);
+    });
+
+    it("shows no choice row when the game has no tags", async () => {
+      const text = textOf(await sheet(detail(1)));
+      expect(text).not.toContain("Game feel");
+      expect(text).not.toContain("Game mechanics");
+    });
+
+    it("uses Chinese names on /zh", async () => {
+      setLocale("zh");
+      const text = textOf(
+        await sheet(detail(1, { feels: [pick(1, "Party Games", "派对游戏")] })),
+      );
+      expect(text).toContain("派对游戏");
+      expect(text).not.toContain("Party Games");
+    });
+  });
+
   // covers: AC-5
   it("sets every --sheet variable inline from the cover tint", async () => {
     const html = await sheet(detail(1));

@@ -17,6 +17,7 @@ The game detail sheet (scope feature 9, [spec 0008](../../../docs/specs/0008-gam
 - A Server Action has no route: `next/root-params` fails there, so the language is passed in (`loadGameSheet(id, locale)`, `intl.ts`).
 - Return plain data from the action, never rendered UI. UI that uses client components fails in the action with "Could not find the module in the React Client Manifest".
 - The modal's open and close motion is `sheet-motion.ts` (FLIP with the Web Animations API): the modal is squeezed into the tapped card's cover box and animated to its real box, and back. The store has a `closing` phase so the Dialog stays mounted while it shrinks; `finishClose` unmounts it. Time the backdrop fade (a CSS transition) with the modal, and do not use the stock keyframe fade: it snapped back to dark before unmount (see [docs/modal-close-flash.md](../../../docs/modal-close-flash.md)). If you animate with a Tailwind class, name the property Tailwind 4 really uses (`translate`, not `transform`).
+- Tags (spec 0014): `getGameDetail` carries `feels`, `themes`, `mechanics`; `buildSheetData` turns them into `choiceGroups` (empty groups left out), and `SheetView` draws them as chip rows between Description and Owners. Names only, no hints.
 - Client strings come in as props (`SheetHostLabels`, `SheetData`), so `IntlClientProvider` does not grow.
 - Dates use `LocalTime` (`monthYear` for "Since Aug 2026").
 

@@ -2,13 +2,19 @@ import { cacheLife, cacheTag } from "next/cache";
 import { createPublicClient } from "@/lib/supabase/public";
 import { GAMES_TAG } from "./cache";
 import {
+  fetchGameChoices,
   fetchGameExists,
   fetchGameIds,
   fetchGameOwners,
   fetchGameRow,
 } from "./rows";
 import { compareNames } from "./shelf";
-import { type GameRow, type OwnerRow, type ProfileRow } from "./types";
+import {
+  type GameChoices,
+  type GameRow,
+  type OwnerRow,
+  type ProfileRow,
+} from "./types";
 
 export { NEUTRAL_SHEET_TINT } from "./neutral-tint";
 
@@ -35,6 +41,10 @@ export type GameDetail = {
   ratingCount: number;
   ownerCount: number;
   owners: GameOwner[];
+  /** Saved tags in `position` order (spec 0014, AC-13). */
+  feels: GameChoices["feels"];
+  themes: GameChoices["themes"];
+  mechanics: GameChoices["mechanics"];
 };
 
 /** A route param to a game id: a positive whole number, else null. */
@@ -74,6 +84,7 @@ export function buildGameDetail(
   games: GameRow[],
   profiles: ProfileRow[],
   owners: OwnerRow[],
+  choices: GameChoices = { feels: [], themes: [], mechanics: [] },
 ): GameDetail | null {
   const game = games.find((g) => g.id === id);
   if (!game) return null;
@@ -102,6 +113,7 @@ export function buildGameDetail(
     ratingCount: game.rating_count,
     ownerCount: rows.length,
     owners: rows,
+    ...choices,
   };
 }
 
@@ -114,12 +126,13 @@ async function readGameDetail(
   cacheTag(GAMES_TAG);
 
   const client = createPublicClient();
-  const [game, links] = await Promise.all([
+  const [game, links, choices] = await Promise.all([
     fetchGameRow(client, id, locale),
     fetchGameOwners(client, id),
+    fetchGameChoices(client, id),
   ]);
   if (game === null) return null;
-  return buildGameDetail(id, [game], links.profiles, links.owners);
+  return buildGameDetail(id, [game], links.profiles, links.owners, choices);
 }
 
 /**

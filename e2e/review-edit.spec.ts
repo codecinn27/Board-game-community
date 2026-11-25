@@ -262,6 +262,13 @@ test("a reviewed game has no editor until it is marked not reviewed (AC-16)", as
   await expect(
     page.getByRole("button", { name: game.name, exact: true }),
   ).toHaveCount(0);
+  // The title opens the game sheet on this page, no navigation (spec 0014, AC-14).
+  const url = page.url();
+  await page.getByRole("link", { name: game.name, exact: true }).click();
+  await expect(page.getByRole("dialog")).toBeVisible();
+  expect(page.url()).toBe(url);
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("dialog")).toHaveCount(0);
   // On this tab the name is a link; scope to this game's row, since the other
   // screen size runs a game of its own at the same time.
   await page

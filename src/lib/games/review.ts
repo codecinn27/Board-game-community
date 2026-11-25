@@ -2,7 +2,8 @@ import "server-only";
 
 import { createClient } from "@/lib/supabase/server";
 import { type EditorLists, type EditorMember } from "./edit-game";
-import { type ReviewTab } from "./review-params";
+import { REVIEW_MAX_SHOWN, type ReviewTab } from "./review-params";
+import { type PromptGame } from "./tagging-prompt";
 
 export type ReviewRow = {
   id: number;
@@ -93,6 +94,35 @@ export async function getReviewQueue(
     };
   });
   return { rows, total: count ?? rows.length };
+}
+
+/**
+ * Every game still to review, for the AI tagging prompt (admin only, never
+ * cached). Capped at the largest page the list can show.
+ */
+export async function getUnreviewedForPrompt(): Promise<PromptGame[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("games")
+    .select(
+      "id, name, name_zh, description, game_feels(choice:feels(slug)), game_themes(choice:themes(slug)), game_mechanics(choice:mechanics(slug))",
+    )
+    .is("reviewed_at", null)
+    .order("created_at", { ascending: true })
+    .order("id")
+    .range(0, REVIEW_MAX_SHOWN - 1);
+  if (error) throw error;
+  const slugs = (links: { choice: { slug: string } | null }[]): string[] =>
+    links.flatMap((link) => (link.choice === null ? [] : [link.choice.slug]));
+  return data.map((row) => ({
+    id: row.id,
+    name: row.name,
+    nameZh: row.name_zh,
+    description: row.description,
+    feels: slugs(row.game_feels),
+    themes: slugs(row.game_themes),
+    mechanics: slugs(row.game_mechanics),
+  }));
 }
 
 /**

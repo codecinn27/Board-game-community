@@ -2,9 +2,11 @@ import { type SupabaseClient } from "@supabase/supabase-js";
 import { type Database } from "@/lib/supabase/database.types";
 import { localized } from "./localized";
 import {
+  type GameChoices,
   type GameRow,
   type OwnerRow,
   type ProfileRow,
+  type SheetChoice,
   type ShelfGame,
 } from "./types";
 
@@ -125,6 +127,50 @@ export async function fetchGameRow(
     players_max: data.players_max,
     play_time_min: data.play_time_min,
     play_time_max: data.play_time_max,
+  };
+}
+
+const CHOICE_COLUMNS = "id, slug, name_en, name_zh, position";
+
+type ChoiceRow = {
+  id: number;
+  slug: string;
+  name_en: string;
+  name_zh: string;
+  position: number;
+};
+
+function sortedChoices(
+  links: { choice: ChoiceRow | null }[] | null | undefined,
+): SheetChoice[] {
+  return (links ?? [])
+    .flatMap((link) => (link.choice === null ? [] : [link.choice]))
+    .sort((a, b) => a.position - b.position || a.id - b.id)
+    .map((c) => ({
+      id: c.id,
+      slug: c.slug,
+      nameEn: c.name_en,
+      nameZh: c.name_zh,
+    }));
+}
+
+/** One game's feels, themes, and mechanics, each in `position` order (spec 0014, AC-13). */
+export async function fetchGameChoices(
+  client: Client,
+  id: number,
+): Promise<GameChoices> {
+  const { data, error } = await client
+    .from("games")
+    .select(
+      `game_feels(choice:feels(${CHOICE_COLUMNS})), game_themes(choice:themes(${CHOICE_COLUMNS})), game_mechanics(choice:mechanics(${CHOICE_COLUMNS}))`,
+    )
+    .eq("id", id)
+    .maybeSingle();
+  if (error) fail("choices", error.message);
+  return {
+    feels: sortedChoices(data?.game_feels),
+    themes: sortedChoices(data?.game_themes),
+    mechanics: sortedChoices(data?.game_mechanics),
   };
 }
 

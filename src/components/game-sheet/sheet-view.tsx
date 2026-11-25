@@ -117,6 +117,28 @@ export function SheetView({
             />
           )}
 
+          {data.choiceGroups.map((group) => (
+            <section
+              key={group.key}
+              aria-labelledby={`game-choices-${group.key}`}
+              className="flex flex-col gap-2"
+            >
+              <h2
+                id={`game-choices-${group.key}`}
+                className="text-xs tracking-wide text-(--sheet-ink-muted) uppercase"
+              >
+                {group.label}
+              </h2>
+              <ul className="flex flex-wrap gap-2">
+                {group.chips.map((name) => (
+                  <li key={name} className={chip}>
+                    {name}
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ))}
+
           <section
             aria-labelledby="game-owners"
             className="flex flex-col gap-3"
