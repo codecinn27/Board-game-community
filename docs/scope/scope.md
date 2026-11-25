@@ -212,7 +212,8 @@ A member searches your own database first; if the game is there they mark "I own
   - [x] Sheet dock: own state, add and remove with Undo, guest link, read only (AC-9 to 11)
   - [x] Admin review: viewer role, Review tab, `/admin/review` with two tabs; seeds marked reviewed; messages, metadata, browser checks (AC-12 to 15)
   - [x] Review editing (amendment 2026-11-24): editor modal, Chinese text, categories, owners, cover with recycle bin and daily purge, edit history, Chinese display (AC-16 to 25)
-Spec [0013](../specs/0013-add-game-i-own/index.md)
+  - [ ] Category groups (spec 0014, replaces the flat categories): feel, theme, and mechanics tables, fixed lists with Chinese and hints, editor picker in three sections (AC-1 to 10)
+Spec [0013](../specs/0013-add-game-i-own/index.md) · [0014](../specs/0014-category-groups.md)
 
 ## Slice 3: Fill game details from online
 
