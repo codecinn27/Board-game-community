@@ -1,7 +1,7 @@
 # 0013. Add a game I own, ownership toggle, and admin review
 
 **Date**: 2026-11-19
-**Status**: In Progress
+**Status**: Accepted
 
 ## Summary
 
@@ -51,7 +51,7 @@ Reasoning and options: see [rationale.md](rationale.md).
 - **AC-22**: When a save replaces or removes a cover, the old file is moved from the public `covers` bucket to the private `covers-trash` bucket and recorded in `cover_trash` (path, game id, trashed at, trashed by). A file nobody points to is never left public. If the new cover upload fails or the save fails, the new file is removed, the old cover stays, and nothing is trashed. If moving the old file fails after a successful save, the save stands, the error is logged, and the old file stays in `covers` (harmless orphan).
 - **AC-23**: A daily job deletes trashed covers older than 30 days: it removes the file through the Storage API and then the `cover_trash` row. A failure on one file keeps its row so the next run retries. Within 30 days an admin can restore a cover by moving the file back and setting `cover_path` in the Supabase dashboard (no UI).
 - **AC-24**: Games get optional `name_zh` and `description_zh`. On `/zh` pages (home, shelf, sheet, game page, Add search, Review) the Chinese text is shown when it exists, otherwise the English text; on `/en` pages the English text is always shown. `search_games` matches the English or the Chinese name. A game with no Chinese text behaves exactly as before.
-- **AC-25**: Categories live in a `categories` table (slug, English label, Chinese label) with a `game_categories` link table. Everyone can read them; only an active admin can add or change them. The editor can add a new category (English and Chinese label required) and pick it at once. Migration seeds a starter list (Strategy, Party, Family, Co-op, Card, Dice, Deduction, Abstract, Thematic, War). Showing categories on the public shelf, home, or sheet is out of scope here (follow-up).
+- **AC-25**: Categories live in a `categories` table (slug, English label, Chinese label) with a `game_categories` link table. Everyone can read them; only an active admin can add or change them. The editor can add a new category (English and Chinese label required) and pick it at once. Migration seeds a starter list (Strategy, Party, Family, Co-op, Card, Dice, Deduction, Abstract, Thematic, War). Showing categories on the public shelf, home, or sheet is out of scope here (follow-up). **Replaced by spec [0014](../0014-category-groups.md)**: three fixed groups (feel, theme, mechanics), no add form.
 
 ## Decision
 

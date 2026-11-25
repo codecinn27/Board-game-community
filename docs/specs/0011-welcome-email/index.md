@@ -1,7 +1,7 @@
 # 0011. Welcome email on registration, sent through Resend SMTP
 
 **Date**: 2026-11-08
-**Status**: In Progress
+**Status**: Accepted
 
 ## Summary
 

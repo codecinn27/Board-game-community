@@ -1,7 +1,8 @@
 import { type Locale } from "@/i18n/routing";
 import { coverInitial } from "@/lib/games/cover-initial";
+import { choiceLabel } from "@/lib/games/choices";
 import { formatRange, type GameDetail } from "@/lib/games/detail";
-import { sheetFormat, sheetT } from "./intl";
+import { sheetFormat, sheetLocale, sheetT } from "./intl";
 
 /**
  * Everything the sheet shows, already translated and formatted (spec 0008).
@@ -20,6 +21,12 @@ export type SheetData = {
   ownerChip: { text: string; label: string };
   stats: { label: string; value: string }[];
   description: { text: string; more: string; less: string } | null;
+  /** Only the groups that have choices, in feel, theme, mechanic order (spec 0014, AC-11). */
+  choiceGroups: {
+    key: "feel" | "theme" | "mechanic";
+    label: string;
+    chips: string[];
+  }[];
   owners: {
     heading: string;
     none: string;
@@ -48,11 +55,13 @@ export async function buildSheetData(
   locale?: Locale,
   sharePath?: string,
 ): Promise<SheetData> {
-  const [t, tStats, tOwners, format] = await Promise.all([
+  const [t, tStats, tOwners, tChoices, format, lang] = await Promise.all([
     sheetT("game", locale),
     sheetT("game.stats", locale),
     sheetT("game.owners", locale),
+    sheetT("game.choices", locale),
     sheetFormat(locale),
+    sheetLocale(locale),
   ]);
 
   const rating =
@@ -75,6 +84,23 @@ export async function buildSheetData(
   const [sinceBefore = "", sinceAfter = ""] = tOwners("since", {
     date: marker,
   }).split(marker);
+
+  const groups = [
+    { key: "feel", choices: game.feels },
+    { key: "theme", choices: game.themes },
+    { key: "mechanic", choices: game.mechanics },
+  ] as const;
+  const choiceGroups = groups.flatMap(({ key, choices }) =>
+    choices.length === 0
+      ? []
+      : [
+          {
+            key,
+            label: tChoices(key),
+            chips: choices.map((c) => choiceLabel(c, lang)),
+          },
+        ],
+  );
 
   return {
     id: game.id,
@@ -111,6 +137,7 @@ export async function buildSheetData(
             more: t("description.more"),
             less: t("description.less"),
           },
+    choiceGroups,
     owners: {
       heading: tOwners("heading", { count: format.number(game.owners.length) }),
       none: tOwners("none"),

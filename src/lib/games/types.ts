@@ -28,3 +28,17 @@ export type OwnerRow = Pick<
   Tables<"game_owners">,
   "game_id" | "member_id" | "created_at"
 >;
+
+/** A saved feel, theme, or mechanic as the sheet shows it (spec 0014, AC-13). */
+export type SheetChoice = {
+  id: number;
+  slug: string;
+  nameEn: string;
+  nameZh: string;
+};
+
+export type GameChoices = {
+  feels: SheetChoice[];
+  themes: SheetChoice[];
+  mechanics: SheetChoice[];
+};

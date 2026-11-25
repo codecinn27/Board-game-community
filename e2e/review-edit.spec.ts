@@ -99,6 +99,8 @@ test("the admin fixes a game in the editor and approves it in one save (AC-16, A
   const zhName = `测试游戏${Date.now()}`;
   await dialog.getByLabel(editor.fields.nameZh).fill(zhName);
   await dialog.getByText("Strategy", { exact: true }).click();
+  await dialog.getByText("Fantasy", { exact: true }).click();
+  await dialog.getByText("Trading", { exact: true }).click();
   await dialog.getByRole("button", { name: editor.saveAndApprove }).click();
   await expect(dialog).toBeHidden({ timeout: 20_000 });
 
@@ -122,8 +124,41 @@ test("the admin fixes a game in the editor and approves it in one save (AC-16, A
     .eq("game_id", game.id);
   expect(edits).toHaveLength(1);
   expect(edits?.[0]?.changed).toEqual(
-    expect.arrayContaining(["name", "name_zh", "category_ids"]),
+    expect.arrayContaining(["name", "name_zh", "feels", "themes", "mechanics"]),
   );
+});
+
+test("the editor shows the three fixed groups with hints and no add form (spec 0014, AC-4, AC-6)", async ({
+  page,
+}) => {
+  await page.getByRole("button", { name: game.name, exact: true }).click();
+  const dialog = page.getByRole("dialog");
+  const titles = [
+    editor.groups.feel.title,
+    editor.groups.theme.title,
+    editor.groups.mechanic.title,
+  ];
+  for (const title of titles) {
+    await expect(dialog.getByRole("group", { name: title })).toBeVisible();
+  }
+  await expect(
+    dialog.getByText(
+      "Build a setup that helps you generate passive resources.",
+    ),
+  ).toBeVisible();
+  await expect(dialog.getByText("Add a category")).toHaveCount(0);
+});
+
+test("on /zh the editor shows Chinese labels and hints (spec 0014, AC-4)", async ({
+  page,
+}) => {
+  await page.goto("/zh/admin/review");
+  await page.getByRole("button", { name: game.name, exact: true }).click();
+  const dialog = page.getByRole("dialog");
+  await expect(dialog.getByText("引擎构建", { exact: true })).toBeVisible();
+  await expect(
+    dialog.getByText("搭建能帮你持续产出被动资源的体系。"),
+  ).toBeVisible();
 });
 
 test("a tap anywhere on the top block opens the editor, View game page opens the sheet", async ({
@@ -227,6 +262,13 @@ test("a reviewed game has no editor until it is marked not reviewed (AC-16)", as
   await expect(
     page.getByRole("button", { name: game.name, exact: true }),
   ).toHaveCount(0);
+  // The title opens the game sheet on this page, no navigation (spec 0014, AC-14).
+  const url = page.url();
+  await page.getByRole("link", { name: game.name, exact: true }).click();
+  await expect(page.getByRole("dialog")).toBeVisible();
+  expect(page.url()).toBe(url);
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("dialog")).toHaveCount(0);
   // On this tab the name is a link; scope to this game's row, since the other
   // screen size runs a game of its own at the same time.
   await page

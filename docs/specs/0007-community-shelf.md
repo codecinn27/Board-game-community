@@ -1,7 +1,7 @@
 # 0007. Community shelf: the All games grid and the By owner view
 
 **Date**: 2026-11-01
-**Status**: In Progress
+**Status**: Accepted
 
 ## Summary
 

@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-// The editor's Server Action (spec 0013 amendment, AC-19 to AC-22, AC-25). The
+// The editor's Server Action (spec 0013 amendment, AC-19 to AC-22; spec 0014, AC-5 and AC-9). The
 // database function is covered by pgTAP; these tests cover the order of steps
 // and the cleanup around it, with the Supabase clients faked.
 
@@ -23,26 +23,21 @@ type GameRow = {
   cover_path: string | null;
   cover_tint: string | null;
   reviewed_at: string | null;
-  game_categories: { category_id: number }[];
+  game_feels: { feel_id: number }[];
+  game_themes: { theme_id: number }[];
+  game_mechanics: { mechanic_id: number }[];
   game_owners: { member_id: string }[];
 };
 let current: GameRow | null;
 const rpc = vi.fn();
-const insertCategory = vi.fn();
 vi.mock("@/lib/supabase/server", () => ({
   createClient: async () => ({
     rpc: (name: string, args: unknown) => rpc(name, args),
-    from: (table: string) => ({
+    from: () => ({
       select: () => ({
         eq: () => ({
           maybeSingle: async () => ({ data: current, error: null }),
         }),
-        // `categories` list read, used after a unique violation.
-        then: (resolve: (value: unknown) => void) =>
-          resolve({ data: [], error: null }),
-      }),
-      insert: (values: unknown) => ({
-        select: () => ({ single: () => insertCategory(table, values) }),
       }),
     }),
   }),
@@ -75,7 +70,7 @@ vi.mock("@/lib/supabase/admin", () => ({
   }),
 }));
 
-import { createCategory, saveGame } from "./actions";
+import { saveGame } from "./actions";
 
 const WEBP = new Uint8Array([
   0x52, 0x49, 0x46, 0x46, 0, 0, 0, 0, 0x57, 0x45, 0x42, 0x50,
@@ -115,7 +110,9 @@ beforeEach(() => {
     cover_path: "old.webp",
     cover_tint: "#112233",
     reviewed_at: null,
-    game_categories: [{ category_id: 1 }, { category_id: 2 }],
+    game_feels: [{ feel_id: 1 }, { feel_id: 2 }],
+    game_themes: [{ theme_id: 4 }],
+    game_mechanics: [],
     game_owners: [{ member_id: "u1" }],
   };
   rpc.mockResolvedValue({ data: "ok", error: null });
@@ -177,7 +174,9 @@ describe("saveGame: fields the form does not send keep their saved value", () =>
       p_game_id: 5,
       p_name_zh: "卡坦岛",
       p_description_zh: "好玩",
-      p_category_ids: [1, 2],
+      p_feel_ids: [1, 2],
+      p_theme_ids: [4],
+      p_mechanic_ids: [],
       p_owner_ids: ["u1"],
       p_cover_path: "old.webp",
       p_cover_tint: "#112233",
@@ -191,14 +190,17 @@ describe("saveGame: fields the form does not send keep their saved value", () =>
     await saveGame(
       form({
         nameZh: "",
-        categoryIds: "[3]",
+        feelIds: "[3]",
+        mechanicIds: "[7,8]",
         ownerIds: '["u2","u3"]',
         markReviewed: "true",
       }),
     );
     expect(rpcArgs()).toMatchObject({
       p_name_zh: null,
-      p_category_ids: [3],
+      p_feel_ids: [3],
+      p_theme_ids: [4],
+      p_mechanic_ids: [7, 8],
       p_owner_ids: ["u2", "u3"],
       p_mark_reviewed: true,
     });
@@ -323,56 +325,5 @@ describe("saveGame: cover order and cleanup (AC-22)", () => {
     const result = await saveGame(form({ removeCover: "true" }));
     expect(result).toEqual({ status: "ok" });
     expect(move).not.toHaveBeenCalled();
-  });
-});
-
-describe("createCategory", () => {
-  it("refuses a non admin", async () => {
-    checkAdmin.mockResolvedValue({ status: "forbidden" });
-    expect(await createCategory("Roll", "掷骰")).toEqual({
-      status: "forbidden",
-    });
-    expect(insertCategory).not.toHaveBeenCalled();
-  });
-
-  it("requires both labels", async () => {
-    expect(await createCategory("Roll", " ")).toEqual({
-      status: "invalid",
-      errors: { nameZh: "required" },
-    });
-  });
-
-  it("creates the category with a slug from the English label", async () => {
-    insertCategory.mockResolvedValue({
-      data: {
-        id: 11,
-        slug: "roll-and-write",
-        name_en: "Roll and write",
-        name_zh: "掷骰",
-      },
-      error: null,
-    });
-    const result = await createCategory(" Roll and write ", "掷骰");
-    expect(insertCategory).toHaveBeenCalledWith("categories", {
-      slug: "roll-and-write",
-      name_en: "Roll and write",
-      name_zh: "掷骰",
-    });
-    expect(result).toEqual({
-      status: "ok",
-      category: {
-        id: 11,
-        slug: "roll-and-write",
-        nameEn: "Roll and write",
-        nameZh: "掷骰",
-      },
-    });
-  });
-
-  it("answers forbidden when the row level security refuses", async () => {
-    insertCategory.mockResolvedValue({ data: null, error: { code: "42501" } });
-    expect(await createCategory("Roll", "掷骰")).toEqual({
-      status: "forbidden",
-    });
   });
 });

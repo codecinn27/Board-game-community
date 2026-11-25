@@ -3,12 +3,6 @@
 import { checkAdmin } from "@/lib/auth/member-check";
 import { field } from "@/lib/auth/validation";
 import { revalidateGames } from "@/lib/games/cache";
-import {
-  slugify,
-  validateCategory,
-  type CategoryErrors,
-  type EditorCategory,
-} from "@/lib/games/categories";
 import { COVER_MAX_BYTES, coverKind, isTint } from "@/lib/games/cover-image";
 import { logFailure, type DebugInfo } from "@/lib/games/debug";
 import {
@@ -191,7 +185,7 @@ export async function saveGame(data: FormData): Promise<SaveGameResult> {
     const { data: current, error: readError } = await supabase
       .from("games")
       .select(
-        "name_zh, description_zh, cover_path, cover_tint, reviewed_at, game_categories(category_id), game_owners(member_id)",
+        "name_zh, description_zh, cover_path, cover_tint, reviewed_at, game_feels(feel_id), game_themes(theme_id), game_mechanics(mechanic_id), game_owners(member_id)",
       )
       .eq("id", gameId)
       .maybeSingle();
@@ -222,15 +216,28 @@ export async function saveGame(data: FormData): Promise<SaveGameResult> {
     if (!checked.ok) return { status: "invalid", fields: checked.errors };
     const game = checked.value;
 
-    const sentCategories = readList(data, "categoryIds");
+    const sentFeels = readList(data, "feelIds");
+    const sentThemes = readList(data, "themeIds");
+    const sentMechanics = readList(data, "mechanicIds");
     const sentOwners = readList(data, "ownerIds");
-    const categoryIds = sentCategories
-      ? numbers(sentCategories)
-      : current.game_categories.map((row) => row.category_id);
+    const feelIds = sentFeels
+      ? numbers(sentFeels)
+      : current.game_feels.map((row) => row.feel_id);
+    const themeIds = sentThemes
+      ? numbers(sentThemes)
+      : current.game_themes.map((row) => row.theme_id);
+    const mechanicIds = sentMechanics
+      ? numbers(sentMechanics)
+      : current.game_mechanics.map((row) => row.mechanic_id);
     const ownerIds = sentOwners
       ? strings(sentOwners)
       : current.game_owners.map((row) => row.member_id);
-    if (categoryIds === null || ownerIds === null) {
+    if (
+      feelIds === null ||
+      themeIds === null ||
+      mechanicIds === null ||
+      ownerIds === null
+    ) {
       return {
         status: "error",
         debug: logFailure("backend", "saveGame got a bad id list"),
@@ -275,7 +282,9 @@ export async function saveGame(data: FormData): Promise<SaveGameResult> {
       p_players_max: orNull(game.playersMax),
       p_play_time_min: orNull(game.playTimeMin),
       p_play_time_max: orNull(game.playTimeMax),
-      p_category_ids: categoryIds,
+      p_feel_ids: feelIds,
+      p_theme_ids: themeIds,
+      p_mechanic_ids: mechanicIds,
       p_owner_ids: ownerIds,
       p_cover_path: orNull(coverPath),
       p_cover_tint: orNull(coverTint),
@@ -326,74 +335,5 @@ export async function saveGame(data: FormData): Promise<SaveGameResult> {
       status: "error",
       debug: logFailure("backend", "saveGame unexpected", error),
     };
-  }
-}
-
-// Categories (AC-25) ----------------------------------------------------------------
-
-export type CreateCategoryResult =
-  | { status: "ok"; category: EditorCategory }
-  | { status: "exists"; category: EditorCategory }
-  | { status: "invalid"; errors: CategoryErrors }
-  | { status: "forbidden" }
-  | { status: "error" };
-
-type CategoryRow = {
-  id: number;
-  slug: string;
-  name_en: string;
-  name_zh: string;
-};
-
-function toCategory(row: CategoryRow): EditorCategory {
-  return {
-    id: row.id,
-    slug: row.slug,
-    nameEn: row.name_en,
-    nameZh: row.name_zh,
-  };
-}
-
-/** Adds a category with both labels; an existing English label is returned. */
-export async function createCategory(
-  nameEn: string,
-  nameZh: string,
-): Promise<CreateCategoryResult> {
-  try {
-    const supabase = await createClient();
-    const admin = await checkAdmin(supabase);
-    if (admin.status !== "admin") return { status: "forbidden" };
-
-    const checked = validateCategory({ nameEn, nameZh });
-    if (!checked.ok) return { status: "invalid", errors: checked.errors };
-    const { nameEn: en, nameZh: zh } = checked.value;
-
-    const base = slugify(en) ?? "category";
-    // The first try uses the plain slug; a slug clash retries with a random tail.
-    for (const slug of [base, `${base}-${crypto.randomUUID().slice(0, 6)}`]) {
-      const { data, error } = await supabase
-        .from("categories")
-        .insert({ slug, name_en: en, name_zh: zh })
-        .select("id, slug, name_en, name_zh")
-        .single();
-      if (!error) return { status: "ok", category: toCategory(data) };
-      if (error.code === "42501") return { status: "forbidden" };
-      if (error.code !== "23505") {
-        logFailure("database", "insert category", error);
-        return { status: "error" };
-      }
-      // A clash on the English label returns the category that already has it.
-      const { data: all } = await supabase
-        .from("categories")
-        .select("id, slug, name_en, name_zh");
-      const same = all?.find(
-        (row) => row.name_en.trim().toLowerCase() === en.toLowerCase(),
-      );
-      if (same) return { status: "exists", category: toCategory(same) };
-    }
-    return { status: "error" };
-  } catch (error) {
-    logFailure("backend", "createCategory unexpected", error);
-    return { status: "error" };
   }
 }

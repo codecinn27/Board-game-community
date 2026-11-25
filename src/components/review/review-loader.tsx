@@ -5,6 +5,7 @@ import {
   getMessages,
   getTranslations,
 } from "next-intl/server";
+import { SheetLink } from "@/components/game-sheet/sheet-link";
 import { CoverTile } from "@/components/games/cover-tile";
 import { LocalTime } from "@/components/time/local-time";
 import { IntlClientProvider } from "@/i18n/intl-client-provider";
@@ -16,6 +17,7 @@ import { type EditorLists } from "@/lib/games/edit-game";
 import {
   getEditorLists,
   getReviewQueue,
+  getUnreviewedForPrompt,
   type ReviewQueue,
   type ReviewRow,
 } from "@/lib/games/review";
@@ -25,9 +27,11 @@ import {
   REVIEW_PAGE_SIZE,
   type ReviewTab,
 } from "@/lib/games/review-params";
+import { buildTaggingPrompt } from "@/lib/games/tagging-prompt";
 import { cn } from "@/lib/utils";
 import { EditableRow } from "./editable-row";
 import { ReviewButton } from "./review-button";
+import { TaggingPrompt } from "./tagging-prompt";
 
 type ReviewLoaderProps = {
   /** Passed down unread: only this component, inside `Suspense`, awaits it. */
@@ -57,8 +61,14 @@ export async function ReviewLoader({ searchParams }: ReviewLoaderProps) {
   ]);
 
   let queue: ReviewQueue | null = null;
+  let prompt: string | null = null;
   // The editor's choices are only needed on the To review tab.
-  let lists: EditorLists = { categories: [], members: [] };
+  let lists: EditorLists = {
+    feels: [],
+    themes: [],
+    mechanics: [],
+    members: [],
+  };
   try {
     [queue, lists] = await Promise.all([
       getReviewQueue(tab, shown),
@@ -66,6 +76,14 @@ export async function ReviewLoader({ searchParams }: ReviewLoaderProps) {
     ]);
   } catch (error) {
     console.error("getReviewQueue failed", error);
+  }
+  // The AI tagging prompt covers every game still to review, not just this page.
+  if (tab === "todo" && queue !== null && queue.rows.length > 0) {
+    try {
+      prompt = buildTaggingPrompt(await getUnreviewedForPrompt(), lists);
+    } catch (error) {
+      console.error("getUnreviewedForPrompt failed", error);
+    }
   }
 
   return (
@@ -87,6 +105,20 @@ export async function ReviewLoader({ searchParams }: ReviewLoaderProps) {
           </Link>
         ))}
       </nav>
+
+      {prompt === null ? null : (
+        <TaggingPrompt
+          prompt={prompt}
+          labels={{
+            title: t("prompt.title"),
+            hint: t("prompt.hint"),
+            copy: t("prompt.copy"),
+            copied: t("prompt.copied"),
+            copyFailed: t("prompt.copyFailed"),
+            field: t("prompt.field"),
+          }}
+        />
+      )}
 
       {queue === null ? (
         <p role="alert" className="text-destructive">
@@ -217,7 +249,9 @@ async function ReviewItem({
           playTimeMax: row.playTimeMax,
           coverPath: row.coverPath,
           coverTint: row.coverTint,
-          categoryIds: row.categoryIds,
+          feelIds: row.feelIds,
+          themeIds: row.themeIds,
+          mechanicIds: row.mechanicIds,
           owners: row.owners,
         }}
         lists={lists}
@@ -236,12 +270,19 @@ async function ReviewItem({
       <div className="flex gap-3">
         {cover}
         <div className="flex min-w-0 flex-1 flex-col gap-1">
-          <Link
-            href={`/games/${row.id}`}
-            className="font-semibold underline-offset-4 hover:underline"
+          <SheetLink
+            card={{
+              id: row.id,
+              name: shownName,
+              coverTint: row.coverTint,
+              coverPath: row.coverPath,
+              ownerCount: row.owners.length,
+              avgRecommendation: null,
+            }}
+            className="inline-flex min-h-11 items-center self-start font-semibold underline-offset-4 hover:underline"
           >
             {shownName}
-          </Link>
+          </SheetLink>
           {facts}
         </div>
       </div>

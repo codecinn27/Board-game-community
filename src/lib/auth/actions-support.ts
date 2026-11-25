@@ -2,7 +2,7 @@ import "server-only";
 
 import { redirect } from "@/i18n/navigation";
 import { hasLocale, routing, type Locale } from "@/i18n/routing";
-import { requireEnv } from "@/lib/supabase/env";
+import { siteBaseUrl } from "@/lib/supabase/env";
 import { safeNext } from "./safe-next";
 import { field } from "./validation";
 
@@ -18,10 +18,7 @@ export function nextOf(data: FormData): string {
 }
 
 export function siteUrl(): string {
-  return requireEnv(
-    process.env.NEXT_PUBLIC_SITE_URL,
-    "NEXT_PUBLIC_SITE_URL",
-  ).replace(/\/+$/, "");
+  return siteBaseUrl().replace(/\/+$/, "");
 }
 
 /** The link the reset email sends the person back to. */

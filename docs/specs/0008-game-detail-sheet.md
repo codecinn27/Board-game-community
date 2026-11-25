@@ -1,7 +1,7 @@
 # 0008. Game detail sheet: the tinted sheet at /games/[id]
 
 **Date**: 2026-11-02
-**Status**: In Progress
+**Status**: Accepted
 **Revised**: 2026-11-03 (client side modal, see Decision and AC-21)
 
 ## Summary

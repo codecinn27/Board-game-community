@@ -42,11 +42,13 @@ select is(
 
 -- The known set of tables that point at games. A new one fails here and must be added on purpose,
 -- with its unique rule, so the merge function in feature 19 handles it.
+-- The link tables (game_feels, game_themes, game_mechanics) merge by primary key with
+-- `on conflict do nothing` (spec 0014).
 select is(
   (select array_agg(conrelid::regclass::text order by conrelid::regclass::text)
     from pg_constraint where contype = 'f' and confrelid = 'public.games'::regclass),
-  array['comments', 'game_categories', 'game_owners', 'ratings', 'top_picks', 'wishlist_entries'],
-  'the tables pointing at games are the known six (add new ones here with their unique rule)'
+  array['comments', 'game_feels', 'game_mechanics', 'game_owners', 'game_themes', 'ratings', 'top_picks', 'wishlist_entries'],
+  'the tables pointing at games are the known eight (add new ones here with their unique rule)'
 );
 
 select * from finish();

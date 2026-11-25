@@ -1,6 +1,6 @@
 import { type Metadata } from "next";
 import { getLocale } from "next-intl/server";
-import { requireEnv } from "@/lib/supabase/env";
+import { siteBaseUrl } from "@/lib/supabase/env";
 import { hasLocale, htmlLang, routing, type Locale } from "./routing";
 
 type Alternates = NonNullable<Metadata["alternates"]>;
@@ -33,10 +33,7 @@ export function buildAlternates(
  * already URL encoded. Call it from each page's metadata, never a layout.
  */
 export async function getAlternates(path: string): Promise<Alternates> {
-  const site = requireEnv(
-    process.env.NEXT_PUBLIC_SITE_URL,
-    "NEXT_PUBLIC_SITE_URL",
-  );
+  const site = siteBaseUrl();
   const locale = await getLocale();
   return buildAlternates(
     site,

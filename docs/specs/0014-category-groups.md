@@ -1,11 +1,11 @@
 # 0014. Game categories in three groups: feel, theme, mechanics
 
 **Date**: 2026-11-25
-**Status**: Proposed
+**Status**: Accepted
 
 ## Summary
 
-Games get tagged in three separate groups instead of one flat category list: game feel (5 choices), game theme (10), and game mechanics (20). Each group is its own table with English and Chinese names, and mechanics also carry a short plain description that the editor shows as a hint. The list is fixed: the admin ticks choices in the review editor but cannot add new ones, and only a migration changes the lists. This replaces the 10 placeholder categories from spec 0013 and drops any tags already saved on them. Showing the tags on the public shelf, home, and sheet stays out of scope.
+Games get tagged in three separate groups instead of one flat category list: game feel (5 choices), game theme (10), and game mechanics (20). Each group is its own table with English and Chinese names, and mechanics also carry a short plain description that the editor shows as a hint. The list is fixed: the admin ticks choices in the review editor but cannot add new ones, and only a migration changes the lists. This replaces the 10 placeholder categories from spec 0013 and drops any tags already saved on them. The game sheet shows the saved tags as three labeled chip rows (amendment, AC-11 to AC-13), and the Reviewed tab opens the sheet instead of navigating (AC-14). Tags on the shelf and home stay out of scope.
 
 ## Context
 
@@ -32,7 +32,12 @@ Spec 0013 is still In Progress and its editor code is uncommitted on branch `fea
 - **AC-7**: Only an active admin can insert or delete rows in the three link tables. Members and guests are refused. Everyone can read links.
 - **AC-8**: The old `categories` and `game_categories` tables and the old `admin_update_game` signature are dropped, and all old links are discarded. Existing `game_edits` rows that mention `category_ids` stay unchanged.
 - **AC-9**: `admin_update_game` refuses a null feel, theme, or mechanic list with error `22023`. The `saveGame` action treats a list the form did not send as "keep the saved value", the same rule 0013 uses for owners.
-- **AC-10**: All of 0013 AC-16 to AC-24 (opening, locking a reviewed game, covers, history) still hold. Public pages (home, shelf, game sheet) are unchanged.
+- **AC-10**: All of 0013 AC-16 to AC-24 (opening, locking a reviewed game, covers, history) still hold. Home and shelf are unchanged. The game sheet changes only as AC-11 to AC-13 say.
+- **AC-11** (amendment): The game sheet (modal and `/games/[id]` page, one `SheetView`) shows three chip rows under the Description and above Owners, in this order: Game feel, Game theme, Game mechanics. Each row has a small label (the same group titles as the editor, without "(optional)") and the game's saved choices as chips, in `position` order, with the name in the page language (`choiceLabel`). A group with no saved choices shows nothing, not even its label. If all three are empty the sheet looks as it does today. A game with no description still shows the rows above Owners.
+- **AC-12** (amendment): Chips show no hint text and are not tappable. Each row is a list (`ul`) named by its label, so a screen reader reads "Game mechanics, list, 3 items". Chip colors come only from the `--sheet-*` variables (the folder rule).
+- **AC-13** (amendment): `getGameDetail` returns the three lists of choices (already in position order, each with `slug`, `nameEn`, `nameZh`). They come from the same cached read, so a saved tag change shows after `revalidateGames()`, which `saveGame` already calls. A failed link read throws like the other reads and is not cached.
+- **AC-14** (amendment): On the Reviewed tab the game title opens the game sheet modal on the same page (the existing `SheetLink`), and does not navigate. A modifier click or open in new tab still goes to `/games/[id]`. The To review tab is unchanged.
+- **AC-15** (amendment): The three group titles in the editor read "Game feel (optional)", "Game theme (optional)", and "Game mechanics (optional)" (Chinese: add "（可选）"). The `legend` carries the full text.
 
 ## Options considered
 
@@ -148,6 +153,13 @@ The migration drops the old function by its full old signature (`drop function p
 
 **Code shape**: `EditorCategory` becomes `EditorChoice { id, slug, nameEn, nameZh, descriptionEn?, descriptionZh? }`. `src/lib/games/categories.ts` keeps only the label helper (renamed `choiceLabel`) and adds `choiceHint(choice, locale)` with the same Chinese then English fallback; it is renamed `choices.ts`. The shared picker is `src/components/review/choice-group.tsx` with props `legend`, `choices`, `selected`, `onChange` (it replaces `category-picker.tsx`). `ReviewRow` and `EditorGame` carry `feelIds`, `themeIds`, `mechanicIds`; `EditSnapshot` and `isEditDirty` compare each with `sameSet`. The review query embeds `game_feels(feel_id), game_themes(theme_id), game_mechanics(mechanic_id)`, and so does the read before save in `actions.ts`. `review-loader.tsx` loads `{ feels, themes, mechanics, members }`.
 
+**Amendment: tags on the sheet.**
+- `GameDetail` gets `feels`, `themes`, `mechanics`: each `{ id, slug, nameEn, nameZh }[]`. A new read `fetchGameChoices(client, id)` in `rows.ts` selects `game_feels(feels(id, slug, name_en, name_zh, position))` and the same for themes and mechanics from `games`, and sorts each by `position`, then `id`. `readGameDetail` runs it in the same `Promise.all` as the game and owners. `buildGameDetail` stays pure and takes the choices as an argument; the fixtures get empty lists.
+- `SheetData` gets `choiceGroups: { key: "feel" | "theme" | "mechanic"; label: string; chips: string[] }[]`, built in `sheet-data.ts` with `choiceLabel(choice, locale)`; empty groups are left out, so the view just maps the array. Labels come from new messages `game.choices.feel`, `game.choices.theme`, `game.choices.mechanic` (en and zh), read through `sheetT`. The locale is the one `buildSheetData` already gets.
+- `sheet-view.tsx` draws the rows between Description and the Owners section. Each is a `section`/`ul` with a small muted label and wrapped chips in the existing chip style (`bg-(--sheet-chip)`). No new color. No hint text.
+- Reviewed tab: in `review-loader.tsx`, the `Link` around `shownName` becomes `SheetLink` with the same `card` shape `EditableRow` uses (`avgRecommendation: null`, `ownerCount` from `row.owners.length`). The "View game page" link on To review already does this.
+- Editor titles: change the three `review.editor.groups.*.title` strings in `messages/en.json` and `messages/zh.json`. `choice-group.tsx` needs no change.
+
 **Message keys** (same in `en.json` and `zh.json`; `review.editor.categories.*` is deleted): `review.editor.groups.feel.title`, `review.editor.groups.theme.title`, `review.editor.groups.mechanic.title`, and `review.editor.groups.none` for an empty list.
 
 **Interface**:
@@ -178,7 +190,7 @@ The migration drops the old function by its full old signature (`drop function p
 
 **Security model**: reads are public. Link writes are active admin only through RLS (`private.is_admin()`) and the function also checks it (`42501`). Choices are write protected for everyone. No new secret or env var. No personal data.
 
-**Critical test scenarios**:
+**Critical test scenarios** (amendment cases at the end):
 - Seed: counts are 5, 10, 20; slugs unique; every mechanic has both hints; `feels` and `themes` pass `hasnt_column` for descriptions; a mechanic with only one hint is refused, verifies **AC-1**, **AC-2**.
 - Admin saves a game with two feels, one theme, three mechanics; reopening shows the same ticks; one `game_edits` row lists only the three changed keys, verifies **AC-3**, **AC-4**, **AC-5**.
 - Editor on `/zh` shows Chinese labels and Chinese hints; on `/en` English, verifies **AC-4**.
@@ -187,19 +199,27 @@ The migration drops the old function by its full old signature (`drop function p
 - Old tables are gone and the old function name with the old signature is gone, verifies **AC-8**.
 - A null list raises `22023`; a missing field in `saveGame` keeps saved ticks, verifies **AC-9**.
 - A reviewed game still cannot be saved, verifies **AC-10**.
+- Sheet of a game with two feels, no themes, three mechanics shows two rows (feel, mechanics) in that order between Description and Owners; the theme label is absent; on `/zh` the names are Chinese, verifies **AC-11**, **AC-13**.
+- Sheet of a game with no tags and no description shows no chip rows, verifies **AC-11**.
+- Reviewed tab: tapping the title opens the modal and the URL stays `/admin/review?tab=done`; ctrl click keeps the link, verifies **AC-14**.
+- Editor legends end in "(optional)" on `/en` and "（可选）" on `/zh`, verifies **AC-15**.
 
 ## Build plan
 
 Approach: Tracer Bullet (the project default). The thin thread is the feel group end to end (table, link, function, editor section), then the other two groups and the hints thicken it. Because the function signature changes once, the migration holds all three groups from the start.
 
-1. Migration `20261125090000_category_groups.sql`: drop the old function, `game_categories`, and `categories`; create the six tables with RLS and grants; seed the three lists; create the new `admin_update_game` with its grants. Satisfies **AC-1**, **AC-2**, **AC-3**, **AC-6**, **AC-7**, **AC-8**, **AC-9**.
-2. pgTAP: new file for the three groups (seed, RLS, function, null list, history keys, service role cannot write choices). Update `10_review_edit.test.sql` (the `tests.cat` helper, the exact `changed` array, the plan count) and `05_merge_readiness.test.sql` (the expected list becomes `comments, game_feels, game_mechanics, game_owners, game_themes, ratings, top_picks, wishlist_entries`, eight not six; record the link merge rule, primary key with `on conflict do nothing`, for feature 19). `seed.sql` needs no sample tags. Satisfies **AC-1**, **AC-5** to **AC-9**.
-3. Regenerate `database.types.ts`. Satisfies **AC-3**.
-4. Thin thread in code: `getEditorLists`, `getReviewQueue`, the `edit-game.ts` types and dirty check, and `saveGame` pass the feel list through; the editor shows the "Game feel" section from the new picker. Satisfies **AC-4**, **AC-5**.
-5. Thicken: theme and mechanic lists and the mechanic hint text; one shared group picker component (replacing `category-picker.tsx`); remove `createCategory`, `validateCategory`, `slugify` and their tests; keep the label helper. Satisfies **AC-4**, **AC-6**, **AC-9**.
-6. Messages in `messages/en.json` and `messages/zh.json`: replace `review.editor.categories` with the three group titles and hints (same keys in both files). Satisfies **AC-4**.
-7. Update the unit tests (`edit-game.test.ts` including the dirty check, `actions.test.ts`, `categories.test.ts` becomes `choices.test.ts` for the label and hint helpers) and `e2e/review-edit.spec.ts` (tick in all three groups, Chinese labels and hints on `/zh`, no add form, the history check expects `feels`, `themes`, `mechanics` instead of `category_ids`). Satisfies **AC-4** to **AC-6**, **AC-10**.
-8. Docs: add a one line pointer under 0013 AC-25 ("replaced by spec 0014"), update `supabase/AGENTS.md` if it names categories, remove the `categories` mention in `docs/scope/scope.md`, and tick the scope sub task. Satisfies **AC-10**.
+- [x] 1. Migration `20261125090000_category_groups.sql`: drop the old function, `game_categories`, and `categories`; create the six tables with RLS and grants; seed the three lists; create the new `admin_update_game` with its grants. Satisfies **AC-1**, **AC-2**, **AC-3**, **AC-6**, **AC-7**, **AC-8**, **AC-9**.
+- [x] 2. pgTAP: new file for the three groups (seed, RLS, function, null list, history keys, service role cannot write choices). Update `10_review_edit.test.sql` (the `tests.cat` helper, the exact `changed` array, the plan count) and `05_merge_readiness.test.sql` (the expected list becomes `comments, game_feels, game_mechanics, game_owners, game_themes, ratings, top_picks, wishlist_entries`, eight not six; record the link merge rule, primary key with `on conflict do nothing`, for feature 19). `seed.sql` needs no sample tags. Satisfies **AC-1**, **AC-5** to **AC-9**.
+- [x] 3. Regenerate `database.types.ts`. Satisfies **AC-3**.
+- [x] 4. Thin thread in code: `getEditorLists`, `getReviewQueue`, the `edit-game.ts` types and dirty check, and `saveGame` pass the feel list through; the editor shows the "Game feel" section from the new picker. Satisfies **AC-4**, **AC-5**.
+- [x] 5. Thicken: theme and mechanic lists and the mechanic hint text; one shared group picker component (replacing `category-picker.tsx`); remove `createCategory`, `validateCategory`, `slugify` and their tests; keep the label helper. Satisfies **AC-4**, **AC-6**, **AC-9**.
+- [x] 6. Messages in `messages/en.json` and `messages/zh.json`: replace `review.editor.categories` with the three group titles and hints (same keys in both files). Satisfies **AC-4**.
+- [x] 7. Update the unit tests (`edit-game.test.ts` including the dirty check, `actions.test.ts`, `categories.test.ts` becomes `choices.test.ts` for the label and hint helpers) and `e2e/review-edit.spec.ts` (tick in all three groups, Chinese labels and hints on `/zh`, no add form, the history check expects `feels`, `themes`, `mechanics` instead of `category_ids`). Satisfies **AC-4** to **AC-6**, **AC-10**.
+- [x] 8. Docs: add a one line pointer under 0013 AC-25 ("replaced by spec 0014"), update `supabase/AGENTS.md` if it names categories, remove the `categories` mention in `docs/scope/scope.md`, and tick the scope sub task. Satisfies **AC-10**.
+- [x] 9. Data: add `fetchGameChoices` and the three lists on `GameDetail` (and fixtures); extend `rows` and `detail` tests (order by position, empty lists). Satisfies **AC-13**.
+- [x] 10. Sheet: `choiceGroups` in `SheetData` and `buildSheetData`, the rows in `sheet-view.tsx`, messages `game.choices.*` in both languages; update `game-sheet.test.tsx` (rows in order, empty group hidden, none shown when all empty, no hint text), the `/design` preview data, and `src/components/game-sheet/AGENTS.md` with one line. Satisfies **AC-11**, **AC-12**.
+- [x] 11. Reviewed tab: `SheetLink` for the title; e2e in `e2e/review-edit.spec.ts` (click a Reviewed title, the dialog opens, URL unchanged; the sheet shows the saved chips). Satisfies **AC-14**, **AC-11**.
+- [x] 12. Editor titles: add "(optional)" and "（可选）" to the three group titles; update the e2e and unit tests that read the titles. Satisfies **AC-15**.
 
 ## Migration plan
 
@@ -224,10 +244,11 @@ Approach: Tracer Bullet (the project default). The thin thread is the feel group
 - Chinese names and hints for the 15 drafted mechanics are a first draft.
 
 **Neutral**:
-- Hints show in the editor only for now.
+- Hints show in the editor only (the sheet shows names only, by design).
 
 ## Follow-up
 
 - [ ] Native Chinese reader checks all Chinese names and hints above (the PR template asks for it).
-- [ ] Show the tags on the shelf, home, and game sheet, and filter by them (feature 14, not in this spec).
+- [ ] Show the tags on the shelf and home, and filter by them (feature 14, not in this spec). The sheet already shows them (AC-11).
+- [ ] Native Chinese reader checks the three new chip row labels and the "（可选）" suffix.
 - [ ] Decide whether a game must have at least one feel before it can be marked reviewed (not required now).

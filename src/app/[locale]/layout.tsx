@@ -8,7 +8,7 @@ import { SheetHost } from "@/components/game-sheet/sheet-host";
 import { IntlClientProvider } from "@/i18n/intl-client-provider";
 import { hasLocale, htmlLang, routing } from "@/i18n/routing";
 import { themeColors } from "@/lib/design/theme-color";
-import { requireEnv } from "@/lib/supabase/env";
+import { siteBaseUrl } from "@/lib/supabase/env";
 import "../globals.css";
 
 const geistSans = Geist({
@@ -32,9 +32,7 @@ export function generateStaticParams() {
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("shell");
   return {
-    metadataBase: new URL(
-      requireEnv(process.env.NEXT_PUBLIC_SITE_URL, "NEXT_PUBLIC_SITE_URL"),
-    ),
+    metadataBase: new URL(siteBaseUrl()),
     title: { default: t("brand"), template: t("meta.titleTemplate") },
     description: t("meta.description"),
   };

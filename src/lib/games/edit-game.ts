@@ -2,7 +2,7 @@
 // action (spec 0013 amendment, AC-17 and AC-19). The English fields follow the
 // Add form rules in `new-game.ts`; the Chinese fields are optional.
 
-import { type EditorCategory } from "./categories";
+import { type EditorChoice } from "./choices";
 import {
   DESCRIPTION_MAX,
   NAME_MAX,
@@ -75,9 +75,11 @@ export function validateEditGame(input: EditGameInput): EditGameCheck {
 /** A member the owners picker can show. */
 export type EditorMember = { id: string; name: string; disabled: boolean };
 
-/** The choices the editor offers: every category and every pickable member. */
+/** The choices the editor offers: the three fixed lists and every pickable member. */
 export type EditorLists = {
-  categories: readonly EditorCategory[];
+  feels: readonly EditorChoice[];
+  themes: readonly EditorChoice[];
+  mechanics: readonly EditorChoice[];
   members: readonly EditorMember[];
 };
 
@@ -94,7 +96,9 @@ export type EditorGame = {
   playTimeMax: number | null;
   coverPath: string | null;
   coverTint: string | null;
-  categoryIds: number[];
+  feelIds: number[];
+  themeIds: number[];
+  mechanicIds: number[];
   owners: EditorMember[];
 };
 
@@ -145,7 +149,9 @@ export type CoverChange = "keep" | "replace" | "remove";
 /** Everything the editor can change, for the unsaved changes check. */
 export type EditSnapshot = {
   fields: EditGameInput;
-  categoryIds: readonly number[];
+  feelIds: readonly number[];
+  themeIds: readonly number[];
+  mechanicIds: readonly number[];
   ownerIds: readonly string[];
   cover: CoverChange;
 };
@@ -175,7 +181,9 @@ export function isEditDirty(
     return true;
   }
   return (
-    !sameSet(initial.categoryIds, current.categoryIds) ||
+    !sameSet(initial.feelIds, current.feelIds) ||
+    !sameSet(initial.themeIds, current.themeIds) ||
+    !sameSet(initial.mechanicIds, current.mechanicIds) ||
     !sameSet(initial.ownerIds, current.ownerIds)
   );
 }
