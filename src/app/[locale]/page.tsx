@@ -1,5 +1,5 @@
 import { type Metadata } from "next";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { HomeHero } from "@/components/home/home-hero";
 import { JustAdded } from "@/components/home/just-added";
 import { TopRated } from "@/components/home/top-rated";
@@ -19,7 +19,9 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function HomePage() {
-  const { gameCount, memberCount, newest, topRated } = await getHomeData();
+  const { gameCount, memberCount, newest, topRated } = await getHomeData(
+    await getLocale(),
+  );
 
   return (
     <div className="flex flex-col gap-6 lg:gap-12">

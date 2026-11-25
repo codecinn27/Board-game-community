@@ -54,6 +54,8 @@ export type NewGameCheck =
 export type GameMatch = {
   id: number;
   name: string;
+  /** Shown instead of `name` on `/zh` pages when it exists (spec 0013, AC-24). */
+  nameZh: string | null;
   coverPath: string | null;
   coverTint: string | null;
   ownerNames: string[];
@@ -146,6 +148,7 @@ export function validateNewGame(input: NewGameInput): NewGameCheck {
 export type SearchRow = {
   id: number;
   name: string;
+  name_zh?: string | null;
   cover_path: string | null;
   cover_tint: string | null;
   owner_names: string[] | null;
@@ -157,6 +160,7 @@ export function toGameMatch(row: SearchRow): GameMatch {
   return {
     id: row.id,
     name: row.name,
+    nameZh: row.name_zh ?? null,
     coverPath: row.cover_path,
     coverTint: row.cover_tint,
     ownerNames: row.owner_names ?? [],

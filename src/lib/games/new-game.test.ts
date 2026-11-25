@@ -130,6 +130,7 @@ describe("toGameMatch", () => {
       toGameMatch({
         id: 3,
         name: "Catan",
+        name_zh: "卡坦岛",
         cover_path: null,
         cover_tint: "#aabbcc",
         owner_names: null,
@@ -139,6 +140,7 @@ describe("toGameMatch", () => {
     ).toEqual({
       id: 3,
       name: "Catan",
+      nameZh: "卡坦岛",
       coverPath: null,
       coverTint: "#aabbcc",
       ownerNames: [],

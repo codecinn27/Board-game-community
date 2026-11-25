@@ -105,14 +105,17 @@ export function buildGameDetail(
   };
 }
 
-async function readGameDetail(id: number): Promise<GameDetail | null> {
+async function readGameDetail(
+  id: number,
+  locale: string,
+): Promise<GameDetail | null> {
   "use cache";
   cacheLife("games");
   cacheTag(GAMES_TAG);
 
   const client = createPublicClient();
   const [game, links] = await Promise.all([
-    fetchGameRow(client, id),
+    fetchGameRow(client, id, locale),
     fetchGameOwners(client, id),
   ]);
   if (game === null) return null;
@@ -121,13 +124,17 @@ async function readGameDetail(id: number): Promise<GameDetail | null> {
 
 /**
  * One game's sheet data from the database, cached for 5 minutes under the
- * `games` tag. An id that is not a positive whole number never reaches the
- * cache or the database. A failed read throws and is not cached.
+ * `games` tag, one entry per language (`locale` is an argument). An id that is
+ * not a positive whole number never reaches the cache or the database. A failed
+ * read throws and is not cached.
  */
-export async function getGameDetail(id: string): Promise<GameDetail | null> {
+export async function getGameDetail(
+  id: string,
+  locale: string,
+): Promise<GameDetail | null> {
   const gameId = parseGameId(id);
   if (gameId === null) return null;
-  return readGameDetail(gameId);
+  return readGameDetail(gameId, locale);
 }
 
 /**

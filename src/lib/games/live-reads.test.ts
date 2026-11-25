@@ -42,7 +42,7 @@ describe("getGameDetail", () => {
   // covers: AC-4, AC-5
   it("reads every fixture id from the database rows", async () => {
     for (const game of fixtureGames) {
-      const detail = await getGameDetail(String(game.id));
+      const detail = await getGameDetail(String(game.id), "en");
       expect(detail?.name, game.name).toBe(game.name);
       expect(detail?.coverTint, game.name).toBe(game.cover_tint);
     }
@@ -50,7 +50,7 @@ describe("getGameDetail", () => {
 
   // covers: AC-4
   it("returns the owners, named and in order, and the owner count", async () => {
-    const detail = await getGameDetail("1");
+    const detail = await getGameDetail("1", "en");
 
     expect(detail?.ownerCount).toBe(4);
     expect(detail?.owners.map((o) => o.displayName).sort()).toEqual([
@@ -67,30 +67,32 @@ describe("getGameDetail", () => {
     tables.game_owners = [];
     use(tables);
 
-    const detail = await getGameDetail("1");
+    const detail = await getGameDetail("1", "en");
     expect(detail?.ownerCount).toBe(0);
     expect(detail?.owners).toEqual([]);
   });
 
   // covers: AC-4
   it("returns null for an unknown id and never asks the database for a bad one", async () => {
-    expect(await getGameDetail("999")).toBeNull();
+    expect(await getGameDetail("999", "en")).toBeNull();
 
     mocks.client = null; // a read would now crash
     for (const bad of ["abc", "0", "1.5", "-1", ""]) {
-      expect(await getGameDetail(bad), bad).toBeNull();
+      expect(await getGameDetail(bad, "en"), bad).toBeNull();
     }
   });
 
   // covers: AC-4, AC-10
   it("throws when the read fails, so nothing is cached", async () => {
     use(fixtureTables(), "connection refused");
-    await expect(getGameDetail("1")).rejects.toThrow(/connection refused/);
+    await expect(getGameDetail("1", "en")).rejects.toThrow(
+      /connection refused/,
+    );
   });
 
   // covers: AC-10
   it("is cached for the games profile under the games tag", async () => {
-    await getGameDetail("1");
+    await getGameDetail("1", "en");
     expect(mocks.cacheLife).toHaveBeenCalledWith("games");
     expect(mocks.cacheTag).toHaveBeenCalledWith(GAMES_TAG);
   });
@@ -106,7 +108,7 @@ describe("getGameIds", () => {
   it("gives one id that is never a game when the database is empty", async () => {
     use(emptyTables());
     expect(await getGameIds()).toEqual([NO_GAME_ID]);
-    expect(await getGameDetail(NO_GAME_ID)).toBeNull();
+    expect(await getGameDetail(NO_GAME_ID, "en")).toBeNull();
   });
 
   // covers: AC-10
@@ -120,7 +122,7 @@ describe("getGameIds", () => {
 describe("getShelfData", () => {
   // covers: AC-7
   it("lists every game A to Z with its owner count, rating, and tint", async () => {
-    const { games } = await getShelfData();
+    const { games } = await getShelfData("en");
 
     expect(games).toHaveLength(12);
     expect(games.map((g) => g.name).slice(0, 3)).toEqual([
@@ -141,18 +143,18 @@ describe("getShelfData", () => {
   // covers: AC-9
   it("is an empty shelf, not an error, for an empty database", async () => {
     use(emptyTables());
-    expect(await getShelfData()).toEqual({ games: [], owners: [] });
+    expect(await getShelfData("en")).toEqual({ games: [], owners: [] });
   });
 
   // covers: AC-11
   it("throws when the read fails", async () => {
     use(fixtureTables(), "connection refused");
-    await expect(getShelfData()).rejects.toThrow(/connection refused/);
+    await expect(getShelfData("en")).rejects.toThrow(/connection refused/);
   });
 
   // covers: AC-10
   it("is cached for the games profile under the games tag", async () => {
-    await getShelfData();
+    await getShelfData("en");
     expect(mocks.cacheLife).toHaveBeenCalledWith("games");
     expect(mocks.cacheTag).toHaveBeenCalledWith(GAMES_TAG);
   });
@@ -161,7 +163,7 @@ describe("getShelfData", () => {
 describe("getHomeData", () => {
   // covers: AC-8
   it("counts games, owning members, the newest six, and the top five", async () => {
-    const data = await getHomeData();
+    const data = await getHomeData("en");
 
     expect(data.gameCount).toBe(12);
     expect(data.memberCount).toBe(4);
@@ -179,7 +181,7 @@ describe("getHomeData", () => {
   // covers: AC-9
   it("renders an empty community, games without ratings, and games without owners", async () => {
     use(emptyTables());
-    expect(await getHomeData()).toEqual({
+    expect(await getHomeData("en")).toEqual({
       gameCount: 0,
       memberCount: 0,
       newest: [],
@@ -194,7 +196,7 @@ describe("getHomeData", () => {
       avg_recommendation: null,
     }));
     use(tables);
-    const bare = await getHomeData();
+    const bare = await getHomeData("en");
     expect(bare.gameCount).toBe(12);
     expect(bare.memberCount).toBe(0);
     expect(bare.topRated).toEqual([]);
@@ -203,12 +205,12 @@ describe("getHomeData", () => {
   // covers: AC-11
   it("throws when the read fails", async () => {
     use(fixtureTables(), "connection refused");
-    await expect(getHomeData()).rejects.toThrow(/connection refused/);
+    await expect(getHomeData("en")).rejects.toThrow(/connection refused/);
   });
 
   // covers: AC-10
   it("is cached for the games profile under the games tag", async () => {
-    await getHomeData();
+    await getHomeData("en");
     expect(mocks.cacheLife).toHaveBeenCalledWith("games");
     expect(mocks.cacheTag).toHaveBeenCalledWith(GAMES_TAG);
   });
@@ -242,5 +244,56 @@ describe("gameExists", () => {
     expect(await gameExists("3")).toBe(true);
     expect(log).toHaveBeenCalled();
     log.mockRestore();
+  });
+});
+
+// Spec 0013 amendment, AC-24: one entry per language, Chinese text when it exists.
+describe("Chinese text", () => {
+  function useChineseFixture() {
+    const tables = fixtureTables();
+    tables.game_stats = tables.game_stats.map((g) =>
+      g.id === 1
+        ? { ...g, name_zh: "展翅高飞", description_zh: "一个关于鸟类的游戏" }
+        : g,
+    );
+    use(tables);
+  }
+
+  it("shows the Chinese name and description on /zh when they exist", async () => {
+    useChineseFixture();
+    const detail = await getGameDetail("1", "zh");
+    expect(detail?.name).toBe("展翅高飞");
+    expect(detail?.description).toBe("一个关于鸟类的游戏");
+  });
+
+  it("never shows Chinese on /en", async () => {
+    useChineseFixture();
+    const detail = await getGameDetail("1", "en");
+    expect(detail?.name).toBe(fixtureGames[0]?.name);
+    expect(detail?.description).toBe(fixtureGames[0]?.description);
+  });
+
+  it("falls back to English for a game with no Chinese text", async () => {
+    useChineseFixture();
+    const plain = fixtureGames.find((g) => g.id === 2);
+    const detail = await getGameDetail("2", "zh");
+    expect(detail?.name).toBe(plain?.name);
+    expect(detail?.description).toBe(plain?.description);
+  });
+
+  it("uses the Chinese name on the shelf and on home", async () => {
+    useChineseFixture();
+    const shelf = await getShelfData("zh");
+    expect(shelf.games.find((g) => g.id === 1)?.name).toBe("展翅高飞");
+    expect(
+      shelf.owners.flatMap((o) => o.games).some((g) => g.name === "展翅高飞"),
+    ).toBe(true);
+    const home = await getHomeData("zh");
+    const names = [...home.newest, ...home.topRated].map((g) => g.name);
+    expect(names).not.toContain(fixtureGames[0]?.name);
+    const english = await getShelfData("en");
+    expect(english.games.find((g) => g.id === 1)?.name).toBe(
+      fixtureGames[0]?.name,
+    );
   });
 });

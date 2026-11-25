@@ -88,7 +88,7 @@ export function CoverPicker({
             <ImagePlus aria-hidden className="size-6 text-muted-foreground" />
           )}
         </div>
-        <div className="flex flex-col gap-2">
+        <div className="flex min-w-0 flex-col gap-2">
           <input
             ref={input}
             id={id}

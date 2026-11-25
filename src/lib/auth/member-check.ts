@@ -9,6 +9,30 @@ export type MemberCheck =
   | { status: "readOnly"; id: string }
   | { status: "active"; id: string; displayName: string | null };
 
+export type AdminCheck =
+  | { status: "guest" }
+  | { status: "forbidden" }
+  | { status: "admin"; id: string };
+
+/**
+ * Whether the caller is an active admin, from the verified claims and the
+ * profile row. Run this before using the secret key on an admin's behalf.
+ */
+export async function checkAdmin(supabase: Client): Promise<AdminCheck> {
+  const { data } = await supabase.auth.getClaims();
+  const id = data?.claims.sub;
+  if (!id) return { status: "guest" };
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role, status")
+    .eq("id", id)
+    .maybeSingle();
+  if (profile?.role === "admin" && profile.status === "active") {
+    return { status: "admin", id };
+  }
+  return { status: "forbidden" };
+}
+
 /**
  * Who is calling a Server Action, from the verified claims and the member's
  * own profile row (never user editable metadata). A missing profile counts as

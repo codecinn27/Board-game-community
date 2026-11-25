@@ -1,7 +1,7 @@
 "use client";
 
 import { Check } from "lucide-react";
-import { useFormatter, useTranslations } from "next-intl";
+import { useFormatter, useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import { CoverTile } from "@/components/games/cover-tile";
 import { markOwned } from "@/components/game-sheet/own-actions";
@@ -9,6 +9,7 @@ import { invalidateSheet } from "@/components/game-sheet/sheet-store";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import { compareNames } from "@/lib/games/compare-names";
+import { localized } from "@/lib/games/localized";
 import { type GameMatch } from "@/lib/games/new-game";
 
 const NAMES_SHOWN = 3;
@@ -42,6 +43,7 @@ export function GameMatchRow({
   owned,
 }: GameMatchRowProps) {
   const t = useTranslations("addGame.result");
+  const shownName = localized(game.name, game.nameZh, useLocale());
   const [busy, setBusy] = useState(false);
   const [failed, setFailed] = useState(false);
 
@@ -73,7 +75,7 @@ export function GameMatchRow({
   return (
     <li className="flex items-center gap-3 py-3">
       <CoverTile
-        name={game.name}
+        name={shownName}
         tint={game.coverTint}
         path={game.coverPath}
         className="size-16 shrink-0 rounded-lg"
@@ -83,7 +85,7 @@ export function GameMatchRow({
           href={`/games/${game.id}`}
           className="truncate font-semibold underline-offset-4 hover:underline"
         >
-          {game.name}
+          {shownName}
         </Link>
         <p className="line-clamp-2 text-sm text-muted-foreground">
           <OwnerNames names={names} />

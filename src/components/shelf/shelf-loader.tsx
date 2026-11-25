@@ -1,4 +1,4 @@
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import {
   getShelfData,
   parseShelfView,
@@ -16,7 +16,7 @@ export async function ShelfLoader({ searchParams }: ShelfLoaderProps) {
   const { view } = await searchParams;
   let data: ShelfData | null = null;
   try {
-    data = await getShelfData();
+    data = await getShelfData(await getLocale());
   } catch {
     // Leave `data` null: the error block below handles it.
   }

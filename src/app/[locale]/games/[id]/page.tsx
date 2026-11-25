@@ -13,9 +13,9 @@ export async function generateStaticParams() {
 export async function generateMetadata({
   params,
 }: PageProps<"/[locale]/games/[id]">): Promise<Metadata> {
-  const { id } = await params;
+  const { id, locale } = await params;
   const t = await getTranslations("game");
-  const game = await getGameDetail(id);
+  const game = await getGameDetail(id, locale);
   if (!game)
     return {
       title: (await getTranslations("common.notFound"))("title"),

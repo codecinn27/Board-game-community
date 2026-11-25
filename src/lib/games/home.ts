@@ -112,15 +112,18 @@ export function buildHomeData(
   };
 }
 
-/** Everything home shows, from the database, cached for 5 minutes under the `games` tag. */
-export async function getHomeData(): Promise<HomeData> {
+/**
+ * Everything home shows, from the database, cached for 5 minutes under the
+ * `games` tag. `locale` is an argument, so the cache keeps one entry per language.
+ */
+export async function getHomeData(locale: string): Promise<HomeData> {
   "use cache";
   cacheLife("games");
   cacheTag(GAMES_TAG);
 
   const client = createPublicClient();
   const [games, profiles, owners] = await Promise.all([
-    fetchShelfGames(client),
+    fetchShelfGames(client, locale),
     fetchProfileRows(client),
     fetchOwnerRows(client),
   ]);

@@ -205,12 +205,13 @@ Spec [0011](../specs/0011-welcome-email/index.md) · code in `src/lib/email/`, `
 A member searches your own database first; if the game is there they mark "I own this", if not they enter it manually. Seeing who already owns a game helps avoid duplicate buys, but it is information only, never a block. This also wires up the "I own this" button on the game sheet.
 **Done when:** a member can add a game they own; the search shows if the community already owns it (and who), and the member can still add themselves as an owner; the game's details are stored once and shared by all its owners; a member can add or remove themselves as an owner from the game sheet.
 - [x] Design it (spec): `/architect add a game I own`
-- [ ] Build it: `/develop add a game I own`
+- [x] Build it: `/develop add a game I own`
   - [x] Database: migration (unique name, review columns, `search_games`, `add_game`, `set_game_reviewed`), foundation test update, pgTAP file 09 (AC-2, 4 to 6, 10, 12, 14)
   - [x] Thin thread to full form: `/games/new` with search, results with "I own this", manual form with every field, duplicate answer, Add tab on (AC-1 to 6)
   - [x] Cover: shrink and tint in the browser, server checks, upload and cleanup (AC-7, 8)
   - [x] Sheet dock: own state, add and remove with Undo, guest link, read only (AC-9 to 11)
-  - [ ] Admin review: viewer role, Review tab, `/admin/review` with two tabs; seeds marked reviewed; messages, metadata, browser checks (AC-12 to 15)
+  - [x] Admin review: viewer role, Review tab, `/admin/review` with two tabs; seeds marked reviewed; messages, metadata, browser checks (AC-12 to 15)
+  - [x] Review editing (amendment 2026-11-24): editor modal, Chinese text, categories, owners, cover with recycle bin and daily purge, edit history, Chinese display (AC-16 to 25)
 Spec [0013](../specs/0013-add-game-i-own/index.md)
 
 ## Slice 3: Fill game details from online

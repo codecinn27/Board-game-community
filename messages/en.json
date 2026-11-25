@@ -432,6 +432,90 @@
       "looksRight": "Looks right",
       "notReviewed": "Mark as not reviewed",
       "actionError": "Could not save. Try again."
+    },
+    "editor": {
+      "open": "Edit {name}",
+      "gamePage": "View game page",
+      "title": "Edit game",
+      "intro": "Fix the details, then save.",
+      "fields": {
+        "name": "Name",
+        "description": "Description",
+        "nameZh": "Chinese name",
+        "descriptionZh": "Chinese description"
+      },
+      "save": "Save",
+      "saveAndApprove": "Save and looks right",
+      "cancel": "Cancel",
+      "saving": "Saving",
+      "errors": {
+        "nameRequired": "Enter the game's name.",
+        "nameLong": "The name can be at most 200 characters.",
+        "nameSymbols": "The name needs at least one letter or number.",
+        "nameZhLong": "The Chinese name can be at most 200 characters.",
+        "nameZhSymbols": "The Chinese name needs at least one letter or number.",
+        "playersWhole": "Use a whole number from 1 to 99.",
+        "playTimeWhole": "Use a whole number from 1 to 1440.",
+        "playersOrder": "The most players cannot be below the fewest.",
+        "playTimeOrder": "The longest time cannot be below the shortest.",
+        "descriptionLong": "The description can be at most {max} characters.",
+        "descriptionZhLong": "The Chinese description can be at most {max} characters."
+      },
+      "problem": {
+        "clash": "Another game already uses this name: {name}.",
+        "clashUnknown": "Another game already uses this name.",
+        "alreadyReviewed": "This game is already reviewed. Mark it not reviewed to edit it.",
+        "forbidden": "Only an admin can save changes.",
+        "notFound": "This game no longer exists.",
+        "error": "Could not save. Nothing was changed. Try again in a moment.",
+        "coverInvalid": "That picture could not be used. Pick a JPEG, PNG, or WebP picture.",
+        "uploadFailed": "Could not store the cover picture. Nothing was saved. Try again in a moment."
+      },
+      "tabs": {
+        "label": "Language",
+        "en": "English",
+        "zh": "中文"
+      },
+      "zhHint": "Optional. Shown on the Chinese pages; the English text is used when this is blank.",
+      "categories": {
+        "title": "Categories",
+        "none": "No categories yet.",
+        "add": "Add a category",
+        "nameEn": "English label",
+        "nameZh": "Chinese label",
+        "create": "Add category",
+        "creating": "Adding",
+        "exists": "That category already exists, so it is ticked for you.",
+        "failed": "Could not add the category. Try again in a moment.",
+        "errors": {
+          "required": "Enter a label.",
+          "long": "Use at most 60 characters.",
+          "symbols": "Use at least one letter or number."
+        }
+      },
+      "owners": {
+        "title": "Owners",
+        "hint": "Tick everyone who owns this game.",
+        "none": "No members to pick.",
+        "readOnly": "read only"
+      },
+      "cover": {
+        "title": "Cover",
+        "current": "Current cover",
+        "none": "No cover",
+        "replace": "Replace",
+        "remove": "Remove",
+        "undo": "Keep the current cover",
+        "willRemove": "The cover is removed when you save.",
+        "newPicture": "New picture. It is saved when you save.",
+        "hint": "Pick a picture. It is shrunk to under 150 KB."
+      },
+      "discard": {
+        "title": "Discard your changes?",
+        "body": "You changed this game and have not saved.",
+        "keep": "Keep editing",
+        "discard": "Discard changes"
+      }
     }
   }
 }
