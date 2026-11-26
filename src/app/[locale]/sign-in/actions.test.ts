@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("server-only", () => ({}));
@@ -18,9 +19,37 @@ vi.mock("next/headers", () => ({ cookies: async () => cookieStore }));
 const auth = {
   signInWithPassword: vi.fn(),
   signUp: vi.fn(),
+  setSession: vi.fn(),
 };
 vi.mock("@/lib/supabase/server", () => ({
   createClient: async () => ({ auth }),
+}));
+
+// The client that saves nothing, used for the Google token exchange.
+const unsaved = { signInWithIdToken: vi.fn(), signOut: vi.fn() };
+vi.mock("@supabase/supabase-js", () => ({
+  createClient: () => ({ auth: unsaved }),
+}));
+
+const adminAuth = {
+  getUserById: vi.fn(),
+  updateUserById: vi.fn(),
+  deleteUser: vi.fn(),
+};
+const profileUpdate = vi.fn();
+const profileRead = vi.fn();
+vi.mock("@/lib/supabase/admin", () => ({
+  createAdminClient: () => ({
+    auth: { admin: adminAuth },
+    from: () => ({
+      update: (values: unknown) => ({
+        eq: () => ({ eq: async () => profileUpdate(values) }),
+      }),
+      select: () => ({
+        eq: () => ({ maybeSingle: async () => profileRead() }),
+      }),
+    }),
+  }),
 }));
 
 const findEmailByUsername = vi.fn();
@@ -54,6 +83,8 @@ beforeEach(() => {
   vi.stubEnv("INVITE_CODE", "right-code-123");
   vi.stubEnv("INVITE_COOKIE_SECRET", SECRET);
   vi.stubEnv("NEXT_PUBLIC_SITE_URL", "http://localhost:3000");
+  vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "http://127.0.0.1:54321");
+  vi.stubEnv("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY", "publishable-key");
   verifyTurnstile.mockResolvedValue(true);
   isUsernameTaken.mockResolvedValue(false);
 });
@@ -368,5 +399,188 @@ describe("signInWithEmail", () => {
       form({ ...credentials, identifier: "me@home" }),
     );
     expect(result.fields).toEqual({ identifier: "emailInvalid" });
+  });
+});
+
+describe("startGoogleSignIn", () => {
+  it("keeps the raw nonce in an httpOnly cookie and returns its hash", async () => {
+    const { startGoogleSignIn } = await import("./actions");
+    const hashed = await startGoogleSignIn();
+    const [name, raw, options] = cookieStore.set.mock.calls[0] as unknown as [
+      string,
+      string,
+      object,
+    ];
+    expect(name).toBe("google_nonce");
+    expect(hashed).toBe(createHash("sha256").update(raw).digest("hex"));
+    expect(options).toMatchObject({
+      httpOnly: true,
+      sameSite: "lax",
+      maxAge: 600,
+    });
+  });
+});
+
+describe("signInWithGoogle", () => {
+  const id = "11111111-2222-3333-4444-555555555555";
+  const google = { credential: "id-token", next: "/shelf" };
+
+  function account(extra: Record<string, unknown> = {}) {
+    return {
+      id,
+      email: "mei@example.com",
+      created_at: new Date().toISOString(),
+      identities: [{ provider: "google" }],
+      app_metadata: {},
+      user_metadata: { full_name: "Mei Tan" },
+      ...extra,
+    };
+  }
+
+  function found(user: unknown) {
+    adminAuth.getUserById.mockResolvedValue({ data: { user }, error: null });
+  }
+
+  async function run(values: Record<string, string> = google) {
+    const { signInWithGoogle } = await import("./actions");
+    return signInWithGoogle({}, form(values));
+  }
+
+  beforeEach(() => {
+    cookieJar.set("google_nonce", "raw-nonce");
+    unsaved.signInWithIdToken.mockResolvedValue({
+      data: {
+        session: { access_token: "a", refresh_token: "r", user: { id } },
+      },
+      error: null,
+    });
+    unsaved.signOut.mockResolvedValue({ error: null });
+    auth.setSession.mockResolvedValue({ error: null });
+    adminAuth.updateUserById.mockResolvedValue({ error: null });
+    adminAuth.deleteUser.mockResolvedValue({ error: null });
+    profileUpdate.mockReturnValue({ error: null });
+    profileRead.mockReturnValue({ data: { display_name: "Mei Tan" } });
+    found(account());
+  });
+
+  it("refuses without a nonce cookie or a credential", async () => {
+    cookieJar.clear();
+    expect((await run()).error).toBe("google");
+    cookieJar.set("google_nonce", "raw-nonce");
+    expect((await run({ credential: "" })).error).toBe("google");
+    expect(unsaved.signInWithIdToken).not.toHaveBeenCalled();
+  });
+
+  it("uses a nonce once", async () => {
+    found(account({ app_metadata: { invited: true } }));
+    await expect(run()).rejects.toThrow("REDIRECT");
+    expect((await run()).error).toBe("google");
+    expect(unsaved.signInWithIdToken).toHaveBeenCalledTimes(1);
+    expect(unsaved.signInWithIdToken).toHaveBeenCalledWith({
+      provider: "google",
+      token: "id-token",
+      nonce: "raw-nonce",
+    });
+  });
+
+  it.each([
+    [400, "google"],
+    [429, "rateLimit"],
+    [500, "generic"],
+  ])("maps a %i from the exchange to %s", async (status, key) => {
+    unsaved.signInWithIdToken.mockResolvedValue({
+      data: { session: null },
+      error: { status },
+    });
+    expect((await run()).error).toBe(key);
+    expect(auth.setSession).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ["a marked member", { app_metadata: { invited: true } }],
+    [
+      "an email member",
+      { identities: [{ provider: "email" }, { provider: "google" }] },
+    ],
+  ])("signs in %s with no pass and no mail", async (_label, facts) => {
+    found(account(facts));
+    await expect(run()).rejects.toThrow('"href":"/shelf"');
+    expect(auth.setSession).toHaveBeenCalledWith({
+      access_token: "a",
+      refresh_token: "r",
+    });
+    expect(adminAuth.updateUserById).not.toHaveBeenCalled();
+    expect(sendWelcomeEmail).not.toHaveBeenCalled();
+  });
+
+  it("lets a new person with a pass join, once marked", async () => {
+    cookieJar.set("invite_pass", await validPass());
+    await expect(run()).rejects.toThrow('"href":"/shelf"');
+    expect(adminAuth.updateUserById).toHaveBeenCalledWith(id, {
+      app_metadata: { invited: true },
+    });
+    expect(profileUpdate).toHaveBeenCalledWith({ display_name: "Mei Tan" });
+    expect(cookieJar.has("invite_pass")).toBe(false);
+    expect(auth.setSession).toHaveBeenCalled();
+    await vi.waitFor(() =>
+      expect(sendWelcomeEmail).toHaveBeenCalledWith({
+        userId: id,
+        email: "mei@example.com",
+        displayName: "Mei Tan",
+        locale: "en",
+        siteUrl: "http://localhost:3000",
+      }),
+    );
+  });
+
+  it("keeps the pass and signs nobody in when marking fails", async () => {
+    cookieJar.set("invite_pass", await validPass());
+    adminAuth.updateUserById.mockResolvedValue({ error: { status: 500 } });
+    expect((await run()).error).toBe("generic");
+    expect(cookieJar.has("invite_pass")).toBe(true);
+    expect(auth.setSession).not.toHaveBeenCalled();
+  });
+
+  it("signs nobody in when the account cannot be read", async () => {
+    adminAuth.getUserById.mockResolvedValue({
+      data: { user: null },
+      error: { status: 500 },
+    });
+    expect((await run()).error).toBe("generic");
+    expect(auth.setSession).not.toHaveBeenCalled();
+  });
+
+  it("refuses and deletes a new account with no pass, keeping next", async () => {
+    await expect(run()).rejects.toThrow(
+      '"query":{"mode":"register","error":"googleInvite","next":"/shelf"}',
+    );
+    expect(unsaved.signOut).toHaveBeenCalledWith({ scope: "local" });
+    expect(adminAuth.deleteUser).toHaveBeenCalledWith(id);
+    expect(auth.setSession).not.toHaveBeenCalled();
+  });
+
+  it("refuses an older unmarked account but keeps it", async () => {
+    found(
+      account({ created_at: new Date(Date.now() - 600_000).toISOString() }),
+    );
+    await expect(run()).rejects.toThrow("googleInvite");
+    expect(adminAuth.deleteUser).not.toHaveBeenCalled();
+    expect(auth.setSession).not.toHaveBeenCalled();
+  });
+
+  it("never deletes an account that became a member before the second read", async () => {
+    adminAuth.getUserById
+      .mockResolvedValueOnce({ data: { user: account() }, error: null })
+      .mockResolvedValueOnce({
+        data: { user: account({ app_metadata: { invited: true } }) },
+        error: null,
+      });
+    await expect(run()).rejects.toThrow("googleInvite");
+    expect(adminAuth.deleteUser).not.toHaveBeenCalled();
+  });
+
+  it("does not trust invited in user editable metadata", async () => {
+    found(account({ user_metadata: { invited: true } }));
+    await expect(run()).rejects.toThrow("googleInvite");
   });
 });

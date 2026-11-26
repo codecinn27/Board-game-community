@@ -201,7 +201,9 @@
       "inviteWrong": "That code is not right. Check it and try again.",
       "inviteNeeded": "Enter the invite code before you register.",
       "link": "That link has expired or was already used. Please try again.",
-      "emailTaken": "An account with this email already exists. Try signing in."
+      "emailTaken": "An account with this email already exists. Try signing in, with your password or with Google.",
+      "google": "Google sign in did not work. Please try again, or use your email.",
+      "googleInvite": "Enter the invite code first, then continue with Google."
     },
     "turnstile": {
       "label": "Security check",
@@ -224,7 +226,7 @@
       "heading": "Create your account",
       "submit": "Create account",
       "pending": "Creating account",
-      "privacy": "By creating an account you agree to the <link>privacy note</link>.",
+      "privacy": "By creating an account you agree to the <terms>terms of service</terms> and the <link>privacy note</link>.",
       "subheading": "Enter a display name for other members to see and a username to sign in with."
     },
     "checkEmail": {
@@ -254,7 +256,7 @@
       "saved": "Saved.",
       "passwordHeading": "Password",
       "passwordSaved": "Your password is changed.",
-      "googleNote": "You sign in with Google, so there is no password to change here.",
+      "googleNote": "You sign in with Google, so there is no password or username here.",
       "signOut": "Sign out",
       "privacy": "Read the privacy note",
       "disabled": "Your account is read only. You can browse, but you cannot add or change anything. Ask the group admin if this looks wrong.",
@@ -270,6 +272,10 @@
     "password": {
       "show": "Show password",
       "hide": "Hide password"
+    },
+    "google": {
+      "or": "or",
+      "hint": "If Google does not work, use your email instead."
     }
   },
   "privacy": {
@@ -290,10 +296,50 @@
       "supabase": "Supabase stores accounts and data.",
       "vercel": "Vercel hosts the website.",
       "turnstile": "Cloudflare Turnstile checks that a visitor is a person, on the sign in and sign up forms.",
-      "resend": "Resend sends our account emails (such as the welcome email and password resets). It receives your email address and display name for that purpose."
+      "resend": "Resend sends our account emails (such as the welcome email and password resets). It receives your email address and display name for that purpose.",
+      "google": "Google signs you in if you choose its button. We receive your name and email address from it."
     },
     "choicesHeading": "Your choices",
     "choices": "You can change your display name any time on the Me page. To delete your account, ask the group admin.",
+    "back": "Back to home",
+    "terms": "Read the terms of service"
+  },
+  "terms": {
+    "meta": {
+      "title": "Terms of Service",
+      "description": "The rules for using Game Shelf."
+    },
+    "heading": "Terms of Service",
+    "intro": "Game Shelf is a free, small community project. By creating an account or using the site, you agree to these simple rules.",
+    "service": {
+      "heading": "What this is",
+      "body": "A shared list of the board games our community owns and who owns them. Anyone can browse. Only invited members can add to it. It is free to use."
+    },
+    "account": {
+      "heading": "Your account",
+      "body": "Join only if you were invited, and do not pass the invite code to strangers. Use one account for yourself, keep your sign in safe, and tell the group admin if someone else may be using it."
+    },
+    "content": {
+      "heading": "What you add",
+      "body": "Add honest information. Do not post anything unlawful, hurtful or spam, and upload only pictures you are allowed to share. You let us show what you add on this site."
+    },
+    "admins": {
+      "heading": "What admins can do",
+      "body": "Admins may edit or remove content, and may disable or delete an account that breaks these rules."
+    },
+    "games": {
+      "heading": "Games and meet ups",
+      "body": "The shelf only shows who owns what. Borrowing, lending, damage, loss and meeting in person are between members, and the project is not responsible for them."
+    },
+    "warranty": {
+      "heading": "No promises",
+      "body": "The site is provided as it is. It may have mistakes, be unavailable, lose data or close. As far as the law allows, we are not liable for loss that comes from using it."
+    },
+    "changes": {
+      "heading": "Changes and contact",
+      "body": "We may update these rules, and this page always shows the current ones. To stop using the site, delete your account, or ask a question, contact the group admin."
+    },
+    "privacy": "Read the privacy note",
     "back": "Back to home"
   },
   "WelcomeEmail": {

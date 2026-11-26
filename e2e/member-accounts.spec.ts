@@ -116,6 +116,20 @@ test.describe("guest", () => {
   });
 });
 
+for (const [locale, heading] of [
+  ["en", "Terms of Service"],
+  ["zh", "服务条款"],
+] as const) {
+  test(`terms in ${locale} renders and fits the screen`, async ({ page }) => {
+    await page.goto(`/${locale}/terms`);
+    await expect(
+      page.getByRole("heading", { level: 1, name: heading }),
+    ).toBeVisible();
+    await expect(page.locator("main h2")).toHaveCount(7);
+    await noSidewaysScroll(page);
+  });
+}
+
 for (const [locale, heading, link] of [
   ["en", "Privacy", "Read the privacy note"],
   ["zh", "隐私说明", "查看隐私说明"],

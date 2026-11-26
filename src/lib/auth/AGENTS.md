@@ -2,7 +2,7 @@
 
 ## Overview
 
-Sign in, registration, and the shared invite code gate (spec 0010). Supabase Auth holds the accounts; this folder holds the rules around it. The gate is soft: our pages enforce the invite code, Supabase sign up stays open underneath (accepted risk, spec 0010 Option 1).
+Sign in, registration, Google sign in (spec 0015), and the shared invite code gate (spec 0010). Supabase Auth holds the accounts; this folder holds the rules around it. The gate is soft: our pages enforce the invite code, Supabase sign up stays open underneath (accepted risk, spec 0010 Option 1).
 
 ## Key files
 
@@ -15,6 +15,7 @@ Sign in, registration, and the shared invite code gate (spec 0010). Supabase Aut
 | [session.ts](session.ts) | `updateSession()`: the `@supabase/ssr` refresh that `src/proxy.ts` chains on the intl response |
 | [viewer.ts](viewer.ts) | `getViewer()`: guest or member from `getClaims()`; call only under `Suspense` |
 | [turnstile.ts](turnstile.ts) | Server side Cloudflare check, used by `verifyInvite` only |
+| [google.ts](google.ts) | Pure Google rules: nonce hash, `isInvitedAccount()`, the new member's name |
 | [errors.ts](errors.ts) | Supabase error code to a message key; credential failures are always the one generic key |
 | [validation.ts](validation.ts) | Display name, email, and password rules shared by actions and forms |
 | [state.ts](state.ts) | `FormState`, what every form action returns |
@@ -33,6 +34,8 @@ Pages: `src/app/[locale]/{sign-in,forgot-password,reset-password,me,privacy}/`. 
 - `/sign-in`, `/forgot-password`, and `/reset-password` render inside `AuthScene` (`src/components/auth/auth-scene.tsx`); `/me` and `/privacy` keep `AuthColumn` (`auth-layout.tsx`). Scene colors are `--auth-*` tokens that exist only inside `.auth-scene` (`src/app/globals.css`), so scene components write no literal colors.
 - The scene's look and motion rules (art, rockets in flight, tokens, `authSceneClass` as a plain string) live in the "Auth Dice Galaxy scene" section of [docs/design.md](../../../docs/design.md); change them there along with the code.
 - Stagger scene animations with an inline `style={{ animationDelay }}`, never an `[animation-delay:…]` class: `motion-safe:animate-auth-*` emits the `animation` shorthand later and resets the class delay to 0 (the five exhaust puffs stacked into one this way).
+- Google sign in: `signInWithGoogle` exchanges the token on a client that saves nothing, and calls `setSession` on the cookie client only after the gate. Member means an `email` identity or `app_metadata.invited` (written only by the admin client); never read it from `user_metadata`. Never delete an account that has either fact. Never log the token, nonce, email, or name.
+- `NEXT_PUBLIC_GOOGLE_CLIENT_ID` empty turns Google off. The Google client must list each origin, so the button does not work on preview or LAN addresses. Browser checks stub Google's script (`e2e/google-sign-in.spec.ts`).
 
 ## Gotchas
 
@@ -45,4 +48,5 @@ Pages: `src/app/[locale]/{sign-in,forgot-password,reset-password,me,privacy}/`. 
 ## Related specs
 
 - [0010 Member accounts](../../../docs/specs/0010-member-accounts/index.md)
+- [0015 Google sign in](../../../docs/specs/0015-google-sign-in.md)
 - [0001 Stack and architecture](../../../docs/specs/0001-stack-architecture/index.md)

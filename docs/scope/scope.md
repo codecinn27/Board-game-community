@@ -24,6 +24,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 6 | Member accounts | Slice 2 | done |
 | 23 | Welcome email | Slice 2 | done |
 | 7 | Add a game I own | Slice 2 | done |
+| 24 | Google sign in | Next: Easier sign in | in-progress |
 | 10 | Online game lookup | Slice 3 | planned |
 | 11 | Paste a link to auto fill | Slice 3 | planned |
 | 12 | Rating form | Slice 4 | planned |
@@ -214,6 +215,23 @@ A member searches your own database first; if the game is there they mark "I own
   - [x] Review editing (amendment 2026-11-24): editor modal, Chinese text, categories, owners, cover with recycle bin and daily purge, edit history, Chinese display (AC-16 to 25)
   - [x] Category groups (spec 0014, replaces the flat categories): feel, theme, and mechanics tables, fixed lists with Chinese and hints, editor picker in three sections (AC-1 to 10)
 Spec [0013](../specs/0013-add-game-i-own/index.md) · [0014](../specs/0014-category-groups.md)
+
+## Next: Easier sign in
+
+An optional extra on top of member accounts. It is free, and email sign in stays.
+
+### 24. Google sign in · in-progress
+Sign in or join with a Google account, with the community invite code still required for new members.
+**Done when:** a returning member signs in with Google, a new person can join with Google only after the invite code, a member who registered by email reaches the same account, and email sign in works as before.
+- [x] Design it (spec): `/architect google sign in`
+- [ ] Build it: `/develop google sign in`
+  - [x] Terms of Service page at `/terms` in both languages, with links (AC-13)
+  - [ ] Setup and thin thread: Google Cloud and Supabase settings, button, returning member signs in, three early checks (AC-4, 8, 10, 12)
+  - [ ] Invite gate for new accounts and linking by email (AC-2, 3, 5)
+  - [ ] New member name and welcome email (AC-6, 7)
+  - [ ] Page states, `/me`, messages in both languages, privacy note (AC-1, 9 to 11)
+  - [ ] Tests, hand check list, auth `AGENTS.md` (AC-1 to 12)
+Spec [0015](../specs/0015-google-sign-in.md), code in `src/lib/auth/google.ts`, `src/app/[locale]/sign-in/actions.ts`, `src/components/auth/google-button.tsx` (written and tested with stand ins; the boxes above wait for the real Google hand checks)
 
 ## Slice 3: Fill game details from online
 

@@ -14,7 +14,13 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 const STORED = ["email", "name", "activity"] as const;
-const HANDLERS = ["supabase", "vercel", "turnstile", "resend"] as const;
+const HANDLERS = [
+  "supabase",
+  "vercel",
+  "turnstile",
+  "resend",
+  "google",
+] as const;
 
 export default async function PrivacyPage() {
   const t = await getTranslations("privacy");
@@ -41,6 +47,12 @@ export default async function PrivacyPage() {
         <h2 className="text-lg font-semibold">{t("choicesHeading")}</h2>
         <p>{t("choices")}</p>
       </section>
+      <Link
+        href="/terms"
+        className="inline-flex min-h-11 items-center text-sm font-medium text-primary underline-offset-4 hover:underline"
+      >
+        {t("terms")}
+      </Link>
       <Link
         href="/"
         className="inline-flex min-h-11 items-center text-sm font-medium text-primary underline-offset-4 hover:underline"
