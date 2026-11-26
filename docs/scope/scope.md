@@ -231,6 +231,7 @@ Sign in or join with a Google account, with the community invite code still requ
   - [ ] New member name and welcome email (AC-6, 7)
   - [ ] Page states, `/me`, messages in both languages, privacy note (AC-1, 9 to 11)
   - [ ] Tests, hand check list, auth `AGENTS.md` (AC-1 to 12)
+  - [x] Cream Table colors on sign in, create account, forgot, and reset, matching the rest of the site (AC-14)
 Spec [0015](../specs/0015-google-sign-in.md), code in `src/lib/auth/google.ts`, `src/app/[locale]/sign-in/actions.ts`, `src/components/auth/google-button.tsx` (written and tested with stand ins; the boxes above wait for the real Google hand checks)
 
 ## Slice 3: Fill game details from online

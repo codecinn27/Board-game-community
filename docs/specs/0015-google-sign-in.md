@@ -2,6 +2,7 @@
 
 **Date**: 2026-11-27
 **Status**: In Progress
+**Revised**: 2026-11-27, by the engineer: the auth pages change from the violet night sky to the "Cream Table" colors (cream to sand sky, terracotta button) so they match the rest of the site and sit well around Google's white button. Adds AC-14 and build task 9. Behaviour, actions, and security are unchanged.
 
 ## Summary
 
@@ -38,6 +39,7 @@ Not deciding costs little. Email sign in already works, so this is a convenience
 - **AC-11**: All new text is in `en.json` and `zh.json`, the Google button follows the page language, the privacy note mentions Google in both, and sign in pages have no sideways scroll at 360px.
 - **AC-12**: With no `NEXT_PUBLIC_GOOGLE_CLIENT_ID` set, no Google button, hint, or script appears and the site behaves as today.
 - **AC-13**: A public Terms of Service page exists at `/terms` in English and Chinese, linked from the register form line and the privacy note, so Google's consent screen can point to it.
+- **AC-14**: Sign in, create account, forgot password, and reset password use the Cream Table colors (option A in [docs/design/sign-in/index.html](../design/sign-in/index.html)): a cream to warm sand sky, dark brown headings, cream clouds, a sage die and a terracotta die, terracotta links and icons, and a solid terracotta submit button. The scene's layout, art, motion, and font stay as spec 0010 describes. Colors stay `--auth-*` tokens and every text pair passes the contrast test.
 
 ## Options considered
 
@@ -51,7 +53,7 @@ Google Identity Services (Google's sign in script) draws the button, returns an 
 
 **Cons**:
 - Loads a script from Google on sign in pages.
-- The button's look is mostly Google's, so it will not match the Dice Galaxy style exactly.
+- The button's look is mostly Google's, so it will not match the auth scene's style exactly.
 
 ### Option 2: Redirect sign in with our own button
 
@@ -190,6 +192,7 @@ Tracer Bullet (one real thread through every layer, then thicken).
 6. Words and privacy: the message keys above and the privacy bullet, satisfies **AC-11**.
 7. Checks: Vitest, Playwright, hand test list, `src/lib/auth/AGENTS.md`, satisfies **AC-1 to AC-12**.
 8. Terms of Service page, both languages, links and a browser check (built 2026-11-27, ahead of the rest), satisfies **AC-13**.
+9. Cream Table colors: new `--auth-*` values in `globals.css`, `--auth-star` and `--auth-die*` tokens, `--auth-magenta` renamed `--auth-fin`, the `/design` preview, and `docs/design.md` (built 2026-11-27), satisfies **AC-14**.
 
 ## Consequences
 

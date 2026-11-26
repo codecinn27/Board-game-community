@@ -1,7 +1,7 @@
 import { type ReactNode, useId } from "react";
 import { cn } from "@/lib/utils";
 
-// The Dice Galaxy art (spec 0010, AC-16, AC-19, AC-21): the night sky, stars,
+// The Dice Galaxy art (spec 0010, AC-16, AC-19, AC-21): the sky, stars,
 // a ringed planet, two clay dice, sparkles, a rocket in flight, and the cloud
 // bank the form card rests on. All of it is inline SVG with `--auth-*` fills,
 // hidden from assistive tech, so it stays sharp at every size and needs no
@@ -20,7 +20,7 @@ export function AuthDecor() {
   return (
     <div
       aria-hidden
-      className="pointer-events-none absolute inset-y-0 left-1/2 -z-10 w-screen -translate-x-1/2 bg-[radial-gradient(130%_75%_at_50%_0%,var(--auth-sky)_0%,var(--auth-sky-mid)_55%,var(--auth-sky-deep)_100%)]"
+      className="pointer-events-none absolute inset-y-0 left-1/2 -z-10 w-screen -translate-x-1/2 bg-[linear-gradient(180deg,var(--auth-sky)_0%,var(--auth-sky-mid)_60%,var(--auth-sky-deep)_100%)]"
     >
       <Stars />
 
@@ -239,16 +239,16 @@ function RocketShape() {
       />
       <path
         d="M60 10 C68 17 74 27 77 38 L43 38 C46 27 52 17 60 10 Z"
-        className="fill-auth-magenta"
+        className="fill-auth-fin"
       />
-      <path d="M38 66 L22 94 L38 90 Z" className="fill-auth-magenta" />
-      <path d="M82 66 L98 94 L82 90 Z" className="fill-auth-magenta" />
+      <path d="M38 66 L22 94 L38 90 Z" className="fill-auth-fin" />
+      <path d="M82 66 L98 94 L82 90 Z" className="fill-auth-fin" />
       <circle
         cx="60"
         cy="58"
         r="11"
         strokeWidth="5"
-        className="fill-auth-window stroke-auth-magenta"
+        className="fill-auth-window stroke-auth-fin"
       />
       <circle
         cx="56"
@@ -334,16 +334,16 @@ function Planet() {
 // Each die face: a fill plus a stroke of the same color, so the corners round.
 const DIE_TONES = {
   clay: {
-    top: "fill-auth-clay stroke-auth-clay",
-    left: "fill-auth-clay-shade stroke-auth-clay-shade",
-    right: "fill-auth-clay-deep stroke-auth-clay-deep",
+    top: "fill-auth-die stroke-auth-die",
+    left: "fill-auth-die-shade stroke-auth-die-shade",
+    right: "fill-auth-die-deep stroke-auth-die-deep",
     pips: "fill-auth-pip",
   },
   rose: {
     top: "fill-auth-rose-light stroke-auth-rose-light",
     left: "fill-auth-rose stroke-auth-rose",
     right: "fill-auth-rose-deep stroke-auth-rose-deep",
-    pips: "fill-auth-clay",
+    pips: "fill-auth-pip",
   },
 } as const;
 
@@ -357,7 +357,7 @@ const PIPS = [
   [36, 44, 2.4, 3.2],
 ] as const;
 
-/** A clay die seen from above a corner. */
+/** A die seen from above a corner: sage (`clay`) or terracotta (`rose`). */
 function Die({ tone }: { tone: keyof typeof DIE_TONES }) {
   const colors = DIE_TONES[tone];
   return (
@@ -436,7 +436,7 @@ function Stars() {
         cx="140"
         cy="120"
         r="90"
-        opacity="0.14"
+        opacity="0.45"
         className="fill-auth-glow"
       />
       <circle
@@ -444,9 +444,9 @@ function Stars() {
         cy="560"
         r="120"
         opacity="0.25"
-        className="fill-auth-sky"
+        className="fill-auth-haze"
       />
-      <g className="fill-auth-clay">
+      <g className="fill-auth-star">
         {STARS.map(([cx, cy, r, opacity]) => (
           <circle key={`${cx}-${cy}`} cx={cx} cy={cy} r={r} opacity={opacity} />
         ))}
@@ -455,7 +455,7 @@ function Stars() {
         <g
           key={index}
           className={cn(
-            "fill-auth-clay motion-safe:animate-auth-twinkle",
+            "fill-auth-star motion-safe:animate-auth-twinkle",
             index === 1 && "[animation-delay:-1.75s]",
           )}
         >
@@ -490,7 +490,7 @@ const BUBBLES = [
 ] as const;
 
 /**
- * Overlapping white clouds along the bottom. A white strip under them fills
+ * Overlapping cream clouds along the bottom. A cream strip under them fills
  * the main's bottom padding, so the clouds continue under the phone tab bar.
  */
 function CloudBank() {

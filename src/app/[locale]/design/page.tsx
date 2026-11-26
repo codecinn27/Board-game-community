@@ -69,12 +69,16 @@ const authFills = [
   "auth-sky-deep",
   "auth-glow",
   "auth-haze",
+  "auth-star",
+  "auth-die",
+  "auth-die-shade",
+  "auth-die-deep",
   "auth-clay-shade",
   "auth-clay-deep",
   "auth-pip",
   "auth-rose",
   "auth-rose-deep",
-  "auth-magenta",
+  "auth-fin",
   "auth-window",
   "auth-gold",
   "auth-spark",
@@ -307,7 +311,7 @@ export default function DesignPage() {
           the real forms need their messages, so see them on /sign-in.
         </p>
         <div
-          className={`${authSceneClass} flex flex-col gap-6 rounded-[28px] bg-[radial-gradient(130%_75%_at_50%_0%,var(--auth-sky)_0%,var(--auth-sky-mid)_55%,var(--auth-sky-deep)_100%)] p-4 text-auth-on-sky md:p-8`}
+          className={`${authSceneClass} flex flex-col gap-6 rounded-[28px] bg-[linear-gradient(180deg,var(--auth-sky)_0%,var(--auth-sky-mid)_60%,var(--auth-sky-deep)_100%)] p-4 text-auth-on-sky md:p-8`}
         >
           <ul className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             {authPairs.map(([surface, text]) => (

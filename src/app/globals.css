@@ -46,54 +46,58 @@
 }
 
 /*
- * Auth Dice Galaxy scene (spec 0010, AC-20): the second scoped theme after
- * Cover Tint. These tokens live only on `.auth-scene` (sign in, forgot,
- * reset), so the rest of the site keeps its terracotta look. Text uses the
+ * Auth Dice Galaxy scene (spec 0010, AC-20; Cream Table colors, spec 0015
+ * AC-14): the second scoped theme after Cover Tint. These tokens live only on `.auth-scene` (sign in, forgot,
+ * reset). Text uses the
  * on-sky, ink, link, button, and danger tokens, which pass 4.5:1 in
- * contrast.test.ts; the art colors (clay, rose, gold, haze, glow, flame) are
- * fills.
+ * contrast.test.ts; the art colors (clay, die, rose, gold, haze, glow, star,
+ * flame) are fills.
  */
 .auth-scene {
-  /* Night sky, top glow to bottom */
-  --auth-sky: oklch(0.416 0.171 298.6);
-  --auth-sky-mid: oklch(0.271 0.116 296.2);
-  --auth-sky-deep: oklch(0.207 0.087 294.8);
-  --auth-glow: oklch(0.508 0.171 343.4);
-  --auth-haze: oklch(0.754 0.105 299.8);
-  --auth-on-sky: oklch(1 0 0);
-  --auth-on-sky-muted: oklch(0.878 0.056 300.1);
+  /* Cream sky, top to the warm sand behind the clouds */
+  --auth-sky: oklch(0.967 0.028 84.6); /* #fdf3df */
+  --auth-sky-mid: oklch(0.923 0.055 82.4); /* #f8e3bd */
+  --auth-sky-deep: oklch(0.881 0.07 78.8); /* #f1d3a4 */
+  --auth-glow: oklch(0.826 0.085 58.6); /* #f0b98f */
+  --auth-haze: oklch(0.809 0.096 72.5); /* #e7b77a */
+  --auth-star: oklch(0.686 0.108 63.8); /* #c98b4e */
+  --auth-on-sky: oklch(0.252 0.023 51.6); /* #2b1f18 */
+  --auth-on-sky-muted: oklch(0.413 0.04 57.4); /* #5c4636 */
   /* Form card */
-  --auth-card: oklch(1 0 0);
-  --auth-field: oklch(0.964 0.015 302.6);
+  --auth-card: oklch(1 0 0); /* #ffffff */
+  --auth-field: oklch(0.972 0.013 82.4); /* #faf5ec */
   /* Field outline: 3:1 on the card and the field, so its edge is visible. */
-  --auth-field-line: oklch(0.618 0.103 296.8);
-  --auth-icon: oklch(0.521 0.195 288.5);
-  --auth-ink: oklch(0.3 0.074 290);
-  --auth-ink-muted: oklch(0.474 0.071 294);
-  --auth-link: oklch(0.485 0.211 293.3);
-  --auth-ring: oklch(0.485 0.211 293.3);
+  --auth-field-line: oklch(0.612 0.026 65.2); /* #8f8174 */
+  --auth-icon: oklch(0.543 0.148 40.2); /* #b44a20 */
+  --auth-ink: oklch(0.252 0.023 51.6); /* #2b1f18 */
+  --auth-ink-muted: oklch(0.48 0.031 61.4); /* #6b5a4c */
+  --auth-link: oklch(0.504 0.138 40.3); /* #a3421b */
+  --auth-ring: oklch(0.504 0.138 40.3); /* #a3421b */
   --auth-danger: oklch(0.5 0.19 20);
   --auth-danger-bg: oklch(0.955 0.03 15);
-  --auth-shadow: oklch(0.15 0.08 300 / 65%);
-  /* Submit button: white text passes on both ends */
-  --auth-button-from: oklch(0.553 0.193 353);
-  --auth-button-to: oklch(0.485 0.211 293.3);
-  --auth-on-button: oklch(1 0 0);
-  --auth-button-glow: oklch(0.508 0.171 343.4 / 70%);
-  /* Art: clay dice, rocket, planet, sparkles */
-  --auth-clay: oklch(1 0 0);
-  --auth-clay-shade: oklch(0.923 0.032 301.6);
-  --auth-clay-deep: oklch(0.846 0.062 299.6);
-  --auth-pip: oklch(0.53 0.205 288.1);
-  --auth-rose-light: oklch(0.939 0.034 354.9);
-  --auth-rose: oklch(0.837 0.084 356.1);
-  --auth-rose-deep: oklch(0.761 0.108 355.5);
-  --auth-magenta: oklch(0.606 0.203 353.1);
-  --auth-window: oklch(0.399 0.148 304.4);
-  --auth-gold: oklch(0.876 0.113 87.4);
-  --auth-spark: oklch(0.834 0.158 89);
+  --auth-shadow: oklch(0.45 0.086 58.8 / 35%); /* #78481e */
+  /* Submit button: solid terracotta (both gradient ends match) */
+  --auth-button-from: oklch(0.543 0.148 40.2); /* #b44a20 */
+  --auth-button-to: oklch(0.543 0.148 40.2); /* #b44a20 */
+  --auth-on-button: oklch(1 0 0); /* #ffffff */
+  --auth-button-glow: oklch(0.543 0.148 40.2 / 70%); /* #b44a20 */
+  /* Art: rocket and clouds (clay), sage die, terracotta die and planet */
+  --auth-clay: oklch(0.994 0.007 88.6); /* #fffdf8 */
+  --auth-clay-shade: oklch(0.901 0.039 80); /* #ecdcc2 */
+  --auth-clay-deep: oklch(0.836 0.052 78.7); /* #dcc6a4 */
+  --auth-die: oklch(0.886 0.042 133); /* #cfe0c4 */
+  --auth-die-shade: oklch(0.791 0.065 135.3); /* #a9c59b */
+  --auth-die-deep: oklch(0.697 0.078 136.7); /* #87a979 */
+  --auth-pip: oklch(0.994 0.007 88.6); /* #fffdf8 */
+  --auth-rose-light: oklch(0.819 0.088 51.9); /* #f2b48f */
+  --auth-rose: oklch(0.667 0.138 43.2); /* #d9754a */
+  --auth-rose-deep: oklch(0.543 0.148 40.2); /* #b44a20 */
+  --auth-fin: oklch(0.543 0.148 40.2); /* #b44a20 */
+  --auth-window: oklch(0.553 0.066 188.7); /* #3f7f7a */
+  --auth-gold: oklch(0.773 0.144 79); /* #e6a935 */
+  --auth-spark: oklch(0.714 0.144 72.5); /* #d9921f */
   /* The middle layer of the rocket's flame (gold outside, white core). */
-  --auth-flame: oklch(0.776 0.147 69.1);
+  --auth-flame: oklch(0.688 0.162 49.3); /* #e8772e */
 }
 
 @keyframes auth-float {
@@ -246,6 +250,7 @@
   --color-auth-sky-deep: var(--auth-sky-deep);
   --color-auth-glow: var(--auth-glow);
   --color-auth-haze: var(--auth-haze);
+  --color-auth-star: var(--auth-star);
   --color-auth-on-sky: var(--auth-on-sky);
   --color-auth-on-sky-muted: var(--auth-on-sky-muted);
   --color-auth-card: var(--auth-card);
@@ -266,11 +271,14 @@
   --color-auth-clay: var(--auth-clay);
   --color-auth-clay-shade: var(--auth-clay-shade);
   --color-auth-clay-deep: var(--auth-clay-deep);
+  --color-auth-die: var(--auth-die);
+  --color-auth-die-shade: var(--auth-die-shade);
+  --color-auth-die-deep: var(--auth-die-deep);
   --color-auth-pip: var(--auth-pip);
   --color-auth-rose-light: var(--auth-rose-light);
   --color-auth-rose: var(--auth-rose);
   --color-auth-rose-deep: var(--auth-rose-deep);
-  --color-auth-magenta: var(--auth-magenta);
+  --color-auth-fin: var(--auth-fin);
   --color-auth-window: var(--auth-window);
   --color-auth-gold: var(--auth-gold);
   --color-auth-spark: var(--auth-spark);
