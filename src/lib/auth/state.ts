@@ -4,7 +4,7 @@ import { type FieldCode } from "./validation";
 /** What a form action hands back to `useActionState` (plain data only). */
 export type FormState = {
   /** Key under `auth.errors` in the message files. */
-  error?: AuthErrorKey | "inviteWrong" | "inviteNeeded";
+  error?: AuthErrorKey | "inviteWrong" | "inviteNeeded" | "google";
   /** Field name to key under `auth.fieldErrors`. */
   fields?: Partial<Record<string, FieldCode>>;
   /** The "check your email" state. */

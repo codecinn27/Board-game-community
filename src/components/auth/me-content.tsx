@@ -39,7 +39,7 @@ export async function MeContent() {
 
   const displayName = profile?.display_name ?? "";
   const disabled = profile?.status === "disabled";
-  // Google members have no password here; email members can change theirs.
+  // A Google only member has no password and no username sign in (spec 0015).
   const hasPassword =
     userData.user?.identities?.some(({ provider }) => provider === "email") ??
     false;
@@ -61,13 +61,17 @@ export async function MeContent() {
         <dd className="break-all">{viewer.email ?? ""}</dd>
       </dl>
 
-      <dl className="flex flex-col gap-1">
-        <dt className="text-sm text-muted-foreground">{t("username")}</dt>
-        <dd className="break-all">{username}</dd>
-        <dd className="text-sm text-muted-foreground">
-          {t("displayNameNote")}
-        </dd>
-      </dl>
+      {hasPassword ? (
+        <dl className="flex flex-col gap-1">
+          <dt className="text-sm text-muted-foreground">{t("username")}</dt>
+          <dd className="break-all">{username}</dd>
+          <dd className="text-sm text-muted-foreground">
+            {t("displayNameNote")}
+          </dd>
+        </dl>
+      ) : (
+        <p className="text-sm text-muted-foreground">{t("displayNameNote")}</p>
+      )}
 
       {disabled ? (
         <p className="text-lg font-semibold">{displayName}</p>

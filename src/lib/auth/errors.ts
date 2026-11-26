@@ -34,3 +34,16 @@ export function authErrorKey(error: AuthErrorLike): AuthErrorKey {
       return error.status === 429 ? "rateLimit" : "generic";
   }
 }
+
+/**
+ * The answer to a failed Google token exchange (spec 0015): a refused token is
+ * `google`, and anything we cannot blame on it stays `generic`.
+ */
+export function googleErrorKey(
+  error: AuthErrorLike,
+): "google" | "rateLimit" | "generic" {
+  if (error.status === 429) return "rateLimit";
+  return error.status === 400 || error.status === 401 || error.status === 403
+    ? "google"
+    : "generic";
+}

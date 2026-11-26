@@ -74,6 +74,14 @@ export function RegisterForm({ siteKey, next }: RegisterFormProps) {
         />
         <p className="px-2 text-center text-sm text-auth-ink-muted">
           {t.rich("register.privacy", {
+            terms: (chunks) => (
+              <Link
+                href="/terms"
+                className="font-medium text-auth-link underline underline-offset-4 focus-visible:ring-3 focus-visible:ring-auth-ring focus-visible:outline-none"
+              >
+                {chunks}
+              </Link>
+            ),
             link: (chunks) => (
               <Link
                 href="/privacy"

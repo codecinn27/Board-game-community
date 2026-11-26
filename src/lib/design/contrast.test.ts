@@ -118,6 +118,8 @@ describe("auth Dice Galaxy scene contrast (WCAG 2.2 AA)", () => {
       "--auth-gold",
       "--auth-haze",
       "--auth-glow",
+      "--auth-star",
+      "--auth-die",
       "--auth-spark",
       "--auth-flame",
     ]) {

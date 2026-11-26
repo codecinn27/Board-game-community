@@ -2,6 +2,12 @@
 
 One high level sentence per feature built each day, newest first. Written from the git history.
 
+## 2026-11-27
+
+- Sign in pages: swapped the violet night sky for the cream and terracotta "Cream Table" colors.
+- Google sign in: built the Google button behind the invite code; real Google checks still to do.
+- Terms of Service: a public `/terms` page in English and Chinese, linked from sign up and the privacy note, ready for Google sign in.
+
 ## 2026-11-26
 
 - Category groups: categories are in the edit card and the admin review list, and the docs are synced with the finished features.

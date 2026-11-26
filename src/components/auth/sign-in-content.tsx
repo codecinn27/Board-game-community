@@ -5,13 +5,14 @@ import { safeNext } from "@/lib/auth/safe-next";
 import { requireEnv } from "@/lib/supabase/env";
 import { AuthCard, AuthFooter } from "./auth-scene";
 import { Notice } from "./form-parts";
+import { GoogleButton } from "./google-button";
 import { InviteForm } from "./invite-form";
 import { RegisterForm } from "./register-form";
 import { SignInForm } from "./sign-in-form";
 
 type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
 
-const NOTICES = ["link"] as const;
+const NOTICES = ["link", "googleInvite"] as const;
 
 function first(value: string | string[] | undefined): string | undefined {
   return Array.isArray(value) ? value[0] : value;
@@ -45,6 +46,10 @@ export async function SignInContent({
   // to a browser that has not entered the code.
   const hasPass = register && (await hasInvitePass());
 
+  // No client ID turns Google sign in off. It never shows on the invite step.
+  const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+  const showGoogle = !register || hasPass;
+
   // The footer switch keeps the return page (AC-17).
   const query = (mode?: "register") => ({
     ...(mode ? { mode } : {}),
@@ -69,6 +74,14 @@ export async function SignInContent({
           ) : (
             <InviteForm siteKey={siteKey} next={next} />
           )}
+          {googleClientId && showGoogle ? (
+            // A new key per mode and return page, so nothing goes stale.
+            <GoogleButton
+              key={`${register}:${next}`}
+              clientId={googleClientId}
+              next={next}
+            />
+          ) : null}
         </div>
       </IntlClientProvider>
       {register ? (
