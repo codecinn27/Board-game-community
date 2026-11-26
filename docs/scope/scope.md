@@ -35,6 +35,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 18 | Wishlist (games to conquer) | Slice 7 | planned |
 | 19 | Admin tools | Slice 8 | planned |
 | 20 | SEO & share previews | Slice 9 | planned |
+| 25 | Move images to a bigger image host | Parked (waits for a trigger) | planned |
 
 Feature numbers are fixed IDs (specs and `docs/design.md` refer to them), so the table is in build order, not number order.
 
@@ -297,6 +298,17 @@ Admins fix wrong game data, merge duplicate games, remove bad comments, and mana
 Public pages are friendly to search engines and show a rich preview (cover, name) when shared in group chats or social media.
 **Done when:** each public page has its own title and description, a sitemap lists every game page, game pages carry structured data, and shared links show a cover preview, in both languages.
 - [ ] Design it (spec): `/architect SEO & share previews`
+
+## Parked: Bigger image storage
+
+Waits for a trigger below, so it does not take a slice yet. Agreed on 2026-11-27: today's storage is fine, so move only when the numbers say so.
+
+### 25. Move images to a bigger image host · needs a decision
+Move every image (game covers, up to 4 per game, and member photos) out of the Supabase `covers` bucket to an image host with more free room. The candidate is Cloudinary (free plan: 25 credits a month, shared across storage, bandwidth, and resizes, where 1 credit is 1 GB stored, 1 GB served, or 1,000 resizes; no paid overage, the account is limited when it runs out). Its real gain is a `next/image` loader that does the resizing, which takes that load off Vercel's image quota.
+**Start when** any one is true: the `covers` bucket passes about 70% of its 1 GB; Supabase egress passes about 70% of its free 5 GB in a month; Vercel's image optimization use passes about 70% of its free quota in a month; or a planned image feature would clearly push one of these over. Check the usage pages about once a month.
+**Why it can wait:** on 2026-11-27 the bucket held 13 covers, 492 KB (about 38 KB each, 150 KB cap, shrunk to WebP in the browser). The 1 to 2 year plan of 1,000 to 3,000 games with 4 images each is up to 12,000 images: about 0.46 GB at today's average, up to 1.8 GB if every image hit the cap. Visitors (100 to 500 a month) reach images through Vercel's image cache, so Supabase serves only cache misses. Until then, keep every image URL built in one place (like `coverUrl()` today), so the move stays small.
+**Done when:** every existing image is copied to the new host and shows on home, shelf, the game sheet, and member pages with no visual change; new uploads (add a game, review editing, member photo) go to the new host with the same size cap; the recycle bin and daily purge delete files there; `pnpm seed:games` uploads there; the old bucket is emptied only after the copy is checked; and the new host's secret stays server only.
+- [ ] Design it (spec): `/architect move images to a bigger image host`
 
 ## Deferred
 Out of scope for the current build pass, kept so the plan stays honest.
